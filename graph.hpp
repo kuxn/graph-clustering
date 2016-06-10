@@ -27,7 +27,7 @@
 
 
 #include <unordered_set>
-#include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -37,13 +37,13 @@ class Graph {
 
 	private:
 		int numOfVertex = 10;
-		map<int, setOfEdges> G;
+		unordered_map<int, setOfEdges> G;
 
 	public:
 		Graph() {}
 		Graph(int num): numOfVertex(num) {}
 		
-		map<int, setOfEdges>::iterator it;
+		unordered_map<int, setOfEdges>::iterator it;
 
 		void addEdge(int src, int dest);
 		void genRandomGraph(int num);

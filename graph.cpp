@@ -91,7 +91,7 @@ void Graph::genRandomGraph(int num) {
 
 	for (int indexOfVertex = 0; indexOfVertex < numOfVertex; indexOfVertex++) {
 		int sizeOfEdgeSet = randEdgeSet(rng);
-        cout << "sizeOfEdgeSet = " << sizeOfEdgeSet << endl;
+        //cout << "sizeOfEdgeSet = " << sizeOfEdgeSet << endl;
 		uniform_int_distribution<int> randEdge(0, sizeOfEdgeSet);
 		setOfEdges edges;
 		for (int indexOfEdge = 0; indexOfEdge < sizeOfEdgeSet; indexOfEdge++) {
