@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -std=c++11
+CXXFLAGS = -Wall -std=c++11 -O3
 
 OBJECTS = main.o graph.o
 TARGETS = main
@@ -7,13 +7,16 @@ TARGETS = main
 all: $(TARGETS)
 
 main: $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $(OBJECTS)
+	$(CC) $(CXXFLAGS) -o $@ $(OBJECTS)
 
 %.o:%.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CXXFLAGS) -c $<
 
 test: main
 	./main
+
+output: main
+	time ./main > graph.dot
 
 .PHONY: clean
 clean:
