@@ -1,6 +1,3 @@
-#ifndef GRAPH_HPP_
-#define GRAPH_HPP_
-
 /*
  * =====================================================================================
  *
@@ -25,6 +22,8 @@
  * =====================================================================================
  */
 
+#ifndef GRAPH_HPP_
+#define GRAPH_HPP_
 
 #include <unordered_set>
 #include <unordered_map>
@@ -36,19 +35,19 @@ typedef unordered_set<int> SetOfNeighbours;
 class Graph {
 
 	private:
-		int numOfVertex = 10;
+		int num_of_vertex = 10;
 		unordered_map<int, SetOfNeighbours> G;
 
 	public:
 		Graph() {}
-		Graph(int num): numOfVertex(num) {}
+		Graph(int num): num_of_vertex(num) {}
 		
-		unordered_map<int, SetOfNeighbours>::iterator it;
-
 		void addEdge(int src, int dest);
 		void genRandomGraph(int num);
-		void printDotFormat();
-		void printLaplacianMat();
+		void printDotFormat() const;
+		void printLaplacianMat() const;
+		const unsigned int size() const;
+		unordered_map<int, SetOfNeighbours>::const_iterator find(int vertex) const;
 };
 
 #endif

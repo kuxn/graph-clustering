@@ -1,7 +1,7 @@
 CC = g++
 CXXFLAGS = -Wall -std=c++11 -O3
 
-OBJECTS = main.o graph.o
+OBJECTS = main.o graph.o lanczos.o
 TARGETS = main
 
 all: $(TARGETS)
