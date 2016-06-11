@@ -20,18 +20,17 @@
 int main() {
 
 	Graph G;
-	G.genRandomGraph(10);	
-/*
+
 	G.addEdge(0,1);
-	G.addEdge(0,2);
-	G.addEdge(0,3);
 	G.addEdge(0,4);
-	G.addEdge(3,2);
 	G.addEdge(1,2);
-	G.addEdge(4,2);
-	G.addEdge(4,5);
-*/	
-	G.print();
+	G.addEdge(2,3);
+	G.addEdge(2,4);
+	G.addEdge(3,4);
+	
+	//G.printDotFormat();
+
+	G.printLaplacianMat();
 
 	return 0;
 }

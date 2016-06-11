@@ -8,9 +8,9 @@
  *
  *    Description:  Class Graph header file
  *
- * 		  Version:  1.0
+ * 		  Version:  1.1
  *		  Created:  06/09/2016 16:22:24
- *		 Revision:  none
+ *		 Revision:  Add printLaplacianMat
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
@@ -31,23 +31,24 @@
 
 using namespace std;
 
-typedef unordered_set<int> setOfEdges;
+typedef unordered_set<int> SetOfNeighbours;
 
 class Graph {
 
 	private:
 		int numOfVertex = 10;
-		unordered_map<int, setOfEdges> G;
+		unordered_map<int, SetOfNeighbours> G;
 
 	public:
 		Graph() {}
 		Graph(int num): numOfVertex(num) {}
 		
-		unordered_map<int, setOfEdges>::iterator it;
+		unordered_map<int, SetOfNeighbours>::iterator it;
 
 		void addEdge(int src, int dest);
 		void genRandomGraph(int num);
-		void print();
+		void printDotFormat();
+		void printLaplacianMat();
 };
 
 #endif
