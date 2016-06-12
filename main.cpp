@@ -14,7 +14,6 @@
  * =====================================================================================
  */
 
-#include <vector>
 #include <iostream>
 #include "graph.hpp"
 #include "lanczos.hpp"
@@ -31,6 +30,7 @@ int main() {
 	G.addEdge(2,3);
 	G.addEdge(2,4);
 	G.addEdge(3,4);
+	G.addEdge(3,5);
 	
 	//G.printDotFormat();
 
@@ -39,12 +39,13 @@ int main() {
 	// Lanczos test
 
 	vector<double> vec(G.size(), 0);
-	vec[0] = 1;
+	vec[2] = 1;
 
 	for (const int& x:vec)
 		cout << x << " ";
 
 	cout << endl;
+
 
 	vector<double> vec2 = multGraphVec(G, vec);
 
@@ -61,12 +62,14 @@ int main() {
 	int size = G.size();
 	
 	cout << "triangular matrix: " << endl;
+	cout << "sizeoftrimat: " << trimat.size() << endl;
 
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++)
 			cout << trimat[make_pair(i,j)] << "\t";
 		cout << endl;
 	}
+  
 	return 0;
 }
 
