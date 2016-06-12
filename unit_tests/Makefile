@@ -2,7 +2,7 @@
 all: t/wvtest
 
 # EDIT HERE: add any "../*.c" files that you need to test
-t/wvtest: wvtestmain.cc wvtest.cc t/wvtest.t.cc ../lanczos.cpp ../graph.cpp
+t/wvtest: wvtestmain.cc wvtest.cc t/wvtest.t.cc ../lanczos.cc ../graph.cc
 	g++ -D WVTEST_CONFIGURED -o $@ -I. $^
 
 runtests: all
