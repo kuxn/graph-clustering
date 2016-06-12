@@ -4,8 +4,8 @@
  *       Filename:  lanczos.cpp
  *
  *    Description:  Lanczos algorithm
- *
  *		  Created:  06/11/2016 15:33:49
+ *
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
  * =====================================================================================
@@ -14,7 +14,7 @@
 #include <iostream> 
 #include <utility> 
 #include <cmath> 
-#include "lanczos.hpp"
+#include "lanczos.h"
 
 using namespace std;
 

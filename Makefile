@@ -13,8 +13,8 @@ $(TARGET): $(OBJECTS)
 	$(CC) $(CXXFLAGS) -c $<
 
 # Explicit dependencies required for headers
-graph.o: 	graph.hpp
-lanczos.o: 	lanczos.hpp
+graph.o: 	graph.h
+lanczos.o: 	lanczos.h
 
 
 # Phony target to get around problem of having a file called 'clean'

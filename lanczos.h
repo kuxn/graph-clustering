@@ -1,21 +1,22 @@
 /*
  * =====================================================================================
  *
- *       Filename:  lanczos.hpp
+ *       Filename:  lanczos.h
  *
  *    Description:  Header file for lanczos algorithm
- *
  *		  Created:  06/11/2016 21:22:58
+ *
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
  * =====================================================================================
  */
-#ifndef LANCZOS_HPP_
-#define LANCZOS_HPP_
+
+#ifndef LANCZOS_H_
+#define LANCZOS_H_
 
 #include <vector>
 #include <map>
-#include "graph.hpp"
+#include "graph.h"
 
 using namespace std;
 

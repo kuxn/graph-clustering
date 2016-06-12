@@ -4,8 +4,8 @@
  *       Filename:  graph.cpp
  *
  *    Description:  Member functions for Class Graph.hpp
- *
- *		  Created:  06/09/2016 22:42:42
+ * 	  	  Created:  06/09/2016 22:42:42
+ * 
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
  * =====================================================================================
@@ -14,7 +14,7 @@
 #include <iostream>
 #include <random>
 
-#include "graph.hpp"
+#include "graph.h"
 
 using namespace std;
 

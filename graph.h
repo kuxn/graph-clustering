@@ -1,13 +1,10 @@
 /*
  * =====================================================================================
  *
- *       Filename:  graph.hpp
+ *       Filename:  graph.h
  *
  *    Description:  Class Graph header file
- *
- * 		  Version:  1.1
  *		  Created:  06/09/2016 16:22:24
- *		 Revision:  Add printLaplacianMat
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
@@ -22,8 +19,8 @@
  * =====================================================================================
  */
 
-#ifndef GRAPH_HPP_
-#define GRAPH_HPP_
+#ifndef GRAPH_H_
+#define GRAPH_H_
 
 #include <unordered_set>
 #include <unordered_map>
