@@ -34,12 +34,18 @@ int main() {
 
 	// Lanczos test
 	vector<double> vec(G.size(), 0);
+
+	//vec[0] = 0.7;
+	//vec[1] = -2.3;
+	//vec[2] = 15.6;
+	//vec[3] = 21.6;
+	//vec[4] = -7.2;
 /*
-	vec[0] = 0.7;
-	vec[1] = -2.3;
-	vec[2] = 15.6;
-	vec[3] = 21.6;
-	vec[4] = -7.2;
+	vec[0] = 0.5;
+	vec[1] = 0.5;
+	vec[2] = 0;
+	vec[3] = 0.5;
+	vec[4] = 0.5;
 */
 
 	vec[0] = 1;

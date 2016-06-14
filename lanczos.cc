@@ -12,6 +12,7 @@
  */
 
 #include <iostream> 
+#include <stdexcept> 
 #include <utility> 
 #include <cmath> 
 #include "lanczos.h"
@@ -80,7 +81,10 @@ map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0) {
 	int size = v0.size();
 	int iter = 0;
 	double alphaval = 0, betaval = 0;
-	
+	alpha.push_back(0);
+	beta.push_back(0);
+	beta.push_back(0);
+
 	vprime = multGraphVec(G, v0);
 	alphaval = dot(v0, vprime)/dot(v0, v0);
 	alpha.push_back(alphaval);
@@ -113,6 +117,9 @@ map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0) {
 		iter++;
 		cout << endl;
 	}
+	beta.erase(beta.end()-1); // Remove the last element
+	trimat.erase(make_pair(iter-1, iter));
+	trimat.erase(make_pair(iter, iter-1));
 	cout << "vector alpha: " << endl;
 	for (const double& x:alpha)
 		cout << x << " ";

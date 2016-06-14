@@ -14,6 +14,7 @@
 #include <iostream>
 #include "graph.h"
 #include "lanczos.h"
+#include "tqli.h"
 
 using namespace std;
 
