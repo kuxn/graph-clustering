@@ -35,6 +35,9 @@ unordered_map<int, SetOfNeighbours>::const_iterator Graph::find(int vertex) cons
 
 void Graph::addEdge(int src, int dest) {
 
+	// Avoid the self circle
+	if (src == dest) return;
+
 	// Add edge src->edge
 	auto it = G.find(src);
 	if (it != G.end())
@@ -117,12 +120,15 @@ void Graph::printLaplacianMat() const {
 
 void Graph::genRandomGraph(int numofvertex) {
 	random_device seed;	mt19937 rng (seed());
-	uniform_int_distribution<int> numofneigh(0, numofvertex - 1);
+	//uniform_int_distribution<int> numofneigh(0, numofvertex - 1);
+	//uniform_int_distribution<int> numofneigh(1, 3);
+	poisson_distribution<int> numofneigh(numofvertex/2);
 
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
 		int numofneighbour = numofneigh(rng);
-        //cout << "sizeofedgeset = " << sizeofedgeset << endl;
-		uniform_int_distribution<int> randneigh(0, numofneighbour);
+        cout << "numofneighbour = " << numofneighbour << endl;
+		//uniform_int_distribution<int> randneigh(0, numofvertex - 1);
+		poisson_distribution<int> randneigh(numofvertex/2);
 		unordered_set<int> neighbours;
 		for (int neighbour = 0; neighbour < numofneighbour; neighbour++) {
 			int randneighbour = randneigh(rng);
