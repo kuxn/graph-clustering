@@ -1,5 +1,5 @@
 CXX 		= g++
-CXXFLAGS 	= -Wall -std=c++11 -O3
+CXXFLAGS 	= -Wall -std=c++11 -O2
 
 OBJECTS 	= main.o graph.o lanczos.o tqli.o
 TESTOBJECTS = test.o graph.o lanczos.o tqli.o

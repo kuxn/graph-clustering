@@ -31,7 +31,7 @@ double pythag(double a, double b) {
 
 /* 
  * ===  FUNCTION  ======================================================================
- *         Name:  tqli
+ *         Name:  tqli (P480, Numerical Recipes)
  *  Description:  Calculate the eigenvalues and eigenvectors of a sysmetric triangular matrix
  * =====================================================================================
  */
@@ -49,7 +49,7 @@ double pythag(double a, double b) {
  *		z[1..n][1..n] the kth column of z returns the normalized eigenvector corresponding to d[k].
  *-----------------------------------------------------------------------------*/
  
-void tqli (vector<double>& d, vector<double>& e, int n) {
+void tqli (vector<double>& d, vector<double>& e, int n, map<pair<int,int>, double>& z) {
 
 	int m,l,iter,i,k;
 	double s,r,p,g,f,dd,c,b;
@@ -96,13 +96,17 @@ void tqli (vector<double>& d, vector<double>& e, int n) {
 					g = c * r - b;
 					// Next loop can be omitted if eigenvectors not wanted
 					// Form eigenvectors.
-					/*
+					
+					//for (k = 1; k <= n; k++) { 
+					//	f = z[k][i+1];
+					//	z[k][i+1] = s * z[k][i] + c * f;
+					//	z[k][i] = c * z[k][i] - s * f;
+					//}
 					for (k = 1; k <= n; k++) { 
-						f = z[k][i+1];
-						z[k][i+1] = s * z[k][i] + c * f;
-						z[k][i] = c * z[k][i] - s * f;
+						f = z[make_pair(k,i+1)];
+						z[make_pair(k,i+1)] = s * z[make_pair(k,i)] + c * f;
+						z[make_pair(k,i)] = c * z[make_pair(k,i)] - s * f;
 					}
-					*/
 				}
 				if (r == 0.0 && i >= l) continue;
 				d[l] -= p;

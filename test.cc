@@ -14,6 +14,7 @@
 #include <iostream>
 #include "graph.h"
 #include "lanczos.h"
+#include "tqli.h"
 
 using namespace std;
 
@@ -64,22 +65,116 @@ int main() {
 
 	double dotprod = dot(vec, vec2);
 	cout << "dotprod = " << dotprod << endl;
-	
 	cout << "norm fo vec2 = " << norm(vec2) << endl;  
 
-	map<pair<int,int>, double> trimat = constructTriMat(G, vec);
+	vector<double> alpha, beta;
+	map<pair<int,int>, double> trimat = constructTriMat(G, vec, alpha, beta);
+
+	cout << "vector alpha: " << endl;
+	for (const double& x:alpha)
+		cout << x << " ";
+	cout << endl;
+
+	cout << "vector beta: " << endl;
+	for (const double& x:beta)
+		cout << x << " ";
+	cout << endl;
 
 	int size = G.size();
 	
 	cout << "triangular matrix: " << endl;
 	cout << "sizeoftrimat: " << trimat.size() << endl;
-
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++)
 			cout << trimat[make_pair(i,j)] << "\t";
 		cout << endl;
 	}
   
+	// TQLI test
+
+	map<pair<int,int>, double> eigenvec;
+	for(int i = 1; i <= size; i++) {
+		eigenvec[make_pair(i,i)] = 1;
+	}
+
+	cout << "eigenvector matrix: " << endl;
+	cout << "sizeofeigenvec: " << eigenvec.size() << endl;
+	for (int i = 1; i <= size; i++) {
+		for (int j = 1; j <= size; j++)
+			cout << eigenvec[make_pair(i,j)] << "\t";
+		cout << endl;
+	}
+	cout << endl;
+/*
+	vector<double> diagonal, subdiagonal;
+	diagonal = {0, 2, 3, 4, 5};
+	subdiagonal = {0, 0, 1, 1, 1};
+
+	tqli(diagonal, subdiagonal, 4, eigenvec);
+
+	cout << "vector diagonal(eigenvalues): " << endl;
+	for (const double& x:diagonal)
+		cout << x << " ";
+	cout << endl;
+
+	cout << "vector subdiagonal(eigenvalues): " << endl;
+	for (const double& x:subdiagonal)
+		cout << x << " ";
+	cout << endl;
+
+	cout << "eigenvector matrix: " << endl;
+	cout << "sizeofeigenvec: " << eigenvec.size() << endl;
+	for (int i = 1; i <= size; i++) {
+		for (int j = 1; j <= size; j++)
+			cout << eigenvec[make_pair(i,j)] << "\t";
+		cout << endl;
+	}
+
+*/
+	
+	tqli(alpha, beta, size, eigenvec);
+
+	cout << "eigenvector matrix: " << endl;
+	cout << "sizeofeigenvec: " << eigenvec.size() << endl;
+	for (int i = 1; i <= size; i++) {
+		for (int j = 1; j <= size; j++)
+			cout << eigenvec[make_pair(i,j)] << "\t";
+		cout << endl;
+	}
+
+	cout << "vector alpha(eigenvalues): " << endl;
+	for (const double& x:alpha)
+		cout << x << " ";
+	cout << endl;
+
+	cout << "vector beta: " << endl;
+	for (const double& x:beta)
+		cout << x << " ";
+	cout << endl;
+
+	cout << "Matrix * Eigenvector test" << endl;
+	vector<double> firstcol;
+
+	for (int i = 1; i <= size; i++) {
+		for (int j = 1; j <= size; j++) {
+			if (j == 1)
+			firstcol.push_back(eigenvec[make_pair(i,j)]);
+		}
+	}
+
+	cout << "first col: " << endl;
+	for (const double& x:firstcol)
+		cout << x << " ";
+	cout << endl;
+
+	vector<double> result;
+	result = multGraphVec(G, firstcol);
+
+	cout << "orginal matrix * firstcol: " << endl;
+	for (const double& x:result)
+		cout << x << " ";
+	cout << endl;
+
 	return 0;
 }
 

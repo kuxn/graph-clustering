@@ -74,8 +74,8 @@ double norm(const vector<double>& vec) {
  * =====================================================================================
  */
 
-map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0) {
-	vector<double> alpha, beta, vprime, v1, v2;
+map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0, vector<double>& alpha, vector<double>& beta) {
+	vector<double> vprime, v1, v2;
 	v1 = v0; v2 = v0;
 	map<pair<int, int>, double> trimat;
 	int size = v0.size();
@@ -120,17 +120,5 @@ map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0) {
 	beta.erase(beta.end()-1); // Remove the last element
 	trimat.erase(make_pair(iter-1, iter));
 	trimat.erase(make_pair(iter, iter-1));
-	cout << "vector alpha: " << endl;
-	for (const double& x:alpha)
-		cout << x << " ";
-
-	cout << endl;
-
-	cout << "vector beta: " << endl;
-	for (const double& x:beta)
-		cout << x << " ";
-
-	cout << endl;
-
 	return trimat;
 }	
