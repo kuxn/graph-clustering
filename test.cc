@@ -92,7 +92,6 @@ int main() {
 	}
   
 	// TQLI test
-
 	map<pair<int,int>, double> eigenvec;
 	for(int i = 0; i < size; i++) {
 		eigenvec[make_pair(i,i)] = 1;
@@ -107,48 +106,24 @@ int main() {
 	}
 	cout << endl;
 
-	vector<double> diagonal, subdiagonal;
-	diagonal = {6, 8, 11, 13};
-	subdiagonal = {8, 2, 1, 0};
-
-	tqli(diagonal, subdiagonal, 4, eigenvec);
-
-	cout << "vector diagonal(eigenvalues): " << endl;
-	for (const double& x:diagonal)
-		cout << x << " ";
-	cout << endl;
-
-	cout << "vector subdiagonal(eigenvalues): " << endl;
-	for (const double& x:subdiagonal)
-		cout << x << " ";
-	cout << endl;
+	tqli(alpha, beta, size, eigenvec);
 
 	cout << "eigenvector matrix: " << endl;
 	cout << "sizeofeigenvec: " << eigenvec.size() << endl;
-	for (int i = 0; i < diagonal.size(); i++) {
-		for (int j = 0; j < diagonal.size(); j++)
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++)
 			cout << eigenvec[make_pair(i,j)] << "\t";
 		cout << endl;
 	}
-	
-	//tqli(alpha, beta, size, eigenvec);
 
-	//cout << "eigenvector matrix: " << endl;
-	//cout << "sizeofeigenvec: " << eigenvec.size() << endl;
-	//for (int i = 0; i < size; i++) {
-	//	for (int j = 0; j < size; j++)
-	//		cout << eigenvec[make_pair(i,j)] << "\t";
-	//	cout << endl;
-	//}
-
-	//cout << "vector alpha(eigenvalues): " << endl;
-	//for (const double& x:alpha)
-	//	cout << x << " ";
-	//cout << endl;
-	//cout << "vector beta: " << endl;
-	//for (const double& x:beta)
-	//	cout << x << " ";
-	//cout << endl;
+	cout << "vector alpha(eigenvalues): " << endl;
+	for (const double& x:alpha)
+		cout << x << " ";
+	cout << endl;
+	cout << "vector beta: " << endl;
+	for (const double& x:beta)
+		cout << x << " ";
+	cout << endl;
 
 /*  Lanczos and TQLI test
 	cout << "Matrix * Eigenvector test" << endl;
