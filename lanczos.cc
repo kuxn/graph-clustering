@@ -82,28 +82,8 @@ map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0, v
 	int iter = 0;
 	double alphaval = 0, betaval = 0;
 
-	vprime = multGraphVec(G, v0);
-	//alphaval = dot(v0, vprime)/dot(v0, v0);
-	alphaval = dot(v0, vprime);
-	alpha.push_back(alphaval);
-	trimat[make_pair(iter, iter)] = alphaval;
-	for (int index = 0; index < size; index++)
-		t[index] = vprime[index] - alphaval * v0[index];
-
-	betaval = norm(t); 
-	beta.push_back(betaval);	
-	trimat[make_pair(iter, iter+1)] = betaval;
-	trimat[make_pair(iter+1, iter)] = betaval;
-
-	for (int index = 0; index < size; index++)
-		v1[index] = t[index]/betaval;
-
-	cout << "v"<< iter <<"*v" << iter+1 << " = " << dot(v0, v1) << endl;
-	iter++;
-
-	while(iter < size) {
+	for (int iter = 0; iter < size; iter++) {
 		vprime = multGraphVec(G, v1);
-		//alphaval = dot(v1, vprime)/dot(v1, v1);
 		alphaval = dot(v1, vprime);
 		alpha.push_back(alphaval);
 		trimat[make_pair(iter, iter)] = alphaval;
@@ -121,7 +101,6 @@ map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0, v
 
 		v0 = v1; v1 = v2;
 		cout << "v"<< iter <<"*v" << iter+1 << " = " << dot(v0, v1) << endl;
-		iter++;
 		cout << endl;
 	}
 	beta.erase(beta.end()-1); // Remove the last element
