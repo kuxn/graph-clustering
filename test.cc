@@ -69,6 +69,7 @@ int main() {
 
 	vector<double> alpha, beta;
 	map<pair<int,int>, double> trimat = constructTriMat(G, vec, alpha, beta);
+	beta.push_back(0);
 
 	cout << "vector alpha: " << endl;
 	for (const double& x:alpha)
@@ -93,22 +94,22 @@ int main() {
 	// TQLI test
 
 	map<pair<int,int>, double> eigenvec;
-	for(int i = 1; i <= size; i++) {
+	for(int i = 0; i < size; i++) {
 		eigenvec[make_pair(i,i)] = 1;
 	}
 
 	cout << "eigenvector matrix: " << endl;
 	cout << "sizeofeigenvec: " << eigenvec.size() << endl;
-	for (int i = 1; i <= size; i++) {
-		for (int j = 1; j <= size; j++)
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++)
 			cout << eigenvec[make_pair(i,j)] << "\t";
 		cout << endl;
 	}
 	cout << endl;
-/*
+
 	vector<double> diagonal, subdiagonal;
-	diagonal = {0, 2, 3, 4, 5};
-	subdiagonal = {0, 0, 1, 1, 1};
+	diagonal = {6, 8, 11, 13};
+	subdiagonal = {8, 2, 1, 0};
 
 	tqli(diagonal, subdiagonal, 4, eigenvec);
 
@@ -124,40 +125,37 @@ int main() {
 
 	cout << "eigenvector matrix: " << endl;
 	cout << "sizeofeigenvec: " << eigenvec.size() << endl;
-	for (int i = 1; i <= size; i++) {
-		for (int j = 1; j <= size; j++)
+	for (int i = 0; i < diagonal.size(); i++) {
+		for (int j = 0; j < diagonal.size(); j++)
 			cout << eigenvec[make_pair(i,j)] << "\t";
 		cout << endl;
 	}
-
-*/
 	
-	tqli(alpha, beta, size, eigenvec);
+	//tqli(alpha, beta, size, eigenvec);
 
-	cout << "eigenvector matrix: " << endl;
-	cout << "sizeofeigenvec: " << eigenvec.size() << endl;
-	for (int i = 1; i <= size; i++) {
-		for (int j = 1; j <= size; j++)
-			cout << eigenvec[make_pair(i,j)] << "\t";
-		cout << endl;
-	}
+	//cout << "eigenvector matrix: " << endl;
+	//cout << "sizeofeigenvec: " << eigenvec.size() << endl;
+	//for (int i = 0; i < size; i++) {
+	//	for (int j = 0; j < size; j++)
+	//		cout << eigenvec[make_pair(i,j)] << "\t";
+	//	cout << endl;
+	//}
 
-	cout << "vector alpha(eigenvalues): " << endl;
-	for (const double& x:alpha)
-		cout << x << " ";
-	cout << endl;
+	//cout << "vector alpha(eigenvalues): " << endl;
+	//for (const double& x:alpha)
+	//	cout << x << " ";
+	//cout << endl;
+	//cout << "vector beta: " << endl;
+	//for (const double& x:beta)
+	//	cout << x << " ";
+	//cout << endl;
 
-	cout << "vector beta: " << endl;
-	for (const double& x:beta)
-		cout << x << " ";
-	cout << endl;
-
+/*  Lanczos and TQLI test
 	cout << "Matrix * Eigenvector test" << endl;
 	vector<double> firstcol;
-
-	for (int i = 1; i <= size; i++) {
-		for (int j = 1; j <= size; j++) {
-			if (j == 1)
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			if (j == 0)
 			firstcol.push_back(eigenvec[make_pair(i,j)]);
 		}
 	}
@@ -174,7 +172,7 @@ int main() {
 	for (const double& x:result)
 		cout << x << " ";
 	cout << endl;
-
+*/
 	return 0;
 }
 

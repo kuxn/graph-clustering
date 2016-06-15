@@ -38,15 +38,15 @@ double pythag(double a, double b) {
  
 /*-----------------------------------------------------------------------------
  *  Signiture of the funtion:
- 	input:
- *		d[1..n] contains the diagonal elements of the tridiagonal matrix
- * 		e[1..n] inputs the subdiagonal elements of the tridiagonal matrix, with e[1] arbitrary
- *		z[1..n][1..n] is input as the identity matrix.
+ * 	input:
+ *		d[0..n-1] contains the diagonal elements of the tridiagonal matrix
+ * 		e[0..n-1] inputs the subdiagonal elements of the tridiagonal matrix, with e[n-1] arbitrary
+ *		z[0..n-1][0..n-1] is input as the identity matrix.
  *
  *	output:
- *		d[1..n] returns the eigenvalues
- *		e[1..n] is destroyed
- *		z[1..n][1..n] the kth column of z returns the normalized eigenvector corresponding to d[k].
+ *		d[0..n-1] returns the eigenvalues
+ *		e[0..n-1] is destroyed
+ *		z[0..n-1][0..n-1] the kth column of z returns the normalized eigenvector corresponding to d[k].
  *-----------------------------------------------------------------------------*/
  
 void tqli (vector<double>& d, vector<double>& e, int n, map<pair<int,int>, double>& z) {
@@ -55,11 +55,15 @@ void tqli (vector<double>& d, vector<double>& e, int n, map<pair<int,int>, doubl
 	double s,r,p,g,f,dd,c,b;
 	
 	// Convenient to renumber the elements of e.
-	for (i = 2; i <= n; i++) 
-		e[i-1] = e[i]; 
-	e[n] = 0.0;
-	
-	for (l = 1; l <= n; l++) {
+	//for (i = 2; i <= n; i++) 
+	//	e[i-1] = e[i]; 
+	//e[n] = 0.0;
+	//
+	//for (i = 0; i <= n; i++)
+	//	cout << e[i] << " ";
+	//cout << endl;
+
+	for (l = 0; l < n; l++) {
 		iter = 0;
 		do {
 		// Look for a single small subdiagonal element to split the matrix.
@@ -102,7 +106,7 @@ void tqli (vector<double>& d, vector<double>& e, int n, map<pair<int,int>, doubl
 					//	z[k][i+1] = s * z[k][i] + c * f;
 					//	z[k][i] = c * z[k][i] - s * f;
 					//}
-					for (k = 1; k <= n; k++) { 
+					for (k = 0; k < n; k++) { 
 						f = z[make_pair(k,i+1)];
 						z[make_pair(k,i+1)] = s * z[make_pair(k,i)] + c * f;
 						z[make_pair(k,i)] = c * z[make_pair(k,i)] - s * f;
@@ -116,4 +120,3 @@ void tqli (vector<double>& d, vector<double>& e, int n, map<pair<int,int>, doubl
 		} while (m != l);
 	}
 }
-

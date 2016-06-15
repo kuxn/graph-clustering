@@ -81,9 +81,8 @@ map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0, v
 	int size = v0.size();
 	int iter = 0;
 	double alphaval = 0, betaval = 0;
-	alpha.push_back(0);
-	beta.push_back(0);
-	beta.push_back(0);
+	//alpha.push_back(0);
+	//beta.push_back(0);
 
 	vprime = multGraphVec(G, v0);
 	alphaval = dot(v0, vprime)/dot(v0, v0);
