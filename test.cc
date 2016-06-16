@@ -35,7 +35,7 @@ int main() {
 
 	// Lanczos test
 	vector<double> vec(G.size(), 0);
-
+	vec[0] = 1;
 	//vec[0] = 0.7;
 	//vec[1] = -2.3;
 	//vec[2] = 15.6;
@@ -48,13 +48,15 @@ int main() {
 	//vec[3] = 0.5;
 	//vec[4] = 0.5;
 
-	vec[0] = 1;
+	
 
 	// Normalise the initial vector
 	cout << "Norm of vec = " << norm(vec) << endl;
 	for (int i = 0; i < G.size(); i++)
-		vec[i] = vec[i]/norm(vec);
+		//vec[i] = vec[i]/norm(vec);
+		vec[i] = vec[i]*(1/norm(vec));
 
+	cout << "Norm of vec = " << norm(vec) << endl;
 	cout << "Input vector: " << endl;
 	for (const double& x:vec)
 		cout << x << " ";
@@ -72,7 +74,12 @@ int main() {
 	cout << "norm fo vec2 = " << norm(vec2) << endl;  
 
 	vector<double> alpha, beta;
-	map<pair<int,int>, double> trimat = constructTriMat(G, vec, alpha, beta);
+	int size = G.size();
+
+	
+	map<int, vector<double>> lanvector;
+
+	map<pair<int,int>, double> trimat = constructTriMat(G, vec, alpha, beta, lanvector);
 	beta.push_back(0);
 
 	cout << "vector alpha: " << endl;
@@ -85,7 +92,6 @@ int main() {
 		cout << x << " ";
 	cout << endl;
 
-	int size = G.size();
 	
 	cout << "triangular matrix: " << endl;
 	cout << "sizeoftrimat: " << trimat.size() << endl;
@@ -94,7 +100,7 @@ int main() {
 			cout << trimat[make_pair(i,j)] << "\t";
 		cout << endl;
 	}
-  
+    
 	// TQLI test
 	map<pair<int,int>, double> eigenvec;
 	for(int i = 0; i < size; i++) {
@@ -124,41 +130,70 @@ int main() {
 	for (const double& x:alpha)
 		cout << x << " ";
 	cout << endl;
-	cout << "vector beta: " << endl;
-	for (const double& x:beta)
-		cout << x << " ";
-	cout << endl;
 
+
+  	//Calculate the eigenvectors of Laplacian matrix
+
+	// The Lanczos vector
+
+	vector<double> v0(G.size(), 0);
+	v0[0] = 1;
+	cout << "lanczos vecs: " << endl;
+	for (int i = 0; i< size; i++) {
+		auto it = lanvector.find(i);
+		for (const double& x:it->second)
+			cout << x << " ";
+		cout << endl;
+	}
 /*
-  	//Lanczos and TQLI test
-	cout << "Matrix * Eigenvector test" << endl;
-	vector<double> firstcol;
+	vector<double> firsteigen(size, 0);
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			if (j == 0)
-			firstcol.push_back(eigenvec[make_pair(i,j)]);
+			if (j == 2)
+				firsteigen[i] = eigenvec[make_pair(i,j)];
+		}
+	}
+	cout << "first eigenvec: " << endl;
+	for (const double& x:firsteigen) {
+		cout << x <<  " ";	
+	}
+	cout << endl;
+
+	vector<double> firstOriginaleigen(size, 0);
+	for	(int i = 0; i < size; i++) {
+		for	(int j = 0; j < size; j++) {
+			firstOriginaleigen[i] += lanvector[j][i] * firsteigen[j];
 		}
 	}
 
-	cout << "first col: " << endl;
-	for (const double& x:firstcol)
-		cout << x << " ";
-	cout << endl;
-
-	vector<double> result;
-	result = multGraphVec(G, firstcol);
-
-	cout << "orginal matrix * firstcol: " << endl;
-	for (const double& x:result)
-		cout << x << " ";
-	cout << endl;
-
-	cout << "eigenvalue * firstcol: " << alpha[0] << " * firstcol" << endl;
-	for (const double& x:firstcol)
-		cout << x*alpha[0] << " ";
+	cout << "first Original eigenvec: " << endl;
+	for (const double& x:firstOriginaleigen) {
+		cout << x/firstOriginaleigen[size-1] <<  " ";	
+	}
 	cout << endl;
 */
+
+	// Lanczos vector * Trivectors
+	
+	map<pair<int,int>, double> lapacianvecs;
+	for (int k = 0; k < size; k++) {
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+			lapacianvecs[make_pair(k,i)] += lanvector[j][i] * eigenvec[make_pair(j,k)];
+			}
+		}	
+	}
+
+	cout << "lapacianvecs: " << endl;
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			cout << lapacianvecs[make_pair(i,j)]/lapacianvecs[make_pair(i,size-1)] << " ";
+		}
+		cout << endl;
+	}
+	
 	return 0;
+
 }
 
 

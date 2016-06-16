@@ -74,13 +74,14 @@ double norm(const vector<double>& vec) {
  * =====================================================================================
  */
 
-map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0, vector<double>& alpha, vector<double>& beta) {
+map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0, vector<double>& alpha, vector<double>& beta, map<int, vector<double>>& lanvector) {
 	vector<double> w, t, v1;
 	t = v0; v1 = v0;
 	map<pair<int, int>, double> trimat;
 	int size = v0.size();
 	int iter = 0;
 	double alphaval = 0, betaval = 0;
+	lanvector[0] = v0;
 
 	for (int iter = 1; iter < size; iter++) {
 		w = multGraphVec(G, v1);
@@ -102,6 +103,7 @@ map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0, v
 		for (int index = 0; index < size; index++)
 			v1[index] = t[index]/betaval;
 
+		lanvector[iter] = v1;
 		cout << "v"<< iter <<"*v" << iter+1 << " = " << dot(v0, v1) << endl;
 		cout << endl;
 	}
