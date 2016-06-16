@@ -48,7 +48,7 @@ int main() {
 	//vec[3] = 0.5;
 	//vec[4] = 0.5;
 
-	vec[1] = 1;
+	vec[0] = 1;
 
 	// Normalise the initial vector
 	cout << "Norm of vec = " << norm(vec) << endl;
@@ -129,6 +129,7 @@ int main() {
 		cout << x << " ";
 	cout << endl;
 
+/*
   	//Lanczos and TQLI test
 	cout << "Matrix * Eigenvector test" << endl;
 	vector<double> firstcol;
@@ -156,7 +157,7 @@ int main() {
 	for (const double& x:firstcol)
 		cout << x*alpha[0] << " ";
 	cout << endl;
-
+*/
 	return 0;
 }
 

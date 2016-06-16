@@ -85,6 +85,7 @@ map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0, v
 	for (int iter = 1; iter < size; iter++) {
 		w = multGraphVec(G, v1);
 		alphaval = dot(v1, w);
+		//cout << "dot(v1, v1) = " << dot(v1, v1) << endl;
 		alpha.push_back(alphaval);
 		trimat[make_pair(iter-1, iter-1)] = alphaval;
 
