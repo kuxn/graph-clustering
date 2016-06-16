@@ -60,7 +60,7 @@ double dot(const vector<double>& v1, const vector<double>& v2) {
 }
 
 double norm(const vector<double>& vec) {
-	int normret = 0;
+	double normret = 0;
 	for (const double& value:vec) {
 		normret += value * value;
 	}
@@ -75,36 +75,38 @@ double norm(const vector<double>& vec) {
  */
 
 map<pair<int,int>, double> constructTriMat(const Graph& G, vector<double>& v0, vector<double>& alpha, vector<double>& beta) {
-	vector<double> vprime, t, v1, v2;
-	t = v0; v1 = v0; v2 = v0;
+	vector<double> w, t, v1;
+	t = v0; v1 = v0;
 	map<pair<int, int>, double> trimat;
 	int size = v0.size();
 	int iter = 0;
 	double alphaval = 0, betaval = 0;
 
-	for (int iter = 0; iter < size; iter++) {
-		vprime = multGraphVec(G, v1);
-		alphaval = dot(v1, vprime);
+	for (int iter = 1; iter < size; iter++) {
+		w = multGraphVec(G, v1);
+		alphaval = dot(v1, w);
 		alpha.push_back(alphaval);
-		trimat[make_pair(iter, iter)] = alphaval;
+		trimat[make_pair(iter-1, iter-1)] = alphaval;
 
 		for (int index = 0; index < size; index++)
-			t[index] = vprime[index] - alphaval * v1[index] - betaval * v0[index];
+			t[index] = w[index] - alphaval * v1[index] - betaval * v0[index];
 
 		betaval = norm(t); 
 		beta.push_back(betaval);	
-		trimat[make_pair(iter, iter+1)] = betaval;
-		trimat[make_pair(iter+1, iter)] = betaval;
+		trimat[make_pair(iter-1, iter)] = betaval;
+		trimat[make_pair(iter, iter-1)] = betaval;
+
+		v0 = v1;
 
 		for (int index = 0; index < size; index++)
-			v2[index] = t[index]/betaval;
+			v1[index] = t[index]/betaval;
 
-		v0 = v1; v1 = v2;
 		cout << "v"<< iter <<"*v" << iter+1 << " = " << dot(v0, v1) << endl;
 		cout << endl;
 	}
-	beta.erase(beta.end()-1); // Remove the last element
-	trimat.erase(make_pair(iter-1, iter));
-	trimat.erase(make_pair(iter, iter-1));
+	w = multGraphVec(G, v1);
+	alphaval = dot(v1, w);
+	alpha.push_back(alphaval);
+	trimat[make_pair(size-1, size-1)] = alphaval;
 	return trimat;
 }	

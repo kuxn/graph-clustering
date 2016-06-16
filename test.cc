@@ -41,15 +41,19 @@ int main() {
 	//vec[2] = 15.6;
 	//vec[3] = 21.6;
 	//vec[4] = -7.2;
-/*
-	vec[0] = 0.5;
-	vec[1] = 0.5;
-	vec[2] = 0;
-	vec[3] = 0.5;
-	vec[4] = 0.5;
-*/
 
-	vec[0] = 1;
+	//vec[0] = 0.5;
+	//vec[1] = 0.5;
+	//vec[2] = 0;
+	//vec[3] = 0.5;
+	//vec[4] = 0.5;
+
+	vec[1] = 1;
+
+	// Normalise the initial vector
+	cout << "Norm of vec = " << norm(vec) << endl;
+	for (int i = 0; i < G.size(); i++)
+		vec[i] = vec[i]/norm(vec);
 
 	cout << "Input vector: " << endl;
 	for (const double& x:vec)
@@ -97,14 +101,14 @@ int main() {
 		eigenvec[make_pair(i,i)] = 1;
 	}
 
-	cout << "eigenvector matrix: " << endl;
-	cout << "sizeofeigenvec: " << eigenvec.size() << endl;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++)
-			cout << eigenvec[make_pair(i,j)] << "\t";
-		cout << endl;
-	}
-	cout << endl;
+	//cout << "eigenvector matrix: " << endl;
+	//cout << "sizeofeigenvec: " << eigenvec.size() << endl;
+	//for (int i = 0; i < size; i++) {
+	//	for (int j = 0; j < size; j++)
+	//		cout << eigenvec[make_pair(i,j)] << "\t";
+	//	cout << endl;
+	//}
+	//cout << endl;
 
 	tqli(alpha, beta, size, eigenvec);
 
