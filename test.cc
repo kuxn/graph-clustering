@@ -48,11 +48,9 @@ int main() {
 	//vec[3] = 0.5;
 	//vec[4] = 0.5;
 
-	
-
 	// Normalise the initial vector
 	cout << "Norm of vec = " << norm(vec) << endl;
-	for (int i = 0; i < G.size(); i++)
+	for (unsigned int i = 0; i < G.size(); i++)
 		//vec[i] = vec[i]/norm(vec);
 		vec[i] = vec[i]*(1/norm(vec));
 
@@ -77,9 +75,9 @@ int main() {
 	int size = G.size();
 
 	
-	map<int, vector<double>> lanvector;
+	map<int, vector<double>> lanczos_vecs;
 
-	map<pair<int,int>, double> trimat = constructTriMat(G, vec, alpha, beta, lanvector);
+	map<pair<int,int>, double> trimat = constructTriMat(G, vec, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
 
 	cout << "vector alpha: " << endl;
@@ -102,27 +100,27 @@ int main() {
 	}
     
 	// TQLI test
-	map<pair<int,int>, double> eigenvec;
+	map<pair<int,int>, double> tri_eigen_vecs;
 	for(int i = 0; i < size; i++) {
-		eigenvec[make_pair(i,i)] = 1;
+		tri_eigen_vecs[make_pair(i,i)] = 1;
 	}
 
 	//cout << "eigenvector matrix: " << endl;
-	//cout << "sizeofeigenvec: " << eigenvec.size() << endl;
+	//cout << "sizeofeigenvec: " << tri_eigen_vecs.size() << endl;
 	//for (int i = 0; i < size; i++) {
 	//	for (int j = 0; j < size; j++)
-	//		cout << eigenvec[make_pair(i,j)] << "\t";
+	//		cout << tri_eigen_vecs[make_pair(i,j)] << "\t";
 	//	cout << endl;
 	//}
 	//cout << endl;
 
-	tqli(alpha, beta, size, eigenvec);
+	tqli(alpha, beta, size, tri_eigen_vecs);
 
 	cout << "eigenvector matrix: " << endl;
-	cout << "sizeofeigenvec: " << eigenvec.size() << endl;
+	cout << "sizeofeigenvec: " << tri_eigen_vecs.size() << endl;
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++)
-			cout << eigenvec[make_pair(i,j)] << "\t";
+			cout << tri_eigen_vecs[make_pair(i,j)] << "\t";
 		cout << endl;
 	}
 
@@ -140,60 +138,66 @@ int main() {
 	v0[0] = 1;
 	cout << "lanczos vecs: " << endl;
 	for (int i = 0; i< size; i++) {
-		auto it = lanvector.find(i);
+		auto it = lanczos_vecs.find(i);
 		for (const double& x:it->second)
 			cout << x << " ";
 		cout << endl;
 	}
+
+
+	/*-----------------------------------------------------------------------------
+	 *  Calculate the second eigenvector of the original matrix
+	 *-----------------------------------------------------------------------------*/
+
 /*
-	vector<double> firsteigen(size, 0);
+	vector<double> tri_second_vec(size, 0);
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			if (j == 2)
-				firsteigen[i] = eigenvec[make_pair(i,j)];
+			if (j == 1)
+				tri_second_vec[i] = tri_eigen_vecs[make_pair(i,j)];
 		}
 	}
 	cout << "first eigenvec: " << endl;
-	for (const double& x:firsteigen) {
+	for (const double& x:tri_second_vec) {
 		cout << x <<  " ";	
 	}
 	cout << endl;
 
-	vector<double> firstOriginaleigen(size, 0);
+	vector<double> original_second_vec(size, 0);
 	for	(int i = 0; i < size; i++) {
 		for	(int j = 0; j < size; j++) {
-			firstOriginaleigen[i] += lanvector[j][i] * firsteigen[j];
+			original_second_vec[i] += lanczos_vecs[j][i] * tri_second_vec[j];
 		}
 	}
 
-	cout << "first Original eigenvec: " << endl;
-	for (const double& x:firstOriginaleigen) {
-		cout << x/firstOriginaleigen[size-1] <<  " ";	
+	cout << "Second original eigenvec: " << endl;
+	for (const double& x:original_second_vec) {
+		cout << x/original_second_vec[size-1] <<  " ";	
 	}
 	cout << endl;
 */
 
+	/*-----------------------------------------------------------------------------
+	 *  Calculate all the eigenvectors of the original matrix
+	 *-----------------------------------------------------------------------------*/
+
 	// Lanczos vector * Trivectors
-	
-	map<pair<int,int>, double> lapacianvecs;
+	map<pair<int,int>, double> lapacian_vecs;
 	for (int k = 0; k < size; k++) {
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
-			lapacianvecs[make_pair(k,i)] += lanvector[j][i] * eigenvec[make_pair(j,k)];
+			lapacian_vecs[make_pair(k,i)] += lanczos_vecs[j][i] * tri_eigen_vecs[make_pair(j,k)];
 			}
 		}	
 	}
 
-	cout << "lapacianvecs: " << endl;
+	cout << "lapacian_vecs: " << endl;
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			cout << lapacianvecs[make_pair(i,j)]/lapacianvecs[make_pair(i,size-1)] << " ";
+			cout << lapacian_vecs[make_pair(i,j)]/lapacian_vecs[make_pair(i,size-1)] << " ";
 		}
 		cout << endl;
 	}
 	
 	return 0;
-
 }
-
-

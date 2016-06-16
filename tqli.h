@@ -21,11 +21,9 @@
 
 #define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a)) // Magnitude of a times sign of b
 
-static double sqrarg;
-#define SQR(a) ((sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg) // Square a double value
-
 using namespace std;
 
+double SQR(double a); 
 double pythag(double a, double b);
 void tqli (vector<double>& d, vector<double>& e, int n, map<pair<int, int>, double>& z);
 

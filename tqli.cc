@@ -21,6 +21,13 @@
  * =====================================================================================
  */
 
+// Square a double value
+static double sqrarg;
+double SQR(double a) {
+	return (sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg;
+}
+
+
 double pythag(double a, double b) {
 	double absa,absb;
 	absa=fabs(a);
