@@ -1,7 +1,7 @@
 CXX 		= g++
 CXXFLAGS 	= -Wall -std=c++11 -O3
 
-OBJECTS 	= main.o graph.o lanczos.o tqli.o
+OBJECTS 	= main.o graph.o lanczos.o tqli.o partition.o
 TESTOBJECTS = test.o graph.o lanczos.o tqli.o
 TARGET 		= main
 TESTTARGET 	= test
@@ -16,8 +16,10 @@ $(TARGET): $(OBJECTS)
 
 # Explicit dependencies required for headers
 graph.o: 	graph.h
-lanczos.o: 	lanczos.h
+lanczos.o: 	graph.h lanczos.h
 tqli.o:		tqli.h
+patition.o:	graph.h	lanczos.h tqli.h partition.h
+main.o:		graph.h partition.h
 
 # Phony target to get around problem of having a file called 'clean'
 .PHONY: clean

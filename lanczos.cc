@@ -119,6 +119,7 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, v
 			v1[index] = t[index]/beta_val;
 
 		lanczos_vecs[iter] = v1;
+        // Verify the dot product of v0 and v1 which is supposed to be 0
 		cout << "v"<< iter <<"*v" << iter+1 << " = " << dot(v0, v1) << endl;
 		cout << endl;
 	}
