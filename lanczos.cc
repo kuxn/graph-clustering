@@ -120,8 +120,12 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, v
 
 		lanczos_vecs[iter] = v1;
         // Verify the dot product of v0 and v1 which is supposed to be 0
-		cout << "v"<< iter <<"*v" << iter+1 << " = " << dot(v0, v1) << endl;
+        double dot_product = dot(v0, v1);
+#ifdef Debug		
+		cout << "v"<< iter <<"*v" << iter+1 << " = " << dot_product << endl;
 		cout << endl;
+#endif
+        if (abs(dot_product) > 1e-5) throw std::runtime_error("Need reorthogonalise");
 	}
 	w = multGraphVec(g, v1);
 	alpha_val = dot(v1, w);

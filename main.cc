@@ -44,16 +44,16 @@ int main() {
 	g.addEdge(5,6);
 	g.addEdge(4,7);
 */
-	g.genRandomGraph(5);
+	g.genRandomGraph(20);
 	//g.printDotFormat();
-    g.printLaplacianMat();
+    //g.printLaplacianMat();
   
 	map<pair<int,int>, double> laplacian_vectors = getEigenMatrix(g);
 	//map<pair<int,int>, double> laplacian_vectorsa = getEigenMatrix(g);
     vector<double> second_eigen_vector = getEigenVec(g);
     //vector<double> second_eigen_vectora = getEigenVec(g);
 	
-    //partition(g);
+    partition(g);
 
 
 

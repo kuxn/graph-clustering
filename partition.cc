@@ -44,7 +44,7 @@ vector<double> getEigenVec(const Graph& g) {
 	// Construct tridiagonal matrix using Lanczos algorithm
     map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
-
+#ifdef Debug
 	cout << endl;
 	cout << "triangular matrix: " << endl;
 	for (int i = 0; i < size; i++) {
@@ -52,6 +52,7 @@ vector<double> getEigenVec(const Graph& g) {
 			cout << trimat[make_pair(i,j)] << "\t";
 		cout << endl;
 	}
+#endif
 
 	// Define an identity matrix as the input for TQLI algorithm
 	map<pair<int,int>, double> tri_eigen_vecs;
@@ -72,7 +73,10 @@ vector<double> getEigenVec(const Graph& g) {
 	sort(auxiliary_vec.begin(), auxiliary_vec.end());
 	auto it = hashmap.find(auxiliary_vec[1]);
 	index_of_second_vec = it->second;
+	
+#ifdef Debug
 	cout << "index_of_second_vec = " << index_of_second_vec << endl;
+#endif
 
 	// Calculate the second eigenvector of original Laplacian matrix using 
 	// the second eigenvector of the tridiagonal matrix computed by TQLI 
@@ -96,11 +100,13 @@ vector<double> getEigenVec(const Graph& g) {
 		}
 	}
 
+#ifdef Debug
 	cout << "Second eigen vector: " << endl;
 	for (const double& x:second_eigen_vec) {
 		cout << x <<  " ";	
 	}
 	cout << endl;
+#endif
 
 	return second_eigen_vec;
 } 
@@ -128,8 +134,8 @@ map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
     map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
 
+#ifdef Debug
 	cout << endl;
-
 	cout << "vector alpha: " << endl;
 	for (const double& x:alpha)
 		cout << x << " ";
@@ -146,6 +152,7 @@ map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
 			cout << trimat[make_pair(i,j)] << "\t";
 		cout << endl;
 	}
+#endif
 
 	// Define an identity matrix as the input for TQLI algorithm
 	map<pair<int,int>, double> tri_eigen_vecs;
@@ -166,7 +173,7 @@ map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
 			}
 		}	
 	}
-
+#ifdef Debug
 	// Print all the eigenvalues of the tridiagonal/laplacian matrix
 	cout << "laplacian eigenvalues: " << endl;
 	for (const double & x:alpha) {
@@ -183,6 +190,7 @@ map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
 		}
 		cout << endl;
 	}
+#endif
 
 	return laplacian_vecs;
 }
@@ -208,16 +216,6 @@ void partition(const Graph& g) {
 	cout << "}" << endl;
 
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
