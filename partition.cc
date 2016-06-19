@@ -165,11 +165,11 @@ map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
 
 	// Calculate all the eigenvectors of original Laplacian matrix using 
 	// the eigenvectors of the tridiagonal matrix computed by TQLI 
-	map<pair<int,int>, double> laplacian_vecs;
+	map<pair<int,int>, double> laplacian_eigen_vecs;
 	for (int k = 0; k < size; k++) {
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
-			laplacian_vecs[make_pair(k,i)] += lanczos_vecs[j][i] * tri_eigen_vecs[make_pair(j,k)];
+			laplacian_eigen_vecs[make_pair(k,i)] += lanczos_vecs[j][i] * tri_eigen_vecs[make_pair(j,k)];
 			}
 		}	
 	}
@@ -182,17 +182,17 @@ map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
 	cout << endl;
 
 	// Print all the eigenvectors in row
-	cout << "laplacian_vecs: " << endl;
+	cout << "laplacian_eigen_vecs: " << endl;
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			//cout << laplacian_vecs[make_pair(i,j)]/laplacian_vecs[make_pair(i,size-1)] << " ";
-			cout << laplacian_vecs[make_pair(i,j)] << " ";
+			//cout << laplacian_eigen_vecs[make_pair(i,j)]/laplacian_eigen_vecs[make_pair(i,size-1)] << " ";
+			cout << laplacian_eigen_vecs[make_pair(i,j)] << " ";
 		}
 		cout << endl;
 	}
 #endif
 
-	return laplacian_vecs;
+	return laplacian_eigen_vecs;
 }
 
 void partition(const Graph& g) {
