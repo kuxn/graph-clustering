@@ -132,7 +132,7 @@ vector<double> getEigenVec(const Graph& g) {
  * =====================================================================================
  */
 
-unordered_map<int, vector<double>> getEigenMatrix(const Graph& g) {
+unordered_map<int, vector<double>> getEigenMatrix(const Graph& g, vector<double>& eigenvalues) {
 
 	int size = g.size();
 
@@ -194,6 +194,7 @@ unordered_map<int, vector<double>> getEigenMatrix(const Graph& g) {
 
 	// Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
 	tqli(alpha, beta, size, tri_eigen_vecs);
+	eigenvalues = alpha;
 
 	// Calculate all the eigenvectors of original Laplacian matrix using 
 	// the eigenvectors of the tridiagonal matrix computed by TQLI 
@@ -204,7 +205,7 @@ unordered_map<int, vector<double>> getEigenMatrix(const Graph& g) {
 			}
 		}	
 	}
-//#ifdef Debug
+#ifdef Debug
 	// Print all the eigenvalues of the tridiagonal/laplacian matrix
 	cout << "laplacian eigenvalues: " << endl;
 	for (const double & x:alpha) {
@@ -220,10 +221,17 @@ unordered_map<int, vector<double>> getEigenMatrix(const Graph& g) {
 		}
 		cout << endl;
 	}
-//#endif
+#endif
 	return laplacian_eigen_vecs;
 }
 
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  partition
+ *  Description:  Partition the graph into two subgraphs according to the second eigenvector
+ * =====================================================================================
+ */
 void partition(const Graph& g) {
 
     int numofvertex = g.size();
@@ -243,4 +251,65 @@ void partition(const Graph& g) {
 			cout << vertex << "--" << neighbour << " ;" << endl;
 	}
 	cout << "}" << endl;
+}
+
+/*-----------------------------------------------------------------------------
+ *  Modified partition function to for multiple partitioning
+ *-----------------------------------------------------------------------------*/
+
+void multiPartition(const Graph& g) {
+	int size = g.size();
+
+	vector<double> eigenvalues;
+	unordered_map<int, vector<double>> laplacian_eigen_vecs = getEigenMatrix(g, eigenvalues);
+
+	// Print all the eigenvalues of the tridiagonal/laplacian matrix
+	cout << "laplacian eigenvalues: " << endl;
+	for (const double & x:eigenvalues) {
+		cout << x << " ";
+	}
+	cout << endl;
+
+	// Print all the eigenvectors in row
+	cout << "laplacian_eigen_vecs: " << endl;
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			cout << laplacian_eigen_vecs[i][j] << " ";
+		}
+		cout << endl;
+	}
+
+	// eigenvalues_index_sort stores the original index of the sorted eigenvalues 
+	vector<int> eigenvalues_index_sort;
+	unordered_multimap<double, int> hashmap;
+	for (int i = 0; i < size; i++)
+		hashmap.insert({eigenvalues[i], i});
+
+	vector<double> auxiliary_vec = eigenvalues;
+	sort(auxiliary_vec.begin(), auxiliary_vec.end());
+	for (int i = 0; i < size; i++) {
+		auto it = hashmap.find(auxiliary_vec[i]);
+		eigenvalues_index_sort.push_back(it->second);
+	}
+
+	cout << endl;
+
+	cout << "Original index of eigenvalues in sorted order: "; 
+	for (const int& x:eigenvalues_index_sort)
+		cout <<	x << " "; 
+	cout << endl;
+
+	cout << "eigenvalues in sorted order: " << endl; 
+	for (const int& x:eigenvalues_index_sort)
+		cout <<	eigenvalues[x] << " "; 
+	cout << endl;
+
+	cout << "Laplacian eigenvectors in sorted order: " << endl;
+	for (const int& row:eigenvalues_index_sort) {
+		for (int col = 0; col < size; col++) {
+			cout << laplacian_eigen_vecs[row][col] << " ";
+		}
+		cout << endl;
+	}
+
 }

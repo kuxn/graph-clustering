@@ -20,5 +20,6 @@
 vector<double> getEigenVec(const Graph& g);
 unordered_map<int, vector<double>> getEigenMatrix(const Graph& g);
 void partition(const Graph& g);
+void multiPartition(const Graph& g);
 
 #endif

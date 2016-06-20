@@ -45,16 +45,11 @@ int main() {
 	g.addEdge(4,6);
 	g.addEdge(4,7);
 */
-	g.genRandomGraph(5);
+	g.genRandomGraph(6);
 	//g.printDotFormat();
     g.printLaplacianMat();
   
-	//map<pair<int,int>, double> laplacian_vectors = getEigenMatrix(g);
-	//unordered_map<int, vector<double>> laplacian_vectors = getEigenMatrix(g);
-    //vector<double> second_eigen_vector = getEigenVec(g);
-    //vector<double> second_eigen_vectora = getEigenVec(g);
-	
-    partition(g);
+    multiPartition(g);
 
 	return 0;
 }
