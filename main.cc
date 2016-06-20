@@ -54,7 +54,7 @@ int main() {
     //vector<double> second_eigen_vector = getEigenVec(g);
     //vector<double> second_eigen_vectora = getEigenVec(g);
 	
-    //partition(g);
+    partition(g);
 
 	return 0;
 }

@@ -12,6 +12,7 @@
  */
 
 #include <iostream>
+#include <stdexcept>
 #include <random>
 
 #include "graph.h"
@@ -131,9 +132,12 @@ void Graph::genRandomGraph(int numofvertex) {
 		//poisson_distribution<int> randneigh(numofvertex/2);
 		unordered_set<int> neighbours;
 		for (int neighbour = 0; neighbour < numofneighbour; neighbour++) {
-			int randneighbour = randneigh(rng);
-			if (randneighbour != vertex)
-			    addEdge(vertex, randneighbour);
+			int randneighbour;
+			do {
+				randneighbour = randneigh(rng);
+			} while (vertex == randneighbour);
+			addEdge(vertex, randneighbour);
 		}
 	}
+	if (G.size() != (unsigned)numofvertex) throw std::length_error ("The size of generated graph is incorrect.");
 }

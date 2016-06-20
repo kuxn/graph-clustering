@@ -12,7 +12,7 @@
  */
 
 #include <iostream> 
-#include <stdexcept> 
+#include <stdexcept>
 #include <utility> 
 #include <cmath> 
 #include "lanczos.h"
