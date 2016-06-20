@@ -137,32 +137,3 @@ void Graph::genRandomGraph(int numofvertex) {
 		}
 	}
 }
-
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  genRandomGraph
- *  Description:  Generate random graph by generate random set for each vertex
- * =====================================================================================
- */
-
-/*
-void genRandomGraph(int numofvertex) {
-	random_device seed;	mt19937 rng (seed());
-	//cout << "numofvertex = " << numofvertex << endl;
-	for (int vertex = 0; vertex < numofvertex; vertex++) {
-		int sizeofedgeset = rand() % numofvertex;
-		//cout << "sizeofedgeset = " << sizeofedgeset << endl;
-		uniform_int_distribution<int> randedge(0, sizeofedgeset);
-		unordered_map<int> edges;
-		for (int edge = 0; edge < sizeofedgeset; edge++) {
-			int randedgeindex = randedge(rng);
-			//cout << "randedgeindex = " << randedgeindex << endl;
-			if (randedgeindex != vertex)
-			edges.insert(randedgeindex);	
-		}
-		//cout << "vertex = " << vertex << endl;
-		G[vertex] = edges;
-	}
-}
-*/
-

@@ -33,17 +33,26 @@ vector<double> getEigenVec(const Graph& g) {
 	int size = g.size();
 
 	// Define the input arguments for Lanczos to construct tridiagonal matrix
-	//vector<double> alpha(size), beta(size);
 	vector<double> alpha, beta;
 	
 	vector<double> v_initial(size, 0);
-	v_initial[0] = 1;
+	for (int i = 0; i < size; i++) {
+		v_initial[i] = drand48();
+	}
+	double normalise = norm(v_initial);
+	for (int i = 0; i < size; i++) {
+		//cout << "v_initial["<<i<<"] = " << v_initial[i] << endl;	
+		v_initial[i] /= normalise;
+	}
+
+	//cout << "norm(v_initial) = " << norm(v_initial) << endl;
 
 	map<int, vector<double>> lanczos_vecs;
 
 	// Construct tridiagonal matrix using Lanczos algorithm
     map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
+
 #ifdef Debug
 	cout << endl;
 	cout << "triangular matrix: " << endl;
@@ -191,7 +200,6 @@ map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
 		cout << endl;
 	}
 #endif
-
 	return laplacian_eigen_vecs;
 }
 
@@ -216,6 +224,4 @@ void partition(const Graph& g) {
 	cout << "}" << endl;
 
 }
-
-
 
