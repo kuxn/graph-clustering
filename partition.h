@@ -18,7 +18,7 @@
 #include "graph.h"
 
 vector<double> getEigenVec(const Graph& g);
-map<pair<int,int>, double> getEigenMatrix(const Graph& g);
+unordered_map<int, vector<double>> getEigenMatrix(const Graph& g);
 void partition(const Graph& g);
 
 #endif

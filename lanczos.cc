@@ -138,7 +138,7 @@ double norm(const vector<double>& vec) {
  *  Modified Lanczos algorithm with reorthogonalisation by Gram–Schmidt
  *-----------------------------------------------------------------------------*/
 
-map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, vector<double>& alpha, vector<double>& beta, map<int, vector<double>>& lanczos_vecs) {
+map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, vector<double>& alpha, vector<double>& beta, unordered_map<int, vector<double>>& lanczos_vecs) {
 	vector<double> w, t, v1;
 	t = v0; v1 = v0;
 	map<pair<int, int>, double> trimat;

@@ -13,7 +13,6 @@
 
 #include <iostream>
 #include <algorithm>
-#include <unordered_map>
 #include "graph.h"
 #include "lanczos.h"
 #include "tqli.h"
@@ -30,7 +29,7 @@ using namespace std;
 
 vector<double> getEigenVec(const Graph& g) {
 
-	int size = g.size();
+  int size = g.size();
 
 	// Define the input arguments for Lanczos to construct tridiagonal matrix
 	vector<double> alpha, beta;
@@ -47,7 +46,7 @@ vector<double> getEigenVec(const Graph& g) {
 
 	//cout << "norm(v_initial) = " << norm(v_initial) << endl;
 
-	map<int, vector<double>> lanczos_vecs;
+	unordered_map<int, vector<double>> lanczos_vecs;
 
 	// Construct tridiagonal matrix using Lanczos algorithm
     map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
@@ -64,9 +63,14 @@ vector<double> getEigenVec(const Graph& g) {
 #endif
 
 	// Define an identity matrix as the input for TQLI algorithm
-	map<pair<int,int>, double> tri_eigen_vecs;
+	unordered_map<int, vector<double>> tri_eigen_vecs;
+	vector<double> vinitial(size,0);
 	for(int i = 0; i < size; i++) {
-		tri_eigen_vecs[make_pair(i,i)] = 1;
+		tri_eigen_vecs[i] = vinitial;
+	}
+
+	for(int i = 0; i < size; i++) {
+		tri_eigen_vecs[i][i] = 1;
 	}
 
 	// Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
@@ -93,7 +97,7 @@ vector<double> getEigenVec(const Graph& g) {
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
 			if (j == index_of_second_vec)
-				tri_second_vec[i] = tri_eigen_vecs[make_pair(i,j)];
+				tri_second_vec[i] = tri_eigen_vecs[i][j];
 		}
 	}
 	//cout << "Second tri eigenvec: " << endl;
@@ -102,7 +106,7 @@ vector<double> getEigenVec(const Graph& g) {
 	//}
 	//cout << endl;
 
-	vector<double> second_eigen_vec(size, 0);
+  vector<double> second_eigen_vec(size, 0);
 	for	(int i = 0; i < size; i++) {
 		for	(int j = 0; j < size; j++) {
 			second_eigen_vec[i] += lanczos_vecs[j][i] * tri_second_vec[j];
@@ -124,20 +128,27 @@ vector<double> getEigenVec(const Graph& g) {
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  getEigenMatrix
- *  Description:  Get all the eigenvectors of the original matrix
+ *  Description:  Get all the eigenvectors of the original matrix.
  * =====================================================================================
  */
 
-map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
+unordered_map<int, vector<double>> getEigenMatrix(const Graph& g) {
 
 	int size = g.size();
 
 	// Define the input arguments for Lanczos to construct tridiagonal matrix
 	vector<double> alpha, beta;
 	vector<double> v_initial(size, 0);
-	v_initial[0] = 1;
+	for (int i = 0; i < size; i++) {
+		v_initial[i] = drand48();
+	}
+	double normalise = norm(v_initial);
+	for (int i = 0; i < size; i++) {
+		//cout << "v_initial["<<i<<"] = " << v_initial[i] << endl;	
+		v_initial[i] /= normalise;
+	}
 
-	map<int, vector<double>> lanczos_vecs;
+	unordered_map<int, vector<double>> lanczos_vecs;
 
 	// Construct tridiagonal matrix using Lanczos algorithm
     map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
@@ -162,11 +173,23 @@ map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
 		cout << endl;
 	}
 #endif
+	cout << "triangular matrix: " << endl;
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++)
+			cout << trimat[make_pair(i,j)] << "\t";
+		cout << endl;
+	}
 
 	// Define an identity matrix as the input for TQLI algorithm
-	map<pair<int,int>, double> tri_eigen_vecs;
+	unordered_map<int, vector<double>> tri_eigen_vecs;
+	unordered_map<int, vector<double>> laplacian_eigen_vecs;
+	vector<double> vinitial(size,0);
 	for(int i = 0; i < size; i++) {
-		tri_eigen_vecs[make_pair(i,i)] = 1;
+		tri_eigen_vecs[i] = vinitial;	
+		laplacian_eigen_vecs[i] = vinitial;
+	}
+	for(int i = 0; i < size; i++) {
+		tri_eigen_vecs[i][i] = 1;
 	}
 
 	// Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
@@ -174,15 +197,14 @@ map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
 
 	// Calculate all the eigenvectors of original Laplacian matrix using 
 	// the eigenvectors of the tridiagonal matrix computed by TQLI 
-	map<pair<int,int>, double> laplacian_eigen_vecs;
 	for (int k = 0; k < size; k++) {
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
-			laplacian_eigen_vecs[make_pair(k,i)] += lanczos_vecs[j][i] * tri_eigen_vecs[make_pair(j,k)];
+			laplacian_eigen_vecs[k][i] += lanczos_vecs[j][i] * tri_eigen_vecs[j][k];
 			}
 		}	
 	}
-#ifdef Debug
+//#ifdef Debug
 	// Print all the eigenvalues of the tridiagonal/laplacian matrix
 	cout << "laplacian eigenvalues: " << endl;
 	for (const double & x:alpha) {
@@ -194,12 +216,11 @@ map<pair<int,int>, double> getEigenMatrix(const Graph& g) {
 	cout << "laplacian_eigen_vecs: " << endl;
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			//cout << laplacian_eigen_vecs[make_pair(i,j)]/laplacian_eigen_vecs[make_pair(i,size-1)] << " ";
-			cout << laplacian_eigen_vecs[make_pair(i,j)] << " ";
+			cout << laplacian_eigen_vecs[i][j] << " ";
 		}
 		cout << endl;
 	}
-#endif
+//#endif
 	return laplacian_eigen_vecs;
 }
 
@@ -222,6 +243,4 @@ void partition(const Graph& g) {
 			cout << vertex << "--" << neighbour << " ;" << endl;
 	}
 	cout << "}" << endl;
-
 }
-

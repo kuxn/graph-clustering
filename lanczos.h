@@ -23,6 +23,6 @@ using namespace std;
 vector<double> multGraphVec(const Graph& g, const vector<double>& vec);
 double dot(const vector<double>& v1, const vector<double>& v2);
 double norm(const vector<double>& vec);
-map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, vector<double>& alpha, vector<double>& beta, map<int, vector<double>>& lanczos_vecs);
+map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, vector<double>& alpha, vector<double>& beta, unordered_map<int, vector<double>>& lanczos_vecs);
 
 #endif

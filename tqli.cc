@@ -56,7 +56,8 @@ double pythag(double a, double b) {
  *		z[0..n-1][0..n-1] the kth column of z returns the normalized eigenvector corresponding to d[k].
  *-----------------------------------------------------------------------------*/
  
-void tqli (vector<double>& d, vector<double>& e, int n, map<pair<int,int>, double>& z) {
+//void tqli (vector<double>& d, vector<double>& e, int n, map<pair<int,int>, double>& z) {
+void tqli (vector<double>& d, vector<double>& e, int n, unordered_map<int, vector<double>>& z) {
 
 	int m,l,iter,i,k;
 	double s,r,p,g,f,dd,c,b;
@@ -114,9 +115,12 @@ void tqli (vector<double>& d, vector<double>& e, int n, map<pair<int,int>, doubl
 					//	z[k][i] = c * z[k][i] - s * f;
 					//}
 					for (k = 0; k < n; k++) { 
-						f = z[make_pair(k,i+1)];
-						z[make_pair(k,i+1)] = s * z[make_pair(k,i)] + c * f;
-						z[make_pair(k,i)] = c * z[make_pair(k,i)] - s * f;
+						//f = z[make_pair(k,i+1)];
+						//z[make_pair(k,i+1)] = s * z[make_pair(k,i)] + c * f;
+						//z[make_pair(k,i)] = c * z[make_pair(k,i)] - s * f;
+						f = z[k][i+1];
+						z[k][i+1] = s * z[k][i] + c * f;
+						z[k][i] = c * z[k][i] - s * f;
 					}
 				}
 				if (r == 0.0 && i >= l) continue;
