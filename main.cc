@@ -45,7 +45,7 @@ int main() {
 	g.addEdge(4,6);
 	g.addEdge(4,7);
 */
-	g.genRandomGraph(6);
+	g.genRandomGraph(10);
 	//g.printDotFormat();
     g.printLaplacianMat();
   

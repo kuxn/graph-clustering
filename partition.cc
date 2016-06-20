@@ -18,6 +18,8 @@
 #include "tqli.h"
 #include "partition.h"
 
+#define Sign(a) (a >= 0.0 ? 1:0)
+
 using namespace std;
 
 /* 
@@ -238,11 +240,7 @@ void partition(const Graph& g) {
     vector<double> second_eigen_vector = getEigenVec(g);
 	cout << "Undirected Graph {" << endl;
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
-		cout << vertex;
-		if (second_eigen_vector[vertex] > 0)
-			cout << "[Partition="<<1<<"];" << endl;
-		else
-			cout << "[Partition="<<0<<"];" << endl;
+		cout << vertex << "[Partition="<<Sign(second_eigen_vector[vertex])<<"];" << endl;
 	}
 
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
@@ -290,8 +288,8 @@ void multiPartition(const Graph& g) {
 	for (int i = 0; i < size; i++) {
 		auto it = hashmap.find(auxiliary_vec[i]);
 		eigenvalues_index_sort.push_back(it->second);
+		hashmap.erase(it);
 	}
-
 	cout << endl;
 
 	cout << "Original index of eigenvalues in sorted order: "; 
@@ -312,4 +310,31 @@ void multiPartition(const Graph& g) {
 		cout << endl;
 	}
 
+	cout << "Laplacian eigenvectors in sorted order: " << endl;
+	for (const int& row:eigenvalues_index_sort) {
+		for (int col = 0; col < size; col++) {
+			//int index = laplacian_eigen_vecs[row][col] >= 0.0 ? 1:0;
+			cout << Sign(laplacian_eigen_vecs[row][col])<< " ";
+		}
+		cout << endl;
+	}
+
+	cout << "Undirected Graph {" << endl;
+	int num = 2; // number of eigenvectors to partition the graph, start from the second smallest.
+	for (int vertex = 0; vertex < size; vertex++) {
+		int index = 0;
+		for (int eigenvec_index = 1; eigenvec_index <= num; eigenvec_index++) {
+			int row = eigenvalues_index_sort[eigenvec_index];
+			index += pow(2, eigenvec_index - 1) * Sign(laplacian_eigen_vecs[row][vertex]);
+		}
+		cout << vertex << "[Partition="<<index<<"];" << endl;
+	}
+
+	for (int vertex = 0; vertex < size; vertex++) {
+		auto it = g.find(vertex);
+		for (const int& neighbour:it->second)
+			cout << vertex << "--" << neighbour << " ;" << endl;
+	}
+	cout << "}" << endl;
 }
+
