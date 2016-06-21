@@ -19,6 +19,8 @@ namespace Tests {
 bool testTqli();
 bool testLanczos();
 bool testPartition();
+bool testReadGraph();
+bool testReadGraphWithColour();
 
 }
 

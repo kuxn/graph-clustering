@@ -47,10 +47,10 @@ class Graph {
 		void printLaplacianMat() const;
 		const unsigned int size() const;
 		unordered_map<int, SetOfNeighbours>::const_iterator find(int vertex) const;
-        void setColour(int vertex, int colour) const;
-        const int getColour(int vertex) const;
-        void readDotFormat(ifstream& In);
-        void readDotFormatWithColour(ifstream& In);
+		void setColour(int vertex, int colour) const;
+		const int getColour(int vertex) const;
+		void readDotFormat(ifstream& In);
+		void readDotFormatWithColour(ifstream& In);
 };
 
 #endif

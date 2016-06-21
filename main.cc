@@ -109,9 +109,9 @@ int main() {
 
 	g.genRandomGraph(5);
 	//g.printDotFormat();
-    g.printLaplacianMat();
-  
-    multiPartition(g);
+	g.printLaplacianMat();
+	
+	multiPartition(g);
 
 	return 0;
 }
