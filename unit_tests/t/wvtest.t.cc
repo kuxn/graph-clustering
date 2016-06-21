@@ -36,16 +36,20 @@ WVTEST_MAIN("lanczos algorithm tests - Graph * Vector")
 
 int test_tqli() {
     int size = 4;
-	map<pair<int,int>, double> eigenvec;
+	unordered_map<int, vector<double>> eigenvecs;
+	vector<double> vinitial(size, 0);
 	for(int i = 0; i < size; i++) {
-		eigenvec[make_pair(i,i)] = 1;
+		eigenvecs.insert({0, vinitial});
+	}
+	for(int i = 0; i < size; i++) {
+		eigenvecs[i][i] = 1;
 	}
 
 	vector<double> diagonal, subdiagonal;
 	diagonal = {6, 8, 11, 13};
 	subdiagonal = {8, 2, 1, 0};
 
-	tqli(diagonal, subdiagonal, size, eigenvec);
+	tqli(diagonal, subdiagonal, size, eigenvecs);
     vector<double> result = {-1.20826, 15.608, 13.2909, 10.3094};
     
     for (int i = 0; i < size; i++) {
@@ -79,16 +83,22 @@ int test_lanczos_tqli() {
 
 	// Calculate the diagonal and subdiagonal vectors
 	vector<double> alpha, beta;
-	map<pair<int,int>, double> trimat = constructTriMat(G, vec, alpha, beta);
+	unordered_map<int, vector<double>> lanczos_vecs;
+	map<pair<int,int>, double> trimat = constructTriMat(G, vec, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
 
 	// Initialise the input matrix for storing eigenvectors
-	map<pair<int,int>, double> eigenvec;
+	unordered_map<int, vector<double>> eigenvecs;
+	vector<double> vinitial(size, 0);
 	for(int i = 0; i < size; i++) {
-		eigenvec[make_pair(i,i)] = 1;
+		eigenvecs.insert({0, vinitial});
+	}
+
+	for(int i = 0; i < size; i++) {
+		eigenvecs[i][i] = 1;
 	}
 	
-	tqli(alpha, beta, size, eigenvec);
+	tqli(alpha, beta, size, eigenvecs);
 
 	// result stores the eigenvalues of orginal symmetric matrix of the graph
 	vector<double> result = {0, 1.38197, 2.38197, 3.61803, 4.61803};

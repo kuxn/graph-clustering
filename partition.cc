@@ -320,7 +320,7 @@ void multiPartition(const Graph& g) {
 	}
 
 	cout << "Undirected Graph {" << endl;
-	int num = 2; // number of eigenvectors to partition the graph, start from the second smallest.
+	int num = 3; // number of eigenvectors to partition the graph, start from the second smallest.
 	for (int vertex = 0; vertex < size; vertex++) {
 		int index = 0;
 		for (int eigenvec_index = 1; eigenvec_index <= num; eigenvec_index++) {
