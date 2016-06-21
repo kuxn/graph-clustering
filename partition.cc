@@ -236,17 +236,12 @@ void partition(const Graph& g) {
 
     int numofvertex = g.size();
     vector<double> second_eigen_vector = getEigenVec(g);
-	cout << "Undirected Graph {" << endl;
-	for (int vertex = 0; vertex < numofvertex; vertex++) {
-		cout << vertex << "[Partition="<<Sign(second_eigen_vector[vertex])<<"];" << endl;
-	}
 
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
-		auto it = g.find(vertex);
-		for (const int& neighbour:it->second)
-			cout << vertex << "--" << neighbour << " ;" << endl;
+		g.setColour(vertex, Sign(second_eigen_vector[vertex]));	
 	}
-	cout << "}" << endl;
+
+	g.printDotFormat();
 }
 
 /*-----------------------------------------------------------------------------
@@ -317,22 +312,15 @@ void multiPartition(const Graph& g) {
 		cout << endl;
 	}
 
-	cout << "Undirected Graph {" << endl;
 	int num = 2; // number of eigenvectors to partition the graph, start from the second smallest.
 	for (int vertex = 0; vertex < size; vertex++) {
-		int index = 0;
+		int colour = 0;
 		for (int eigenvec_index = 1; eigenvec_index <= num; eigenvec_index++) {
 			int row = eigenvalues_index_sort[eigenvec_index];
-			index += pow(2, eigenvec_index - 1) * Sign(laplacian_eigen_vecs[row][vertex]);
+			colour += pow(2, eigenvec_index - 1) * Sign(laplacian_eigen_vecs[row][vertex]);
 		}
-		cout << vertex << "[Partition="<<index<<"];" << endl;
+		g.setColour(vertex, colour);
 	}
 
-	for (int vertex = 0; vertex < size; vertex++) {
-		auto it = g.find(vertex);
-		for (const int& neighbour:it->second)
-			cout << vertex << "--" << neighbour << " ;" << endl;
-	}
-	cout << "}" << endl;
+	g.printDotFormat();
 }
-

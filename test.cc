@@ -16,6 +16,7 @@
 #include "lanczos.h"
 #include "tqli.h"
 #include "test.h"
+#include "partition.h"
 
 namespace Tests {
 
@@ -148,11 +149,45 @@ bool testPartition() {
 	
 	return true;
 }
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  testReadGraph
+ *  Description:  Test the read function, can not verify the correctness in unit testing, but can test the performance
+ * =====================================================================================
+ */
+
+bool testReadGraph() {
+	Graph g;
+	ifstream In;
+	In.open("read_test.dot");
+
+	if (In) g.readDotFormat(In);
+    
+    g.printDotFormat();
+
+    return true;
+}
+
+bool testReadGraphWithColour() {
+	Graph g;
+	ifstream In;
+	In.open("read_test.dot");
+
+	if (In) g.readDotFormatWithColour(In);	
+
+	g.printDotFormat();
+	partition(g);
+
+	return true;
+}
 }
 
 int main() {
-	cout << Tests::testTqli() << endl;;
-	cout << Tests::testPartition() << endl;
+	//cout << Tests::testTqli() << endl;;
+	//cout << Tests::testPartition() << endl;
+	//Tests::testReadGraph();
+	Tests::testReadGraphWithColour();
 	return 0;
 
 }

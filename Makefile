@@ -2,7 +2,7 @@ CXX 		= g++
 CXXFLAGS 	= -Wall -std=c++11 -O3
 
 OBJECTS 	= main.o graph.o lanczos.o tqli.o partition.o
-TESTOBJECTS = test.o graph.o lanczos.o tqli.o
+TESTOBJECTS = test.o graph.o lanczos.o tqli.o partition.o
 TARGET 		= main
 TESTTARGET 	= test
 

@@ -14,6 +14,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <random>
+#include <climits>
 
 #include "graph.h"
 
@@ -71,7 +72,10 @@ void Graph::printDotFormat() const {
     int numofvertex = G.size();
 	cout << "Undirected Graph {" << endl;
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
-		cout << vertex << ";" << endl;
+		if (Colour.size() == 0)
+			cout << vertex << ";" << endl;
+		else
+			cout << vertex << "[Colour=" << getColour(vertex) << "];" << endl;
 	}
 
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
@@ -132,7 +136,7 @@ void Graph::genRandomGraph(int numofvertex) {
 		//poisson_distribution<int> randneigh(numofvertex/2);
 		unordered_set<int> neighbours;
 		for (int neighbour = 0; neighbour < numofneighbour; neighbour++) {
-			int randneighbour;
+			int randneighbour = 0;
 			do {
 				randneighbour = randneigh(rng);
 			} while (vertex == randneighbour);
@@ -140,4 +144,88 @@ void Graph::genRandomGraph(int numofvertex) {
 		}
 	}
 	if (G.size() != (unsigned)numofvertex) throw std::length_error ("The size of generated graph is incorrect.");
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  setColour
+ *  Description:  Map colour for each vertex
+ * =====================================================================================
+ */
+
+void Graph::setColour(int vertex, int colour) const {
+	Colour.insert({vertex, colour});
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getColour
+ *  Description:  Return the colour of the vertex
+ * =====================================================================================
+ */
+
+const int Graph::getColour(int vertex) const {
+	return Colour.at(vertex);
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  readDotFormat
+ *  Description:  Read the graph from Dot file
+ * =====================================================================================
+ */
+
+void Graph::readDotFormat(ifstream& In) {
+	In.ignore(INT_MAX, '-');
+	In.ignore(1); // Skip the second '-'
+
+	int from = 0;
+	int to = 0;
+	In >> to;
+	In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
+	while (In.good()) {
+		addEdge(from, to);
+		In >> from;
+		In.ignore(2); // Ignore "--"
+		In >> to;
+		In.ignore(INT_MAX, '\n');
+	}
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  readDotFormatWithColour
+ *  Description:  Read the graph from Dot file where has colour for each vertex
+ * =====================================================================================
+ */
+
+void Graph::readDotFormatWithColour(ifstream& In) {
+	
+	In.ignore(INT_MAX, '='); // Ignore the chars before the value of colour
+	int vertex = 0;
+	int colour = 0;
+	In >> colour;
+	In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
+	
+	while (In.good()) {
+		setColour(vertex, colour);
+		In >> vertex;
+		if (vertex == 0) break; // Break the loop at the beginning of edge line
+		In.ignore(INT_MAX, '='); 
+		In >> colour;
+		In.ignore(INT_MAX, '\n');
+	}
+
+	int from = 0;
+	int to = 0;
+	In.ignore(2); // Ignore "--"
+	In >> to;
+	In.ignore(INT_MAX, '\n'); 
+	while (In.good()) {
+		addEdge(from, to);
+		In >> from;
+		In.ignore(2); // Ignore "--"
+		In >> to;
+		In.ignore(INT_MAX, '\n');
+	}
 }
