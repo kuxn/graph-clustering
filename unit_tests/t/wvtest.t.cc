@@ -5,9 +5,14 @@
 #include "../lanczos.h"
 #include "../graph.h"
 #include "../tqli.h"
+#include "../test.h"
 #include <iostream>
-using namespace std;
 
+using namespace Tests;
+
+using std::vector;
+using std::unordered_map;
+using std::map;
 
 WVTEST_MAIN("lanczos algorithm tests - dot product/norm")
 {
@@ -21,105 +26,14 @@ WVTEST_MAIN("lanczos algorithm tests - dot product/norm")
 	
 }
 
-WVTEST_MAIN("lanczos algorithm tests - Graph * Vector")
-{
-	Graph G;
-	G.addEdge(0,1);
-	G.addEdge(0,4);
-	G.addEdge(1,2);
-	G.addEdge(2,3);
-	G.addEdge(2,4);
-	G.addEdge(3,4);
-
-	vector<double> v1(2, 1);
-}
-
-int test_tqli() {
-    int size = 4;
-	unordered_map<int, vector<double>> eigenvecs;
-	vector<double> vinitial(size, 0);
-	for(int i = 0; i < size; i++) {
-		eigenvecs.insert({0, vinitial});
-	}
-	for(int i = 0; i < size; i++) {
-		eigenvecs[i][i] = 1;
-	}
-
-	vector<double> diagonal, subdiagonal;
-	diagonal = {6, 8, 11, 13};
-	subdiagonal = {8, 2, 1, 0};
-
-	tqli(diagonal, subdiagonal, size, eigenvecs);
-    vector<double> result = {-1.20826, 15.608, 13.2909, 10.3094};
-    
-    for (int i = 0; i < size; i++) {
-        if (diagonal[i] - result[i] > 1e-5)
-            return 0;
-    }
-    return 1;
-}
-
 WVTEST_MAIN("tqli algorithm tests - eigenvalues")
 {
-    WVPASS(test_tqli());
+    WVPASS(testTqli());
 }
 
-int test_lanczos_tqli() {
 
-	// Initialise the graph
-	Graph G;
-	G.addEdge(0,1);
-	G.addEdge(0,4);
-	G.addEdge(1,2);
-	G.addEdge(2,3);
-	G.addEdge(2,4);
-	G.addEdge(3,4);
-
-	int size = G.size();
-
-	// Initialise the input vector for lanczos algorithm
-	vector<double> vec(size, 0);
-	vec[0] = 1;
-
-	// Calculate the diagonal and subdiagonal vectors
-	vector<double> alpha, beta;
-	unordered_map<int, vector<double>> lanczos_vecs;
-	map<pair<int,int>, double> trimat = constructTriMat(G, vec, alpha, beta, lanczos_vecs);
-	beta.push_back(0);
-
-	// Initialise the input matrix for storing eigenvectors
-	unordered_map<int, vector<double>> eigenvecs;
-	vector<double> vinitial(size, 0);
-	for(int i = 0; i < size; i++) {
-		eigenvecs.insert({0, vinitial});
-	}
-
-	for(int i = 0; i < size; i++) {
-		eigenvecs[i][i] = 1;
-	}
-	
-	tqli(alpha, beta, size, eigenvecs);
-
-	// result stores the eigenvalues of orginal symmetric matrix of the graph
-	vector<double> result = {0, 1.38197, 2.38197, 3.61803, 4.61803};
-
-	// Verify if the eigenvalues of the diagonalised the matrix are same as result
-	for (int i = 0; i < size; i++) {
-        if (alpha[i] - result[i] > 1e-5)
-            return 0;
-    }
-    return 1;
-}
-
-WVTEST_MAIN("lanczos/tqli algorithm tests - eigenvalues") 
+WVTEST_MAIN("lanczos algorithm tests - eigenvalues") 
 {
-	WVPASS(test_lanczos_tqli);
+	WVPASS(testLanczos());
 }
-
-
-
-
-
-
-
 

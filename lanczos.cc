@@ -157,6 +157,7 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, v
 			t[index] = w[index] - alpha_val * v1[index] - beta_val * v0[index];
 
 		beta_val = norm(t); 
+        if (abs(beta_val) < 1e-5) throw std::runtime_error("Value of beta is close to 0");
 		//cout << "beta_val: " << beta_val << endl;
 		beta.push_back(beta_val);	
 		trimat[make_pair(iter-1, iter)] = beta_val;

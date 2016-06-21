@@ -18,8 +18,6 @@
 #include "tqli.h"
 #include "partition.h"
 
-#define Sign(a) (a >= 0.0 ? 1:0)
-
 using namespace std;
 
 /* 
@@ -42,7 +40,6 @@ vector<double> getEigenVec(const Graph& g) {
 	}
 	double normalise = norm(v_initial);
 	for (int i = 0; i < size; i++) {
-		//cout << "v_initial["<<i<<"] = " << v_initial[i] << endl;	
 		v_initial[i] /= normalise;
 	}
 
@@ -51,7 +48,7 @@ vector<double> getEigenVec(const Graph& g) {
 	unordered_map<int, vector<double>> lanczos_vecs;
 
 	// Construct tridiagonal matrix using Lanczos algorithm
-    map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
+	map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
 
 #ifdef Debug
@@ -107,8 +104,8 @@ vector<double> getEigenVec(const Graph& g) {
 	//	cout << x <<  " ";	
 	//}
 	//cout << endl;
-
-  vector<double> second_eigen_vec(size, 0);
+	
+	vector<double> second_eigen_vec(size, 0);
 	for	(int i = 0; i < size; i++) {
 		for	(int j = 0; j < size; j++) {
 			second_eigen_vec[i] += lanczos_vecs[j][i] * tri_second_vec[j];
@@ -153,7 +150,7 @@ unordered_map<int, vector<double>> getEigenMatrix(const Graph& g, vector<double>
 	unordered_map<int, vector<double>> lanczos_vecs;
 
 	// Construct tridiagonal matrix using Lanczos algorithm
-    map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
+	map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
 
 #ifdef Debug
@@ -207,6 +204,7 @@ unordered_map<int, vector<double>> getEigenMatrix(const Graph& g, vector<double>
 			}
 		}	
 	}
+
 #ifdef Debug
 	// Print all the eigenvalues of the tridiagonal/laplacian matrix
 	cout << "laplacian eigenvalues: " << endl;
@@ -320,7 +318,7 @@ void multiPartition(const Graph& g) {
 	}
 
 	cout << "Undirected Graph {" << endl;
-	int num = 3; // number of eigenvectors to partition the graph, start from the second smallest.
+	int num = 2; // number of eigenvectors to partition the graph, start from the second smallest.
 	for (int vertex = 0; vertex < size; vertex++) {
 		int index = 0;
 		for (int eigenvec_index = 1; eigenvec_index <= num; eigenvec_index++) {

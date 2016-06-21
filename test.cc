@@ -1,9 +1,9 @@
 /*
  * =====================================================================================
  *
- *       Filename:  main.cc
+ *       Filename:  test.cc
  *
- *    Description:  Main function
+ *    Description:  Functions for unit tests
  *		  Created:  06/09/2016 18:12:52
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
@@ -15,189 +15,144 @@
 #include "graph.h"
 #include "lanczos.h"
 #include "tqli.h"
+#include "test.h"
 
-using namespace std;
+namespace Tests {
 
-int main() {
+using std::vector;
+using std::unordered_map;
+using std::map;
+using std::cout;
 
-	Graph G;
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  testTqli
+ *  Description:  Test tqli function for the correctness of calculating eigenvalues, 
+ * 				  correct eigenvalues come from Matlab.
+ * =====================================================================================
+ */
 
-	// Addedge function test
-	G.addEdge(0,1);
-	G.addEdge(0,4);
-	G.addEdge(1,2);
-	G.addEdge(2,3);
-	G.addEdge(2,4);
-	G.addEdge(3,4);
-	
-	//G.printDotFormat();
-	G.printLaplacianMat();
+bool testTqli() {
+    int size = 5;
+	unordered_map<int, vector<double>> eigenvecs;
+	vector<double> vinitial(size, 0);
+	for(int i = 0; i < size; i++) {
+		eigenvecs.insert({i, vinitial});
+	}
 
-	// Lanczos test
-	vector<double> vec(G.size(), 0);
-	vec[0] = 1;
-	//vec[0] = 0.7;
-	//vec[1] = -2.3;
-	//vec[2] = 15.6;
-	//vec[3] = 21.6;
-	//vec[4] = -7.2;
+	for(int i = 0; i < size; i++) {
+		eigenvecs[i][i] = 1;
+	}
 
-	//vec[0] = 0.5;
-	//vec[1] = 0.5;
-	//vec[2] = 0;
-	//vec[3] = 0.5;
-	//vec[4] = 0.5;
+	vector<double> diagonal, subdiagonal;
+	diagonal = {0.569893, 3.81259, 3.02478, 3.39064, 3.2021};
+	subdiagonal = {1.45159, 0.550477, 1.06987, 1.25114, 0.0};
 
-	// Normalise the initial vector
-	cout << "Norm of vec = " << norm(vec) << endl;
-	for (unsigned int i = 0; i < G.size(); i++)
-		//vec[i] = vec[i]/norm(vec);
-		vec[i] = vec[i]*(1/norm(vec));
+	tqli(diagonal, subdiagonal, size, eigenvecs);
+    vector<double> result = {0.0, 1.58578, 3.00000, 4.41421, 5.00000};
+    
+    for (int i = 0; i < size; i++) {
+        if (diagonal[i] - result[i] > 1e-5)
+            return false;
+    }
+    return true;
+}
 
-	cout << "Norm of vec = " << norm(vec) << endl;
-	cout << "Input vector: " << endl;
-	for (const double& x:vec)
-		cout << x << " ";
-	cout << endl;
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  testLanczos
+ *  Description:  The eigenvalues of original matrix should be same as the ones after tridiagonalising and calculating by TQLI.
+ * =====================================================================================
+ */
 
-	vector<double> vec2 = multGraphVec(G, vec);
+bool testLanczos() {
+	// Initialise the graph
+	Graph g;
+	g.addEdge(0,1);
+	g.addEdge(0,4);
+	g.addEdge(1,2);
+	g.addEdge(2,3);
+	g.addEdge(2,4);
+	g.addEdge(3,4);
 
-	cout << "Grpah * Vec: " << endl;
-	for (const double& x:vec2)
-		cout << x << " ";
-	cout << endl;
+	// The Laplacian matrix of the undirected graph above:
+	/*-----------------------------------------------------------------------------
+			0	1	2	3	4
+		0	2	-1	0	0	-1
+		1	-1	2	-1	0	0
+		2	0	-1	3	-1	-1
+		3	0	0	-1	2	-1
+		4	-1	0	-1	-1	3
+	 *-----------------------------------------------------------------------------*/
 
-	double dotprod = dot(vec, vec2);
-	cout << "dotprod = " << dotprod << endl;
-	cout << "norm fo vec2 = " << norm(vec2) << endl;  
+	int size = g.size();
+	// Initialise the input vector for lanczos algorithm
+	vector<double> v_initial(size, 0);
+	for (int i = 0; i < size; i++) {
+		v_initial[i] = drand48();
+	}
+	double normalise = norm(v_initial);
+	for (int i = 0; i < size; i++) {
+		v_initial[i] /= normalise;
+	}
 
+	// Calculate the diagonal and subdiagonal vectors
 	vector<double> alpha, beta;
-	int size = G.size();
-
-	
-	map<int, vector<double>> lanczos_vecs;
-
-	map<pair<int,int>, double> trimat = constructTriMat(G, vec, alpha, beta, lanczos_vecs);
+	unordered_map<int, vector<double>> lanczos_vecs;
+	map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
 
-	cout << "vector alpha: " << endl;
-	for (const double& x:alpha)
-		cout << x << " ";
-	cout << endl;
-
-	cout << "vector beta: " << endl;
-	for (const double& x:beta)
-		cout << x << " ";
-	cout << endl;
-
-	
-	cout << "triangular matrix: " << endl;
-	cout << "sizeoftrimat: " << trimat.size() << endl;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++)
-			cout << trimat[make_pair(i,j)] << "\t";
-		cout << endl;
-	}
-    
-	// TQLI test
-	map<pair<int,int>, double> tri_eigen_vecs;
+	// Initialise the input matrix for storing eigenvectors
+	unordered_map<int, vector<double>> eigenvecs;
+	vector<double> vinitial(size, 0);
 	for(int i = 0; i < size; i++) {
-		tri_eigen_vecs[make_pair(i,i)] = 1;
+		eigenvecs.insert({i, vinitial});
 	}
 
-	//cout << "eigenvector matrix: " << endl;
-	//cout << "sizeofeigenvec: " << tri_eigen_vecs.size() << endl;
-	//for (int i = 0; i < size; i++) {
-	//	for (int j = 0; j < size; j++)
-	//		cout << tri_eigen_vecs[make_pair(i,j)] << "\t";
-	//	cout << endl;
-	//}
-	//cout << endl;
-
-	tqli(alpha, beta, size, tri_eigen_vecs);
-
-	cout << "eigenvector matrix: " << endl;
-	cout << "sizeofeigenvec: " << tri_eigen_vecs.size() << endl;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++)
-			cout << tri_eigen_vecs[make_pair(i,j)] << "\t";
-		cout << endl;
-	}
-
-	cout << "vector alpha(eigenvalues): " << endl;
-	for (const double& x:alpha)
-		cout << x << " ";
-	cout << endl;
-
-
-  	//Calculate the eigenvectors of Laplacian matrix
-
-	// The Lanczos vector
-
-	vector<double> v0(G.size(), 0);
-	v0[0] = 1;
-	cout << "lanczos vecs: " << endl;
-	for (int i = 0; i< size; i++) {
-		auto it = lanczos_vecs.find(i);
-		for (const double& x:it->second)
-			cout << x << " ";
-		cout << endl;
-	}
-
-
-	/*-----------------------------------------------------------------------------
-	 *  Calculate the second eigenvector of the original matrix
-	 *-----------------------------------------------------------------------------*/
-
-/*
-	vector<double> tri_second_vec(size, 0);
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			if (j == 1)
-				tri_second_vec[i] = tri_eigen_vecs[make_pair(i,j)];
-		}
-	}
-	cout << "second eigenvec: " << endl;
-	for (const double& x:tri_second_vec) {
-		cout << x <<  " ";	
-	}
-	cout << endl;
-
-	vector<double> original_second_vec(size, 0);
-	for	(int i = 0; i < size; i++) {
-		for	(int j = 0; j < size; j++) {
-			original_second_vec[i] += lanczos_vecs[j][i] * tri_second_vec[j];
-		}
-	}
-
-	cout << "Second original eigenvec: " << endl;
-	for (const double& x:original_second_vec) {
-		cout << x/original_second_vec[size-1] <<  " ";	
-	}
-	cout << endl;
-*/
-
-	/*-----------------------------------------------------------------------------
-	 *  Calculate all the eigenvectors of the original matrix
-	 *-----------------------------------------------------------------------------*/
-
-	// Lanczos vector * Trivectors
-	map<pair<int,int>, double> laplacian_vecs;
-	for (int k = 0; k < size; k++) {
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-			laplacian_vecs[make_pair(k,i)] += lanczos_vecs[j][i] * tri_eigen_vecs[make_pair(j,k)];
-			}
-		}	
-	}
-
-	cout << "laplacian_vecs: " << endl;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			cout << laplacian_vecs[make_pair(i,j)]/laplacian_vecs[make_pair(i,size-1)] << " ";
-		}
-		cout << endl;
+	// Create the identity matrix used as input for TQLI
+	for(int i = 0; i < size; i++) {
+		eigenvecs[i][i] = 1;
 	}
 	
+	tqli(alpha, beta, size, eigenvecs);
+
+	// result stores the eigenvalues of orginal Laplacian matrix, calculated by Matlab
+	vector<double> result = {0, 1.381966, 2.381966, 3.61803, 4.61803};
+
+	// Verify if the eigenvalues of the diagonalised the matrix are same as result
+	for (int i = 0; i < size; i++) {
+        if (alpha[i] - result[i] > 1e-5)
+            return false;
+    }
+    return true;
+}
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  testPartition
+ *  Description:  Partitioning is based on the correctness of the calculation of eigenvalues and corresponding eigenvectors of the Laplacian matrix
+ * =====================================================================================
+ */
+
+bool testPartition() {
+	
+	Graph g;
+	g.addEdge(0,1);
+	g.addEdge(0,2);
+	g.addEdge(1,2);
+	g.addEdge(2,3);
+	g.addEdge(3,4);
+	g.addEdge(3,5);
+	g.addEdge(4,5);
+	
+	return true;
+}
+}
+
+int main() {
+	cout << Tests::testTqli() << endl;;
+	cout << Tests::testPartition() << endl;
 	return 0;
+
 }

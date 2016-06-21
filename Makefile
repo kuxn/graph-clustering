@@ -19,6 +19,7 @@ graph.o: 	graph.h
 lanczos.o: 	graph.h lanczos.h
 tqli.o:		tqli.h
 patition.o:	graph.h	lanczos.h tqli.h partition.h
+test.o:		graph.h	lanczos.h tqli.h partition.h test.h
 main.o:		graph.h partition.h
 
 # Phony target to get around problem of having a file called 'clean'
@@ -28,7 +29,7 @@ clean:
 
 $(TESTTARGET): $(TESTOBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $(TESTOBJECTS)
-	time ./$(TESTTARGET)
+	./$(TESTTARGET)
 
 output: main
 	time ./main > graph.dot

@@ -41,7 +41,8 @@ int main() {
 	/*-----------------------------------------------------------------------------
 	 *  Special test case for two partitioning
 	 *-----------------------------------------------------------------------------*/
-
+	
+	// Have complex eigenvalue
 	//g.addEdge(0,1);
 	//g.addEdge(0,2);
 	//g.addEdge(1,2);
@@ -53,6 +54,15 @@ int main() {
 	//g.addEdge(5,6);
 	//g.addEdge(4,6);
 	//g.addEdge(4,7);
+
+
+	//g.addEdge(0,1);
+	//g.addEdge(0,2);
+	//g.addEdge(1,2);
+	//g.addEdge(2,3);
+	//g.addEdge(3,4);
+	//g.addEdge(3,5);
+	//g.addEdge(4,5);
 
 
 	/*-----------------------------------------------------------------------------
@@ -105,5 +115,4 @@ int main() {
 
 	return 0;
 }
-
 
