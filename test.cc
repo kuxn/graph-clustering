@@ -17,6 +17,7 @@
 #include "tqli.h"
 #include "test.h"
 #include "partition.h"
+#include "analysis.h"
 
 namespace Tests {
 
@@ -181,13 +182,36 @@ bool testReadGraphWithColour() {
 
 	return true;
 }
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  testCutEdgePercent
+ *  Description:  Test the percentage of edges have been cut
+ * =====================================================================================
+ */
+
+bool testCutEdgePercent() {
+	Graph g;
+	ifstream In;
+	In.open("read_test.dot");
+
+	if (In) g.readDotFormatWithColour(In);	
+
+	double cut_edge_percent = cutEdgePercent(g);
+	
+	cout << "cut_edge_percent = " << cut_edge_percent << endl;
+
+	return true;
+}
 }
 
 int main() {
 	//cout << Tests::testTqli() << endl;;
 	//cout << Tests::testPartition() << endl;
 	//Tests::testReadGraph();
-	Tests::testReadGraphWithColour();
-	return 0;
+	//Tests::testReadGraphWithColour();
+	Tests::testCutEdgePercent();
 
+	return 0;
 }

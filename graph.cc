@@ -96,26 +96,26 @@ void Graph::printDotFormat() const {
  */
 
 void Graph::printLaplacianMat() const {
-    int numofvertex = G.size();
-    cout << "Laplacian Matrix:" << endl;
+	int numofvertex = G.size();
+	cout << "Laplacian Matrix:" << endl;
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
-        cout << "\t" << vertex;
-    }
-    cout << endl;
-
+		cout << "\t" << vertex;
+	}
+	cout << endl;
+	
 	for (int row = 0; row < numofvertex; row++) {
-        cout << row << "\t";
-        auto it = G.find(row);
-        for (int col = 0; col < numofvertex; col++) {
-            if (col == row)
-                cout << G.at(row).size() << "\t";
-            else if (it->second.find(col) != it->second.end())
-                cout << "-1\t";
-            else
-                cout << "0\t";
-        }
-        cout << endl;
-    }    
+		cout << row << "\t";
+		auto it = G.find(row);
+		for (int col = 0; col < numofvertex; col++) {
+			if (col == row)
+				cout << G.at(row).size() << "\t";
+			else if (it->second.find(col) != it->second.end())
+				cout << "-1\t";
+			else
+				cout << "0\t";
+		}
+		cout << endl;
+	}    
 }
 
 /* 
