@@ -88,20 +88,11 @@ bool testLanczos() {
 	 *-----------------------------------------------------------------------------*/
 
 	int size = g.size();
-	// Initialise the input vector for lanczos algorithm
-	vector<double> v_initial(size, 0);
-	for (int i = 0; i < size; i++) {
-		v_initial[i] = drand48();
-	}
-	double normalise = norm(v_initial);
-	for (int i = 0; i < size; i++) {
-		v_initial[i] /= normalise;
-	}
 
 	// Calculate the diagonal and subdiagonal vectors
 	vector<double> alpha, beta;
 	unordered_map<int, vector<double>> lanczos_vecs;
-	map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
+	map<pair<int,int>, double> trimat = constructTriMat(g, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
 
 	// Initialise the input matrix for storing eigenvectors
