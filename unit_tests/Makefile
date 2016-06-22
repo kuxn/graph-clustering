@@ -1,8 +1,8 @@
 all: t/wvtest
 
 # EDIT HERE: add any "../*.c" files that you need to test
-t/wvtest: wvtestmain.cc wvtest.cc t/wvtest.t.cc ../lanczos.cc ../graph.cc ../tqli.cc ../test.cc ../partition.cc
-	g++ -D WVTEST_CONFIGURED -o $@ -I. -I ../include $^
+t/wvtest: wvtestmain.cc wvtest.cc t/wvtest.t.cc ../lanczos.cc ../graph.cc ../tqli.cc ../test.cc ../partition.cc ../analysis.cc
+	g++ -D WVTEST_CONFIGURED -o $@ -I. -I../include $^
 
 runtests: all
 	t/wvtest

@@ -172,12 +172,6 @@ unordered_map<int, vector<double>> getEigenMatrix(const Graph& g, vector<double>
 		cout << endl;
 	}
 #endif
-	cout << "triangular matrix: " << endl;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++)
-			cout << trimat[make_pair(i,j)] << "\t";
-		cout << endl;
-	}
 
 	// Define an identity matrix as the input for TQLI algorithm
 	unordered_map<int, vector<double>> tri_eigen_vecs;
@@ -240,8 +234,7 @@ void partition(const Graph& g) {
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
 		g.setColour(vertex, Sign(second_eigen_vector[vertex]));	
 	}
-
-	g.printDotFormat();
+	cout << "Partitioning is done." << endl;
 }
 
 /*-----------------------------------------------------------------------------
@@ -254,6 +247,7 @@ void multiPartition(const Graph& g) {
 	vector<double> eigenvalues;
 	unordered_map<int, vector<double>> laplacian_eigen_vecs = getEigenMatrix(g, eigenvalues);
 
+#ifdef Debug
 	// Print all the eigenvalues of the tridiagonal/laplacian matrix
 	cout << "laplacian eigenvalues: " << endl;
 	for (const double & x:eigenvalues) {
@@ -269,6 +263,7 @@ void multiPartition(const Graph& g) {
 		}
 		cout << endl;
 	}
+#endif
 
 	// eigenvalues_index_sort stores the original index of the sorted eigenvalues 
 	vector<int> eigenvalues_index_sort;
@@ -283,8 +278,9 @@ void multiPartition(const Graph& g) {
 		eigenvalues_index_sort.push_back(it->second);
 		hashmap.erase(it);
 	}
-	cout << endl;
 
+#ifdef Debug
+	cout << endl;
 	cout << "Original index of eigenvalues in sorted order: "; 
 	for (const int& x:eigenvalues_index_sort)
 		cout <<	x << " "; 
@@ -311,6 +307,7 @@ void multiPartition(const Graph& g) {
 		}
 		cout << endl;
 	}
+#endif
 
 	int num = 2; // number of eigenvectors to partition the graph, start from the second smallest.
 	for (int vertex = 0; vertex < size; vertex++) {
@@ -321,6 +318,4 @@ void multiPartition(const Graph& g) {
 		}
 		g.setColour(vertex, colour);
 	}
-
-	g.printDotFormat();
 }

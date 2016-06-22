@@ -199,6 +199,7 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, v
 	alpha_val = dot(v1, w);
 	alpha.push_back(alpha_val);
 	trimat[make_pair(size-1, size-1)] = alpha_val;
+	cout << "Lanczos algorithm is done." << endl;
 	return trimat;
 }
 

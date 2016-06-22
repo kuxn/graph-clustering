@@ -206,12 +206,12 @@ bool testCutEdgePercent() {
 }
 }
 
-int main() {
+//int main() {
 	//cout << Tests::testTqli() << endl;;
 	//cout << Tests::testPartition() << endl;
 	//Tests::testReadGraph();
 	//Tests::testReadGraphWithColour();
-	Tests::testCutEdgePercent();
+//	Tests::testCutEdgePercent();
 
-	return 0;
-}
+//	return 0;
+//}

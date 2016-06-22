@@ -139,13 +139,18 @@ void Graph::genRandomGraph(int numofvertex) {
 		unordered_set<int> neighbours;
 		for (int neighbour = 0; neighbour < numofneighbour; neighbour++) {
 			int randneighbour = 0;
+			int trials = 1000;
 			do {
 				randneighbour = randneigh(rng);
-			} while (vertex == randneighbour);
+				trials--;
+			} while (vertex == randneighbour && trials);
+			
+			if (trials <= 0) throw std::runtime_error ("Run out of trials.");
 			addEdge(vertex, randneighbour);
 		}
 	}
 	if (G.size() != (unsigned)numofvertex) throw std::length_error ("The size of generated graph is incorrect.");
+	cout << "Graph generation is done." << endl;
 }
 
 /* 

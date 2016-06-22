@@ -6,6 +6,8 @@
 #include "../../include/tqli.h"
 #include "../../include/partition.h"
 #include "../../include/test.h"
+#include "../../include/analysis.h"
+
 
 WVTEST_MAIN("lanczos algorithm tests - dot product/norm")
 {
@@ -29,4 +31,3 @@ WVTEST_MAIN("lanczos algorithm tests - eigenvalues")
 {
 	WVPASS(Tests::testLanczos());
 }
-

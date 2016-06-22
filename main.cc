@@ -107,11 +107,11 @@ int main() {
 	//g.addEdge(13,15);
 	//g.addEdge(14,15);
 
-	g.genRandomGraph(5);
-	//g.printDotFormat();
-	g.printLaplacianMat();
+	g.genRandomGraph(1000);
+	//g.printLaplacianMat();
 	
-	multiPartition(g);
+	partition(g);
+	//g.printDotFormat();
 
 	return 0;
 }
