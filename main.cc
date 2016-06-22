@@ -12,6 +12,7 @@
  */
 
 #include <iostream>
+#include <sstream>
 #include "graph.h"
 #include "lanczos.h"
 #include "tqli.h"
@@ -19,7 +20,7 @@
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
 
 	Graph g;
 
@@ -106,12 +107,18 @@ int main() {
 	//g.addEdge(13,14);
 	//g.addEdge(13,15);
 	//g.addEdge(14,15);
+	istringstream ss(argv[1]);
+	int num = 0;
+	if (!(ss >> num))
+		cerr << "Invalid number " << argv[1] << endl;
 
-	g.genRandomGraph(1000);
+	cout << "num of vertices= " << num << endl;
+
+	g.genRandomGraph(num);
 	//g.printLaplacianMat();
 	
 	partition(g);
-	//g.printDotFormat();
+	g.printDotFormat();
 
 	return 0;
 }
