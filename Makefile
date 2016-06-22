@@ -1,5 +1,6 @@
 CXX 		= g++
-CXXFLAGS 	= -Wall -std=c++11 -O3
+INCPATH		= include
+CXXFLAGS 	= -Wall -std=c++11 -O3 -I $(INCPATH)
 
 OBJECTS 	= main.o graph.o lanczos.o tqli.o partition.o
 TESTOBJECTS = test.o graph.o lanczos.o tqli.o partition.o
@@ -15,12 +16,12 @@ $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
 
 # Explicit dependencies required for headers
-graph.o: 	graph.h
-lanczos.o: 	graph.h lanczos.h
-tqli.o:		tqli.h
-patition.o:	graph.h	lanczos.h tqli.h partition.h
-test.o:		graph.h	lanczos.h tqli.h partition.h test.h
-main.o:		graph.h partition.h
+graph.o: 	$(INCPATH)/graph.h
+lanczos.o: 	$(INCPATH)/graph.h $(INCPATH)/lanczos.h
+tqli.o:		$(INCPATH)/tqli.h
+patition.o:	$(INCPATH)/graph.h $(INCPATH)/lanczos.h $(INCPATH)/tqli.h $(INCPATH)/partition.h
+test.o:		$(INCPATH)/graph.h $(INCPATH)/lanczos.h $(INCPATH)/tqli.h $(INCPATH)/partition.h $(INCPATH)/test.h
+main.o:		$(INCPATH)/graph.h $(INCPATH)/partition.h
 
 # Phony target to get around problem of having a file called 'clean'
 .PHONY: clean

@@ -71,12 +71,14 @@ void Graph::addEdge(int src, int dest) {
 void Graph::printDotFormat() const {
     int numofvertex = G.size();
 	cout << "Undirected Graph {" << endl;
-	for (int vertex = 0; vertex < numofvertex; vertex++) {
-		if (Colour.size() == 0)
-			cout << vertex << ";" << endl;
-		else
+	if (Colour.size() == 0)
+		for (int vertex = 0; vertex < numofvertex; vertex++) {
+				cout << vertex << ";" << endl;
+		}
+	else
+		for (int vertex = 0; vertex < numofvertex; vertex++) {
 			cout << vertex << "[Colour=" << getColour(vertex) << "];" << endl;
-	}
+		}
 
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
 		auto it = G.find(vertex);

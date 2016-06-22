@@ -2,17 +2,10 @@
 #include "wvtest.h"
 
 // Include any "../*.h" header files which are required for your code
-#include "../lanczos.h"
-#include "../graph.h"
-#include "../tqli.h"
-#include "../test.h"
-#include <iostream>
-
-using namespace Tests;
-
-using std::vector;
-using std::unordered_map;
-using std::map;
+#include "../../include/lanczos.h"
+#include "../../include/tqli.h"
+#include "../../include/partition.h"
+#include "../../include/test.h"
 
 WVTEST_MAIN("lanczos algorithm tests - dot product/norm")
 {
@@ -28,12 +21,12 @@ WVTEST_MAIN("lanczos algorithm tests - dot product/norm")
 
 WVTEST_MAIN("tqli algorithm tests - eigenvalues")
 {
-    WVPASS(testTqli());
+    WVPASS(Tests::testTqli());
 }
 
 
 WVTEST_MAIN("lanczos algorithm tests - eigenvalues") 
 {
-	WVPASS(testLanczos());
+	WVPASS(Tests::testLanczos());
 }
 
