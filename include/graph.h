@@ -4,7 +4,7 @@
  *       Filename:  graph.h
  *
  *    Description:  Class Graph header file
- *		  Created:  06/09/2016 16:22:24
+ *        Created:  06/09/2016 16:22:24
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
@@ -26,16 +26,13 @@
 #include <unordered_map>
 #include <fstream>
 
-using namespace std;
-
-typedef unordered_set<int> SetOfNeighbours;
-
 class Graph {
 
 	private:
 		int num_of_vertex = 10;
-		unordered_map<int, SetOfNeighbours> G;
-        mutable unordered_map<int, int> Colour;
+		typedef std::unordered_set<int> SetOfNeighbours;
+		std::unordered_map<int, SetOfNeighbours> G;
+		mutable std::unordered_map<int, int> Colour;
 
 	public:
 		Graph() {}
@@ -46,11 +43,11 @@ class Graph {
 		void printDotFormat() const;
 		void printLaplacianMat() const;
 		const unsigned int size() const;
-		unordered_map<int, SetOfNeighbours>::const_iterator find(int vertex) const;
+		std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
 		void setColour(int vertex, int colour) const;
 		const int getColour(int vertex) const;
-		void readDotFormat(ifstream& In);
-		void readDotFormatWithColour(ifstream& In);
+		void readDotFormat(std::ifstream& In);
+		void readDotFormatWithColour(std::ifstream& In);
 };
 
 #endif

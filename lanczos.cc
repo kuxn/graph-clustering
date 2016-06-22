@@ -4,7 +4,7 @@
  *       Filename:  lanczos.cpp
  *
  *    Description:  Lanczos algorithm
- *		  Created:  06/11/2016 15:33:49
+ *        Created:  06/11/2016 15:33:49
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
@@ -18,6 +18,12 @@
 #include "lanczos.h"
 
 using namespace std;
+
+vector<double> multGraphVec(const Graph& g, const vector<double>& vec);
+double dot(const vector<double>& v1, const vector<double>& v2);
+double norm(const vector<double>& vec);
+
+
 
 /* 
  * ===  FUNCTION  ======================================================================

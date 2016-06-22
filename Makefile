@@ -1,36 +1,36 @@
 CXX 		= g++
-CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DDebug
+CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 INCPATH		= include
 
-OBJECTS 	= main.o graph.o lanczos.o tqli.o partition.o analysis.o
-TESTOBJECTS = test.o graph.o lanczos.o tqli.o partition.o analysis.o
+OBJECTS 	= graph.o lanczos.o tqli.o partition.o analysis.o
 TARGET 		= main
 TESTTARGET 	= test
 
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $(OBJECTS)
+$(TARGET): $(OBJECTS) main.o
+	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^
 
 %.o:%.cc
 	$(CXX) $(CXXFLAGS) -I $(INCPATH) -c $<
 
 # Explicit dependencies required for headers
-graph.o: 	$(INCPATH)/graph.h
-lanczos.o: 	$(INCPATH)/graph.h $(INCPATH)/lanczos.h
-tqli.o:		$(INCPATH)/tqli.h
-patition.o:	$(INCPATH)/graph.h $(INCPATH)/lanczos.h $(INCPATH)/tqli.h $(INCPATH)/partition.h
-test.o:		$(INCPATH)/graph.h $(INCPATH)/lanczos.h $(INCPATH)/tqli.h $(INCPATH)/partition.h $(INCPATH)/test.h
-main.o:		$(INCPATH)/graph.h $(INCPATH)/partition.h
-analysis.o:	$(INCPATH)/graph.h $(INCPATH)/partition.h
+$(OBJECTS): $(INCPATH)/graph.h
+test.o partition.o: $(INCPATH)/*.h
+
+define OBJECT_DEPENDS_ON_CORRESPONDING_HEADER
+    $(1) : $(INCPATH)/${1:.o=.h}
+endef
+
+$(foreach object_file,$(OBJECTS),$(eval $(call OBJECT_DEPENDS_ON_CORRESPONDING_HEADER,$(object_file))))
 
 # Phony target to get around problem of having a file called 'clean'
 .PHONY: clean
 clean:
-	rm -f $(OBJECTS) $(TARGET) $(TESTOBJECTS) $(TESTTARGET)
+	rm -f *.o $(TARGET) $(TESTTARGET)
 
-$(TESTTARGET): $(TESTOBJECTS)
-	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $(TESTOBJECTS)
+$(TESTTARGET): $(OBJECTS) test.o
+	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^
 	./$(TESTTARGET)
 
 output: main
@@ -38,4 +38,3 @@ output: main
 
 unit_tests: $(TARGET).o
 	make -C unit_tests test
-

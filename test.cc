@@ -4,7 +4,7 @@
  *       Filename:  test.cc
  *
  *    Description:  Functions for unit tests
- *		  Created:  06/09/2016 18:12:52
+ *        Created:  06/09/2016 18:12:52
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
@@ -12,19 +12,19 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <utility>
+#include <cmath>
+#include "test.h"
 #include "graph.h"
 #include "lanczos.h"
 #include "tqli.h"
-#include "test.h"
 #include "partition.h"
 #include "analysis.h"
 
 namespace Tests {
 
-using std::vector;
-using std::unordered_map;
-using std::map;
-using std::cout;
+using namespace std;
 
 /* 
  * ===  FUNCTION  ======================================================================
@@ -35,7 +35,7 @@ using std::cout;
  */
 
 bool testTqli() {
-    int size = 5;
+	int size = 5;
 	unordered_map<int, vector<double>> eigenvecs;
 	vector<double> vinitial(size, 0);
 	for(int i = 0; i < size; i++) {
@@ -51,13 +51,14 @@ bool testTqli() {
 	subdiagonal = {1.45159, 0.550477, 1.06987, 1.25114, 0.0};
 
 	tqli(diagonal, subdiagonal, size, eigenvecs);
-    vector<double> result = {0.0, 1.58578, 3.00000, 4.41421, 5.00000};
-    
-    for (int i = 0; i < size; i++) {
-        if (diagonal[i] - result[i] > 1e-5)
-            return false;
-    }
-    return true;
+	vector<double> result = {0.0, 1.58578, 3.00000, 4.41421, 5.00000};
+	
+	for (int i = 0; i < size; i++) {
+		if (abs(diagonal[i] - result[i]) > 1e-5)
+			return false;
+	}
+	
+	return true;
 }
 
 /* 
@@ -114,7 +115,7 @@ bool testLanczos() {
 
 	// Verify if the eigenvalues of the diagonalised the matrix are same as result
 	for (int i = 0; i < size; i++) {
-        if (alpha[i] - result[i] > 1e-5)
+        if (abs(alpha[i] - result[i]) > 1e-5)
             return false;
     }
     return true;
@@ -155,10 +156,10 @@ bool testReadGraph() {
 	In.open("read_test.dot");
 
 	if (In) g.readDotFormat(In);
-    
-    g.printDotFormat();
-
-    return true;
+	
+	g.printDotFormat();
+	
+	return true;
 }
 
 bool testReadGraphWithColour() {
@@ -192,17 +193,21 @@ bool testCutEdgePercent() {
 	double cut_edge_percent = cutEdgePercent(g);
 	
 	cout << "cut_edge_percent = " << cut_edge_percent << endl;
-
+	
+	if (abs(cut_edge_percent - 0.142857) > 1e-5) {
+		return false;
+	}
+	
 	return true;
 }
 }
 
 //int main() {
-	//cout << Tests::testTqli() << endl;;
-	//cout << Tests::testPartition() << endl;
-	//Tests::testReadGraph();
-	//Tests::testReadGraphWithColour();
+//	//cout << Tests::testTqli() << endl;;
+//	//cout << Tests::testPartition() << endl;
+//	//Tests::testReadGraph();
+//	//Tests::testReadGraphWithColour();
 //	Tests::testCutEdgePercent();
-
+//
 //	return 0;
 //}

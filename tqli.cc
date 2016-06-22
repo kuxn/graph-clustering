@@ -4,7 +4,7 @@
  *       Filename:  tqli.cc
  *
  *    Description:  Tridiagonal QL Implicit (tqli) algorithm
- *		  Created:  06/14/2016 21:19:24
+ *        Created:  06/14/2016 21:19:24
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
@@ -13,9 +13,16 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
+#include <utility>
 #include "tqli.h"
 
+#define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a)) // Magnitude of a times sign of b
+
 using namespace std;
+
+double SQR(double a); 
+double pythag(double a, double b);
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  pythag (P70, Numerical Recipes)

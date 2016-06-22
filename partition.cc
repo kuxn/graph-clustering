@@ -4,7 +4,7 @@
  *       Filename:  partition.cc
  *
  *    Description:  Partition the graph according to the eigenvectors
- *		  Created:  06/17/2016 14:15:15
+ *        Created:  06/17/2016 14:15:15
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
@@ -13,12 +13,22 @@
 
 #include <iostream>
 #include <algorithm>
+#include <cmath>
+
+#include "partition.h"
 #include "graph.h"
 #include "lanczos.h"
 #include "tqli.h"
-#include "partition.h"
+
+#define Sign(a) (a >= 0.0 ? 1:0)
 
 using namespace std;
+
+void printSparseMatrix(std::map<std::pair<int,int>, double>& sparse_matrix, int size);
+void printDenseMatrix(std::unordered_map<int, std::vector<double>>& dense_matrix);
+void printVector(const std::vector<double>& vec);
+std::vector<double> getEigenVec(const Graph& g);
+std::unordered_map<int, std::vector<double>> getEigenMatrix(const Graph& g);
 
 
 /* 

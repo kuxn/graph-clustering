@@ -4,7 +4,7 @@
  *       Filename:  graph.cpp
  *
  *    Description:  Member functions for Class Graph.hpp
- * 	  	  Created:  06/09/2016 22:42:42
+ *        Created:  06/09/2016 22:42:42
  * 
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
@@ -31,7 +31,7 @@ const unsigned int Graph::size() const {
 	return G.size();
 }
 
-unordered_map<int, SetOfNeighbours>::const_iterator Graph::find(int vertex) const {
+unordered_map<int, std::unordered_set<int>>::const_iterator Graph::find(int vertex) const {
 	return G.find(vertex);
 }
 
