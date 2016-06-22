@@ -20,6 +20,38 @@
 
 using namespace std;
 
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  utils
+ *  Description:  Print vector, matrix for debug
+ * =====================================================================================
+ */
+
+void printSparseMatrix(map<pair<int,int>, double>& sparse_matrix, int size) {
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++)
+			cout << sparse_matrix[make_pair(i,j)] << "\t";
+		cout << endl;
+	}
+}
+
+void printDenseMatrix(unordered_map<int, vector<double>>& dense_matrix) {
+	int size = dense_matrix.size();
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			cout << dense_matrix[i][j] << " ";
+		}
+		cout << endl;
+	}
+}
+
+void printVector(const vector<double>& vec) {
+	for (const double& x:vec)
+		cout << x <<  " ";
+	cout << endl;
+}
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  getEigenVec
@@ -33,44 +65,26 @@ vector<double> getEigenVec(const Graph& g) {
 
 	// Define the input arguments for Lanczos to construct tridiagonal matrix
 	vector<double> alpha, beta;
-	
-	vector<double> v_initial(size, 0);
-	for (int i = 0; i < size; i++) {
-		v_initial[i] = drand48();
-	}
-	double normalise = norm(v_initial);
-	for (int i = 0; i < size; i++) {
-		v_initial[i] /= normalise;
-	}
-
-	//cout << "norm(v_initial) = " << norm(v_initial) << endl;
 
 	unordered_map<int, vector<double>> lanczos_vecs;
 
 	// Construct tridiagonal matrix using Lanczos algorithm
-	map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
+	map<pair<int,int>, double> trimat = constructTriMat(g, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
 
 #ifdef Debug
 	cout << endl;
 	cout << "triangular matrix: " << endl;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++)
-			cout << trimat[make_pair(i,j)] << "\t";
-		cout << endl;
-	}
+	printSparseMatrix(trimat, size);
+
 #endif
 
 	// Define an identity matrix as the input for TQLI algorithm
 	unordered_map<int, vector<double>> tri_eigen_vecs;
 	vector<double> vinitial(size,0);
-	for(int i = 0; i < size; i++) {
-		tri_eigen_vecs[i] = vinitial;
-	}
+	for(int i = 0; i < size; i++)	tri_eigen_vecs[i] = vinitial;
 
-	for(int i = 0; i < size; i++) {
-		tri_eigen_vecs[i][i] = 1;
-	}
+	for(int i = 0; i < size; i++)	tri_eigen_vecs[i][i] = 1;
 
 	// Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
 	tqli(alpha, beta, size, tri_eigen_vecs);
@@ -100,10 +114,7 @@ vector<double> getEigenVec(const Graph& g) {
 		}
 	}
 	//cout << "Second tri eigenvec: " << endl;
-	//for (const double& x:tri_second_vec) {
-	//	cout << x <<  " ";	
-	//}
-	//cout << endl;
+	//printVector(tri_second_vec);
 	
 	vector<double> second_eigen_vec(size, 0);
 	for	(int i = 0; i < size; i++) {
@@ -114,10 +125,7 @@ vector<double> getEigenVec(const Graph& g) {
 
 #ifdef Debug
 	cout << "Second eigen vector: " << endl;
-	for (const double& x:second_eigen_vec) {
-		cout << x <<  " ";	
-	}
-	cout << endl;
+	printVector(second_eigen_vec);
 #endif
 
 	return second_eigen_vec;
@@ -137,40 +145,22 @@ unordered_map<int, vector<double>> getEigenMatrix(const Graph& g, vector<double>
 
 	// Define the input arguments for Lanczos to construct tridiagonal matrix
 	vector<double> alpha, beta;
-	vector<double> v_initial(size, 0);
-	for (int i = 0; i < size; i++) {
-		v_initial[i] = drand48();
-	}
-	double normalise = norm(v_initial);
-	for (int i = 0; i < size; i++) {
-		//cout << "v_initial["<<i<<"] = " << v_initial[i] << endl;	
-		v_initial[i] /= normalise;
-	}
-
 	unordered_map<int, vector<double>> lanczos_vecs;
 
 	// Construct tridiagonal matrix using Lanczos algorithm
-	map<pair<int,int>, double> trimat = constructTriMat(g, v_initial, alpha, beta, lanczos_vecs);
+	map<pair<int,int>, double> trimat = constructTriMat(g, alpha, beta, lanczos_vecs);
 	beta.push_back(0);
 
 #ifdef Debug
 	cout << endl;
 	cout << "vector alpha: " << endl;
-	for (const double& x:alpha)
-		cout << x << " ";
-	cout << endl;
+	printVector(alpha);
 
 	cout << "vector beta: " << endl;
-	for (const double& x:beta)
-		cout << x << " ";
-	cout << endl;
+	printVector(beta);
 
 	cout << "triangular matrix: " << endl;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++)
-			cout << trimat[make_pair(i,j)] << "\t";
-		cout << endl;
-	}
+	printSparseMatrix(trimat, size);
 #endif
 
 	// Define an identity matrix as the input for TQLI algorithm
@@ -202,19 +192,12 @@ unordered_map<int, vector<double>> getEigenMatrix(const Graph& g, vector<double>
 #ifdef Debug
 	// Print all the eigenvalues of the tridiagonal/laplacian matrix
 	cout << "laplacian eigenvalues: " << endl;
-	for (const double & x:alpha) {
-		cout << x << " ";
-	}
-	cout << endl;
+	printVector(alpha);
 
 	// Print all the eigenvectors in row
 	cout << "laplacian_eigen_vecs: " << endl;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			cout << laplacian_eigen_vecs[i][j] << " ";
-		}
-		cout << endl;
-	}
+	printDenseMatrix(laplacian_eigen_vecs);
+
 #endif
 	return laplacian_eigen_vecs;
 }
@@ -250,19 +233,12 @@ void multiPartition(const Graph& g) {
 #ifdef Debug
 	// Print all the eigenvalues of the tridiagonal/laplacian matrix
 	cout << "laplacian eigenvalues: " << endl;
-	for (const double & x:eigenvalues) {
-		cout << x << " ";
-	}
-	cout << endl;
+	printVector(eigenvalues);
 
 	// Print all the eigenvectors in row
 	cout << "laplacian_eigen_vecs: " << endl;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			cout << laplacian_eigen_vecs[i][j] << " ";
-		}
-		cout << endl;
-	}
+	printDenseMatrix(laplacian_eigen_vecs);
+
 #endif
 
 	// eigenvalues_index_sort stores the original index of the sorted eigenvalues 
@@ -302,7 +278,6 @@ void multiPartition(const Graph& g) {
 	cout << "Laplacian eigenvectors in sorted order: " << endl;
 	for (const int& row:eigenvalues_index_sort) {
 		for (int col = 0; col < size; col++) {
-			//int index = laplacian_eigen_vecs[row][col] >= 0.0 ? 1:0;
 			cout << Sign(laplacian_eigen_vecs[row][col])<< " ";
 		}
 		cout << endl;

@@ -89,65 +89,32 @@ double norm(const vector<double>& vec) {
  *		trimat[0..n-1][0..n-1] returns the tridiagonal matrix
  *		lanczos_vecs[0..n-1][0..n-1] the kth row returns the kth Lanczos vector
  *-----------------------------------------------------------------------------*/
- 
-//map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, vector<double>& alpha, vector<double>& beta, map<int, vector<double>>& lanczos_vecs) {
-//	vector<double> w, t, v1;
-//	t = v0; v1 = v0;
-//	map<pair<int, int>, double> trimat;
-//	int size = v0.size();
-//	double alpha_val = 0, beta_val = 0;
-//	lanczos_vecs[0] = v0;
-//
-//	for (int iter = 1; iter < size; iter++) {
-//		w = multGraphVec(g, v1);
-//		alpha_val = dot(v1, w);
-//		//cout << "dot(v1, v1) = " << dot(v1, v1) << endl;
-//		alpha.push_back(alpha_val);
-//		trimat[make_pair(iter-1, iter-1)] = alpha_val;
-//
-//		for (int index = 0; index < size; index++)
-//			t[index] = w[index] - alpha_val * v1[index] - beta_val * v0[index];
-//
-//		beta_val = norm(t); 
-//		beta.push_back(beta_val);	
-//		trimat[make_pair(iter-1, iter)] = beta_val;
-//		trimat[make_pair(iter, iter-1)] = beta_val;
-//
-//		v0 = v1;
-//
-//		for (int index = 0; index < size; index++)
-//			v1[index] = t[index]/beta_val;
-//
-//		lanczos_vecs[iter] = v1;
-//        // Verify the dot product of v0 and v1 which is supposed to be 0
-//        double dot_product = dot(v0, v1);
-//#ifdef Debug		
-//		cout << "v"<< iter <<"*v" << iter+1 << " = " << dot_product << endl;
-//		cout << endl;
-//#endif
-//        if (abs(dot_product) > 1e-5) throw std::runtime_error("Need reorthogonalise");
-//	}
-//	w = multGraphVec(g, v1);
-//	alpha_val = dot(v1, w);
-//	alpha.push_back(alpha_val);
-//	trimat[make_pair(size-1, size-1)] = alpha_val;
-//	return trimat;
-//}	
 
 /*-----------------------------------------------------------------------------
  *  Modified Lanczos algorithm with reorthogonalisation by Gram–Schmidt
  *-----------------------------------------------------------------------------*/
 
-map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, vector<double>& alpha, vector<double>& beta, unordered_map<int, vector<double>>& lanczos_vecs) {
-	vector<double> w, t, v1;
-	t = v0; v1 = v0;
-	map<pair<int, int>, double> trimat;
-	int size = v0.size();
+map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& alpha, vector<double>& beta, unordered_map<int, vector<double>>& lanczos_vecs) {
+
+
+    int size = g.size();
+
+	vector<double> v0(size, 0);
+	for (int i = 0; i < size; i++)  v0[i] = drand48();
+
+	double normalise = norm(v0);
+	for (int i = 0; i < size; i++)  v0[i] /= normalise;
+
+	vector<double> t = v0;
+	vector<double> v1 = v0;
+    vector<double> w;
+   	map<pair<int, int>, double> trimat;
+
 	double alpha_val = 0, beta_val = 0;
 	lanczos_vecs[0] = v0;
 
 	for (int iter = 1; iter < size; iter++) {
-		w = multGraphVec(g, v1);
+        w = multGraphVec(g, v1);
 		alpha_val = dot(v1, w);
 		//cout << "dot(v1, v1) = " << dot(v1, v1) << endl;
 		alpha.push_back(alpha_val);
@@ -193,8 +160,6 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, v
 		cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_product << endl;
 		cout << endl;
 #endif
-		cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_product << endl;
-		cout << endl;
         if (abs(dot_product) > 1e-5) throw std::runtime_error("Need reorthogonalise");
 	}
 	w = multGraphVec(g, v1);
@@ -204,4 +169,3 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& v0, v
 	cout << "Lanczos algorithm is done." << endl;
 	return trimat;
 }
-
