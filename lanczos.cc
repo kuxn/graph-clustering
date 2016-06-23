@@ -131,9 +131,11 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& alpha
 
 		beta_val = norm(t); 
 		if (abs(beta_val) < 1e-5) 
-		try { throw std::runtime_error("Value of beta is close to 0"); }
-		catch (std::runtime_error& e) { std::cerr << "ERROR: " << e.what() << endl; }
-		//cout << "beta_val: " << beta_val << endl;
+		try { throw std::runtime_error("Value of beta is close to 0: "); }
+		catch (std::runtime_error& e) { 
+			std::cerr << "ERROR: " << e.what(); 
+			cout << "beta[" << iter-1 << "]: " << beta_val << endl;
+		}
 
 		beta.push_back(beta_val);	
 		trimat[make_pair(iter-1, iter)] = beta_val;
@@ -170,8 +172,11 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& alpha
 		cout << endl;
 #endif
         if (abs(dot_product) > 1e-5) 
-		try { throw std::runtime_error("Need reorthogonalise"); }
-		catch (std::runtime_error& e) { std::cerr << "ERROR: " << e.what() << endl; }
+		try { throw std::runtime_error("Need reorthogonalise: "); }
+		catch (std::runtime_error& e) { 
+			std::cerr << "ERROR: " << e.what(); 
+			cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_product << endl;
+		}
 	}
 	w = multGraphVec(g, v1);
 	alpha_val = dot(v1, w);

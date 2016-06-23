@@ -19,7 +19,7 @@
 #include "graph.h"
 
 void printEigenvalues(const Graph& g);
-void partition(const Graph& g);
+void partition(const Graph& g, const int subgraphs);
 void multiPartition(const Graph& g);
 
 #endif

@@ -153,10 +153,15 @@ bool testPartition() {
 bool testReadGraph() {
 	Graph g;
 	ifstream In;
-	In.open("read_test.dot");
+	//In.open("read_test.dot");
+	In.open("test-13.dot");
 
 	if (In) g.readDotFormat(In);
 	
+	In.close();
+
+	g.printDotFormat();
+	partition(g, 4);
 	g.printDotFormat();
 	
 	return true;
@@ -169,8 +174,9 @@ bool testReadGraphWithColour() {
 
 	if (In) g.readDotFormatWithColour(In);	
 
+	In.close();
+
 	g.printDotFormat();
-	partition(g);
 
 	return true;
 }
@@ -202,12 +208,12 @@ bool testCutEdgePercent() {
 }
 }
 
-//int main() {
-//	//cout << Tests::testTqli() << endl;;
-//	//cout << Tests::testPartition() << endl;
-//	//Tests::testReadGraph();
-//	//Tests::testReadGraphWithColour();
-//	Tests::testCutEdgePercent();
-//
-//	return 0;
-//}
+int main() {
+	//cout << Tests::testTqli() << endl;;
+	//cout << Tests::testPartition() << endl;
+	Tests::testReadGraph();
+	//Tests::testReadGraphWithColour();
+	//Tests::testCutEdgePercent();
+
+	return 0;
+}
