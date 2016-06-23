@@ -130,13 +130,16 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& alpha
 			t[index] = w[index] - alpha_val * v1[index] - beta_val * v0[index];
 
 		beta_val = norm(t); 
-		if (abs(beta_val) < 1e-5) throw std::runtime_error("Value of beta is close to 0");
+		if (abs(beta_val) < 1e-5) 
+		try { throw std::runtime_error("Value of beta is close to 0"); }
+		catch (std::runtime_error& e) { std::cerr << "ERROR: " << e.what() << endl; }
 		//cout << "beta_val: " << beta_val << endl;
+
 		beta.push_back(beta_val);	
 		trimat[make_pair(iter-1, iter)] = beta_val;
 		trimat[make_pair(iter, iter-1)] = beta_val;
 
-		v0 = v1;
+		//v0 = v1;
 		for (int index = 0; index < size; index++)
 			v1[index] = t[index]/beta_val;
 
@@ -159,14 +162,16 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& alpha
 		}
 		v0 = lanczos_vecs[iter-1];
 		v1 = lanczos_vecs[iter];
-
-        // Verify the dot product of v0 and v1 which is supposed to be 0
+		
+		//Verify the dot product of v0 and v1 which is supposed to be 0
         double dot_product = dot(v0, v1);
 #ifdef Debug		
 		cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_product << endl;
 		cout << endl;
 #endif
-        if (abs(dot_product) > 1e-5) throw std::runtime_error("Need reorthogonalise");
+        if (abs(dot_product) > 1e-5) 
+		try { throw std::runtime_error("Need reorthogonalise"); }
+		catch (std::runtime_error& e) { std::cerr << "ERROR: " << e.what() << endl; }
 	}
 	w = multGraphVec(g, v1);
 	alpha_val = dot(v1, w);

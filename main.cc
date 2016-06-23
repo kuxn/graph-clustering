@@ -107,6 +107,7 @@ int main(int argc, char* argv[]) {
 	//g.addEdge(13,14);
 	//g.addEdge(13,15);
 	//g.addEdge(14,15);
+
 	istringstream ss(argv[1]);
 	int num = 0;
 	if (!(ss >> num))
@@ -117,8 +118,8 @@ int main(int argc, char* argv[]) {
 	g.genRandomGraph(num);
 	//g.printLaplacianMat();
 	
-	//partition(g);
-	//g.printDotFormat();
+	partition(g);
+	g.printDotFormat();
 
 	printEigenvalues(g);
 

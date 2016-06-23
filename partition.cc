@@ -97,7 +97,7 @@ void printEigenvalues(const Graph& g) {
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  getEigenVec
- *  Description:  Return the second vector using lanczos and tqli functions
+ *  Description:  Return the fiedler vector using lanczos and tqli functions
  * =====================================================================================
  */
 
@@ -131,7 +131,7 @@ vector<double> getEigenVec(const Graph& g) {
 	// Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
 	tqli(alpha, beta, size, tri_eigen_vecs);
 
-	// Find the index of the second smallest eigenvalue of the eigenvalues vector "alpha" 
+	// Find the index of the second smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha" 
 	int index_of_second_vec = 0;
 	unordered_multimap<double, int> hashmap;
 	for (unsigned int i = 0; i < alpha.size(); i++)
@@ -146,8 +146,8 @@ vector<double> getEigenVec(const Graph& g) {
 	cout << "index_of_second_vec = " << index_of_second_vec << endl;
 #endif
 
-	// Calculate the second eigenvector of original Laplacian matrix using 
-	// the second eigenvector of the tridiagonal matrix computed by TQLI 
+	// Calculate the fiedler vector of original Laplacian matrix using 
+	// the fiedler vector of the tridiagonal matrix computed by TQLI 
 	vector<double> tri_second_vec(size, 0);
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
@@ -158,19 +158,19 @@ vector<double> getEigenVec(const Graph& g) {
 	//cout << "Second tri eigenvec: " << endl;
 	//printVector(tri_second_vec);
 	
-	vector<double> second_eigen_vec(size, 0);
+	vector<double> fiedler_vector(size, 0);
 	for	(int i = 0; i < size; i++) {
 		for	(int j = 0; j < size; j++) {
-			second_eigen_vec[i] += lanczos_vecs[j][i] * tri_second_vec[j];
+			fiedler_vector[i] += lanczos_vecs[j][i] * tri_second_vec[j];
 		}
 	}
 
 #ifdef Debug
-	cout << "Second eigen vector: " << endl;
-	printVector(second_eigen_vec);
+	cout << "fiedler vector: " << endl;
+	printVector(fiedler_vector);
 #endif
 
-	return second_eigen_vec;
+	return fiedler_vector;
 } 
 
 
@@ -248,16 +248,16 @@ unordered_map<int, vector<double>> getEigenMatrix(const Graph& g, vector<double>
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  partition
- *  Description:  Partition the graph into two subgraphs according to the second eigenvector
+ *  Description:  Partition the graph into two subgraphs according to the fiedler vector
  * =====================================================================================
  */
 void partition(const Graph& g) {
 
     int numofvertex = g.size();
-    vector<double> second_eigen_vector = getEigenVec(g);
+    vector<double> fiedler_vector = getEigenVec(g);
 
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
-		g.setColour(vertex, Sign(second_eigen_vector[vertex]));	
+		g.setColour(vertex, Sign(fiedler_vector[vertex]));	
 	}
 	cout << "Partitioning is done." << endl;
 }
@@ -280,7 +280,6 @@ void multiPartition(const Graph& g) {
 	// Print all the eigenvectors in row
 	cout << "laplacian_eigen_vecs: " << endl;
 	printDenseMatrix(laplacian_eigen_vecs);
-
 #endif
 
 	// eigenvalues_index_sort stores the original index of the sorted eigenvalues 
