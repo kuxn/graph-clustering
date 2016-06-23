@@ -14,6 +14,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 
 #include "partition.h"
 #include "graph.h"
@@ -62,6 +63,37 @@ void printVector(const vector<double>& vec) {
 	cout << endl;
 }
 
+void printEigenvalues(const Graph& g) {
+	int size = g.size();
+
+	// Define the input arguments for Lanczos to construct tridiagonal matrix
+	vector<double> alpha, beta;
+
+	unordered_map<int, vector<double>> lanczos_vecs;
+
+	// Construct tridiagonal matrix using Lanczos algorithm
+	map<pair<int,int>, double> trimat = constructTriMat(g, alpha, beta, lanczos_vecs);
+	beta.push_back(0);
+
+	// Define an identity matrix as the input for TQLI algorithm
+	unordered_map<int, vector<double>> tri_eigen_vecs;
+	vector<double> vinitial(size,0);
+	for(int i = 0; i < size; i++)	tri_eigen_vecs[i] = vinitial;
+	for(int i = 0; i < size; i++)	tri_eigen_vecs[i][i] = 1;
+
+	// Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
+	tqli(alpha, beta, size, tri_eigen_vecs);
+
+	ofstream Output;
+	Output.open("eigenvalues.dat");
+
+	for (int i = 0; i < size; i++)	{
+		Output << i << " " << alpha[i] << endl;
+	}
+
+	Output.close();
+}
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  getEigenVec
@@ -71,7 +103,7 @@ void printVector(const vector<double>& vec) {
 
 vector<double> getEigenVec(const Graph& g) {
 
-  int size = g.size();
+	int size = g.size();
 
 	// Define the input arguments for Lanczos to construct tridiagonal matrix
 	vector<double> alpha, beta;

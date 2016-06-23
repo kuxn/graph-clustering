@@ -197,6 +197,7 @@ void Graph::readDotFormat(ifstream& In) {
 		In >> to;
 		In.ignore(INT_MAX, '\n');
 	}
+	In.close();
 }
 
 /* 
@@ -235,4 +236,5 @@ void Graph::readDotFormatWithColour(ifstream& In) {
 		In >> to;
 		In.ignore(INT_MAX, '\n');
 	}
+	In.close();
 }

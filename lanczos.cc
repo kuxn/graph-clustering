@@ -142,23 +142,23 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& alpha
 
 		lanczos_vecs[iter] = v1;
 
-		//for (int k = 1; k <= iter; k++) {
-		//	//cout << "i - norm of lanczos_vecs["<<k<<"] = " << norm(lanczos_vecs[k]) << endl;
-		//	for (int i = 0; i < k; i++) {
-		//		double reorthog_dot_product = dot(lanczos_vecs[i], lanczos_vecs[k]);
-		//		for (int j = 0; j < size; j++) {
-		//			lanczos_vecs[k][j] -= reorthog_dot_product * lanczos_vecs[i][j];
-		//		}
-		//	}
-		//	double normalise = norm(lanczos_vecs[k]);
-		//	for (int j = 0; j < size; j++) lanczos_vecs[k][j] /= normalise;
-		//	//cout << "norm of lanczos_vecs["<<iter<<"] = " << norm(lanczos_vecs[iter]) << endl;
-		//	for (int i = 0; i < k; i++) {
-		//	//cout << "DOT: " << i << k << " "<< dot(lanczos_vecs[i], lanczos_vecs[k]) << endl;
-		//	}
-		//}
-		//v0 = lanczos_vecs[iter-1];
-		//v1 = lanczos_vecs[iter];
+		for (int k = 1; k <= iter; k++) {
+			//cout << "i - norm of lanczos_vecs["<<k<<"] = " << norm(lanczos_vecs[k]) << endl;
+			for (int i = 0; i < k; i++) {
+				double reorthog_dot_product = dot(lanczos_vecs[i], lanczos_vecs[k]);
+				for (int j = 0; j < size; j++) {
+					lanczos_vecs[k][j] -= reorthog_dot_product * lanczos_vecs[i][j];
+				}
+			}
+			double normalise = norm(lanczos_vecs[k]);
+			for (int j = 0; j < size; j++) lanczos_vecs[k][j] /= normalise;
+			//cout << "norm of lanczos_vecs["<<iter<<"] = " << norm(lanczos_vecs[iter]) << endl;
+			for (int i = 0; i < k; i++) {
+			//cout << "DOT: " << i << k << " "<< dot(lanczos_vecs[i], lanczos_vecs[k]) << endl;
+			}
+		}
+		v0 = lanczos_vecs[iter-1];
+		v1 = lanczos_vecs[iter];
 
         // Verify the dot product of v0 and v1 which is supposed to be 0
         double dot_product = dot(v0, v1);

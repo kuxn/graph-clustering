@@ -18,6 +18,7 @@
 #include <map>
 #include "graph.h"
 
+void printEigenvalues(const Graph& g);
 void partition(const Graph& g);
 void multiPartition(const Graph& g);
 

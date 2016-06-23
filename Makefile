@@ -36,5 +36,8 @@ $(TESTTARGET): $(OBJECTS) test.o
 output: main
 	time ./main > graph.dot
 
+eigenvalues_figure:
+	gnuplot < eigenvalues.gnu
+
 unit_tests: $(TARGET).o
 	make -C unit_tests test
