@@ -36,7 +36,6 @@ double SQR(double a) {
 	return (sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg;
 }
 
-
 double pythag(double a, double b) {
 	double absa,absb;
 	absa=fabs(a);
@@ -123,9 +122,6 @@ void tqli (vector<double>& d, vector<double>& e, int n, unordered_map<int, vecto
 					//	z[k][i] = c * z[k][i] - s * f;
 					//}
 					for (k = 0; k < n; k++) { 
-						//f = z[make_pair(k,i+1)];
-						//z[make_pair(k,i+1)] = s * z[make_pair(k,i)] + c * f;
-						//z[make_pair(k,i)] = c * z[make_pair(k,i)] - s * f;
 						f = z[k][i+1];
 						z[k][i+1] = s * z[k][i] + c * f;
 						z[k][i] = c * z[k][i] - s * f;

@@ -21,11 +21,12 @@
 template<typename Vector>
 class Lanczos {
     private:
-        inline Vector multGraphVec(const Graph& g, const Vector& vec);
+        Vector& initialise(Vector& vec);
+        Vector multGraphVec(const Graph& g, const Vector& vec);
         inline double dot(const Vector& v1, const Vector& v2);
         inline double norm(const Vector& vec);
         inline Vector& normalise(Vector& vec);
-        inline Vector& initialise(Vector& vec);
+        inline void gramSchmidt(int& iter, int& size);
 
     public:
         Lanczos(const Graph& g);
@@ -33,7 +34,7 @@ class Lanczos {
         Vector alpha;
         Vector beta;
         std::unordered_map<int, Vector> lanczos_vecs;
-        std::map<std::pair<int,int>, double> tri_mat;
+        void print_tri_mat();
 };
 
 #include "../lanczos.cc"

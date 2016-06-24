@@ -15,8 +15,8 @@ $(TARGET): $(OBJECTS) main.o
 	$(CXX) $(CXXFLAGS) -I $(INCPATH) -c $<
 
 # Explicit dependencies required for headers
-$(OBJECTS): $(INCPATH)/graph.h
-test.o partition.o: $(INCPATH)/*.h
+$(OBJECTS): 		$(INCPATH)/graph.h
+test.o partition.o: $(INCPATH)/*.h lanczos.cc
 
 define OBJECT_DEPENDS_ON_CORRESPONDING_HEADER
     $(1) : $(INCPATH)/${1:.o=.h}

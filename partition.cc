@@ -29,7 +29,6 @@ typedef std::vector<double> Vector;
 typedef std::map<std::pair<int,int>, double> SparseMatrix;
 typedef std::unordered_map<int, Vector> DenseMatrix;
 
-void printSparseMatrix(SparseMatrix& sparse_matrix, int size);
 void printDenseMatrix(DenseMatrix& dense_matrix);
 void printVector(const Vector& vec);
 //Vector getEigenVec(const Graph& g);
@@ -42,15 +41,6 @@ std::unordered_map<int, Vector> getEigenMatrix(const Graph& g);
  *  Description:  Print vector, matrix for debug
  * =====================================================================================
  */
-
-void printSparseMatrix(SparseMatrix& sparse_matrix, int size) {
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			cout << sparse_matrix[make_pair(i,j)] << "\t";
-		}
-		cout << endl;
-	}
-}
 
 void printDenseMatrix(DenseMatrix& dense_matrix) {
 	int row_size = dense_matrix.size();
@@ -123,8 +113,8 @@ Vector getEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const
 
 	// Calculate the corresponding Laplacian vector
 	Vector laplacian_vector(size, 0);
-	for	(int i = 0; i < size; i++) {
-		for	(int j = 0; j < size; j++) {
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
 			laplacian_vector[i] += lanczos_vecs[j][i] * tri_eigen_vec[j];
 		}
 	}
@@ -205,7 +195,7 @@ void partition(const Graph& g, const int subgraphs) {
 #ifdef Debug
 	cout << endl;
 	cout << "triangular matrix: " << endl;
-	printSparseMatrix(trimat, size);
+	lanczos.print_tri_mat();
 #endif
 
 	// Define an identity matrix as the input for TQLI algorithm
