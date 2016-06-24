@@ -65,7 +65,6 @@ double pythag(double a, double b) {
  *		z[0..n-1][0..n-1] the kth column of z returns the normalized eigenvector corresponding to d[k].
  *-----------------------------------------------------------------------------*/
  
-//void tqli (vector<double>& d, vector<double>& e, int n, map<pair<int,int>, double>& z) {
 void tqli (vector<double>& d, vector<double>& e, int n, unordered_map<int, vector<double>>& z) {
 
 	int m,l,iter,i,k;

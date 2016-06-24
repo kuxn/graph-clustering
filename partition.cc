@@ -25,14 +25,15 @@
 
 using namespace std;
 
+typedef std::vector<double> Vector;
 typedef std::map<std::pair<int,int>, double> SparseMatrix;
-typedef std::unordered_map<int, std::vector<double>> DenseMatrix;
+typedef std::unordered_map<int, Vector> DenseMatrix;
 
 void printSparseMatrix(SparseMatrix& sparse_matrix, int size);
 void printDenseMatrix(DenseMatrix& dense_matrix);
-void printVector(const std::vector<double>& vec);
-//std::vector<double> getEigenVec(const Graph& g);
-std::unordered_map<int, std::vector<double>> getEigenMatrix(const Graph& g);
+void printVector(const Vector& vec);
+//Vector getEigenVec(const Graph& g);
+std::unordered_map<int, Vector> getEigenMatrix(const Graph& g);
 
 
 /* 
@@ -62,7 +63,7 @@ void printDenseMatrix(DenseMatrix& dense_matrix) {
 	}
 }
 
-void printVector(const vector<double>& vec) {
+void printVector(const Vector& vec) {
 	for (const double& x:vec) {
 		cout << x <<  " ";
 	}
@@ -73,21 +74,23 @@ void printEigenvalues(const Graph& g) {
 	int size = g.size();
 
 	// Define the input arguments for Lanczos to construct tridiagonal matrix
-	vector<double> alpha, beta;
-
-	DenseMatrix lanczos_vecs;
-
 	// Construct tridiagonal matrix using Lanczos algorithm
-	SparseMatrix trimat = constructTriMat(g, alpha, beta, lanczos_vecs);
+
+	//Lanczos<Vector> lanczos(g);
+	Lanczos<std::vector<double>> lanczos(g);
+	Vector alpha = lanczos.alpha;
+	Vector beta = lanczos.beta;
+
 	beta.push_back(0);
 
 	// Define an identity matrix as the input for TQLI algorithm
 	DenseMatrix tri_eigen_vecs;
-	vector<double> vinitial(size,0);
+	Vector vinitial(size,0);
 	for(int i = 0; i < size; i++)	tri_eigen_vecs[i] = vinitial;
 	for(int i = 0; i < size; i++)	tri_eigen_vecs[i][i] = 1;
 
 	// Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
+	//tqli(alpha, beta, size, tri_eigen_vecs);
 	tqli(alpha, beta, size, tri_eigen_vecs);
 
 	ofstream Output;
@@ -107,9 +110,9 @@ void printEigenvalues(const Graph& g) {
  * =====================================================================================
  */
 
-vector<double> getEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index, const int& size) {
+Vector getEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index, const int& size) {
 	// Find the eigenvector from the vector matrix of the Tridiagonal matrix
-	vector<double> tri_eigen_vec(size, 0);
+	Vector tri_eigen_vec(size, 0);
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
 			if (j == vector_index) {
@@ -119,7 +122,7 @@ vector<double> getEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vec
 	}
 
 	// Calculate the corresponding Laplacian vector
-	vector<double> laplacian_vector(size, 0);
+	Vector laplacian_vector(size, 0);
 	for	(int i = 0; i < size; i++) {
 		for	(int j = 0; j < size; j++) {
 			laplacian_vector[i] += lanczos_vecs[j][i] * tri_eigen_vec[j];
@@ -137,23 +140,24 @@ vector<double> getEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vec
  * =====================================================================================
  */
 
-DenseMatrix getEigenMatrix(const Graph& g, vector<double>& eigenvalues) {
+DenseMatrix getEigenMatrix(const Graph& g, Vector& eigenvalues) {
 
 	int size = g.size();
 
 	// Define the input arguments for Lanczos to construct tridiagonal matrix
-	vector<double> alpha, beta;
-	DenseMatrix lanczos_vecs;
 
 	// Construct tridiagonal matrix using Lanczos algorithm
-	SparseMatrix trimat = constructTriMat(g, alpha, beta, lanczos_vecs);
+	Lanczos<Vector> lanczos(g);
+	Vector alpha = lanczos.alpha;
+	Vector beta = lanczos.beta;
+
 	beta.push_back(0);
 
 	// Define an identity matrix as the input for TQLI algorithm
 	DenseMatrix tri_eigen_vecs;
 	DenseMatrix laplacian_eigen_vecs;
 
-	vector<double> vinitial(size,0);
+	Vector vinitial(size,0);
 	for(int i = 0; i < size; i++) {
 		tri_eigen_vecs[i] = vinitial;	
 		laplacian_eigen_vecs[i] = vinitial;
@@ -171,7 +175,7 @@ DenseMatrix getEigenMatrix(const Graph& g, vector<double>& eigenvalues) {
 	for (int k = 0; k < size; k++) {
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
-			laplacian_eigen_vecs[k][i] += lanczos_vecs[j][i] * tri_eigen_vecs[j][k];
+			laplacian_eigen_vecs[k][i] += lanczos.lanczos_vecs[j][i] * tri_eigen_vecs[j][k];
 			}
 		}	
 	}
@@ -191,25 +195,22 @@ void partition(const Graph& g, const int subgraphs) {
 	int size = g.size();
 	int num_of_eigenvec = log2(subgraphs);
 
-	// Define the input arguments for Lanczos to construct tridiagonal matrix
-	vector<double> alpha, beta;
-
-	DenseMatrix lanczos_vecs;
-
 	// Construct tridiagonal matrix using Lanczos algorithm
-	SparseMatrix trimat = constructTriMat(g, alpha, beta, lanczos_vecs);
+	Lanczos<Vector> lanczos(g);
+	Vector alpha = lanczos.alpha;
+	Vector beta = lanczos.beta;
+
 	beta.push_back(0);
 
 #ifdef Debug
 	cout << endl;
 	cout << "triangular matrix: " << endl;
 	printSparseMatrix(trimat, size);
-
 #endif
 
 	// Define an identity matrix as the input for TQLI algorithm
 	DenseMatrix tri_eigen_vecs;
-	vector<double> vinitial(size,0);
+	Vector vinitial(size,0);
 	for(int i = 0; i < size; i++)	tri_eigen_vecs[i] = vinitial;
 	for(int i = 0; i < size; i++)	tri_eigen_vecs[i][i] = 1;
 
@@ -224,13 +225,13 @@ void partition(const Graph& g, const int subgraphs) {
 	for (unsigned int i = 0; i < alpha.size(); i++)
 		hashmap.insert({alpha[i], i});
 
-	vector<double> auxiliary_vec = alpha;
+	Vector auxiliary_vec = alpha;
 	sort(auxiliary_vec.begin(), auxiliary_vec.end());
 	for (int i = 0; i < num_of_eigenvec; i++) {
 		auto it = hashmap.find(auxiliary_vec[i+1]);
 		vector_index = it->second;
 		hashmap.erase(it);
-		partial_laplacian_eigen_vecs[i] = getEigenVec(lanczos_vecs, tri_eigen_vecs, vector_index, size);
+		partial_laplacian_eigen_vecs[i] = getEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index, size);
 	}
 
 #ifdef Debug
@@ -253,7 +254,7 @@ void partition(const Graph& g, const int subgraphs) {
 void multiPartition(const Graph& g) {
 	int size = g.size();
 
-	vector<double> eigenvalues;
+	Vector eigenvalues;
 	DenseMatrix laplacian_eigen_vecs = getEigenMatrix(g, eigenvalues);
 
 #ifdef Debug
@@ -272,7 +273,7 @@ void multiPartition(const Graph& g) {
 	for (int i = 0; i < size; i++)
 		hashmap.insert({eigenvalues[i], i});
 
-	vector<double> auxiliary_vec = eigenvalues;
+	Vector auxiliary_vec = eigenvalues;
 	sort(auxiliary_vec.begin(), auxiliary_vec.end());
 	for (int i = 0; i < size; i++) {
 		auto it = hashmap.find(auxiliary_vec[i]);

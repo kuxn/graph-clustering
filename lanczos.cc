@@ -11,6 +11,9 @@
  * =====================================================================================
  */
 
+#ifndef LANCZOS_CPP_
+#define LANCZOS_CPP_
+
 #include <iostream> 
 #include <stdexcept>
 #include <utility> 
@@ -19,21 +22,15 @@
 
 using namespace std;
 
-vector<double> multGraphVec(const Graph& g, const vector<double>& vec);
-double dot(const vector<double>& v1, const vector<double>& v2);
-double norm(const vector<double>& vec);
-
-
-
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  multGraphVec
  *  Description:  The first component of Lanczos iteration fomular, Laplacian matrix * vector
  * =====================================================================================
  */
-
-vector<double> multGraphVec(const Graph& g, const vector<double>& vec) {
-	vector<double> prod;
+template<typename Vector>
+inline Vector Lanczos<Vector>::multGraphVec(const Graph& g, const Vector& vec) {
+	Vector prod;
 	if (g.size() != vec.size()) throw std::length_error("The sizes don't match.");
 	int numofvertex = vec.size();
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
@@ -50,12 +47,13 @@ vector<double> multGraphVec(const Graph& g, const vector<double>& vec) {
 
 /* 
  * ===  FUNCTION  ======================================================================
- *         Name:  dot
- *  Description:  Dot product for the calcualtion of alpha for Lanczos
+ *         Name:  utilities
+ *  Description:  Vector operations
  * =====================================================================================
  */
 
-double dot(const vector<double>& v1, const vector<double>& v2) {
+template<typename Vector>
+inline double Lanczos<Vector>::dot(const Vector& v1, const Vector& v2) {
 	if (v1.size() != v2.size())	throw std::length_error("The vector sizes don't match.");
 	int size = v1.size();
 	double dotprod = 0;
@@ -65,12 +63,36 @@ double dot(const vector<double>& v1, const vector<double>& v2) {
 	return dotprod;
 }
 
-double norm(const vector<double>& vec) {
+template<typename Vector>
+inline double Lanczos<Vector>::norm(const Vector& vec) {
 	double normret = 0;
 	for (const double& value:vec) {
 		normret += value * value;
 	}
 	return sqrt(normret);
+}
+
+template<typename Vector>
+inline Vector& Lanczos<Vector>::normalise(Vector& vec) {
+	int size = vec.size();
+	double normal = norm(vec);
+	for (int i = 0; i < size; i++) {
+		vec[i] /= normal;
+	}
+	return vec;
+}
+
+template<typename Vector>
+inline Vector& Lanczos<Vector>::initialise(Vector& vec) {
+	int size = vec.size();
+	for (int i = 0; i < size; i++)  
+		vec[i] = drand48();
+	
+	double normalise = norm(vec);
+	for (int i = 0; i < size; i++)  
+		vec[i] /= normalise;
+
+	return vec;
 }
 
 /* 
@@ -84,10 +106,6 @@ double norm(const vector<double>& vec) {
  *  Signiture of the funtion:
  * 	input:
  *		G contains all the elements of the original graph
- * 		v0[0..n-1] is the initial arbitrary vector whose norm is 1
- *		alpha[0..n-1] is an empty vector
- *		beta[0..n-1] is an empty vector
- *		lanczos_vecs[0..n-1][0..n-1] is an empty matrix
  *
  *	output:
  *		alpha[0..n-1] returns all the diagonal elements of the tridiagonal matrix (diagonalised)
@@ -100,20 +118,17 @@ double norm(const vector<double>& vec) {
  *  Modified Lanczos algorithm with reorthogonalisation by Gram–Schmidt
  *-----------------------------------------------------------------------------*/
 
-map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& alpha, vector<double>& beta, unordered_map<int, vector<double>>& lanczos_vecs) {
-
+template<typename Vector>
+Lanczos<Vector>::Lanczos(const Graph& g) {
 
     int size = g.size();
 
-	vector<double> v0(size, 0);
-	for (int i = 0; i < size; i++)  v0[i] = drand48();
+	Vector v0(size, 0);
+	v0 = initialise(v0);
 
-	double normalise = norm(v0);
-	for (int i = 0; i < size; i++)  v0[i] /= normalise;
-
-	vector<double> t = v0;
-	vector<double> v1 = v0;
-    vector<double> w;
+	Vector t = v0;
+	Vector v1 = v0;
+	Vector w;
    	map<pair<int, int>, double> trimat;
 
 	double alpha_val = 0, beta_val = 0;
@@ -155,12 +170,10 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& alpha
 					lanczos_vecs[k][j] -= reorthog_dot_product * lanczos_vecs[i][j];
 				}
 			}
-			double normalise = norm(lanczos_vecs[k]);
-			for (int j = 0; j < size; j++) lanczos_vecs[k][j] /= normalise;
+			//double normalise = norm(lanczos_vecs[k]);
+			//for (int j = 0; j < size; j++) lanczos_vecs[k][j] /= normalise;
+			normalise(lanczos_vecs[k]);
 			//cout << "norm of lanczos_vecs["<<iter<<"] = " << norm(lanczos_vecs[iter]) << endl;
-			for (int i = 0; i < k; i++) {
-			//cout << "DOT: " << i << k << " "<< dot(lanczos_vecs[i], lanczos_vecs[k]) << endl;
-			}
 		}
 		v0 = lanczos_vecs[iter-1];
 		v1 = lanczos_vecs[iter];
@@ -183,5 +196,5 @@ map<pair<int,int>, double> constructTriMat(const Graph& g, vector<double>& alpha
 	alpha.push_back(alpha_val);
 	trimat[make_pair(size-1, size-1)] = alpha_val;
 	cout << "Lanczos algorithm is done." << endl;
-	return trimat;
 }
+#endif

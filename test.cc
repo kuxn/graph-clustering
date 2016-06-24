@@ -91,9 +91,10 @@ bool testLanczos() {
 	int size = g.size();
 
 	// Calculate the diagonal and subdiagonal vectors
-	vector<double> alpha, beta;
-	unordered_map<int, vector<double>> lanczos_vecs;
-	map<pair<int,int>, double> trimat = constructTriMat(g, alpha, beta, lanczos_vecs);
+	Lanczos<vector<double>> lanczos(g);
+	vector<double> alpha = lanczos.alpha;
+	vector<double> beta = lanczos.beta;
+
 	beta.push_back(0);
 
 	// Initialise the input matrix for storing eigenvectors
@@ -208,12 +209,12 @@ bool testCutEdgePercent() {
 }
 }
 
-int main() {
-	//cout << Tests::testTqli() << endl;;
-	//cout << Tests::testPartition() << endl;
-	Tests::testReadGraph();
-	//Tests::testReadGraphWithColour();
-	//Tests::testCutEdgePercent();
-
-	return 0;
-}
+//int main() {
+//	//cout << Tests::testTqli() << endl;;
+//	//cout << Tests::testPartition() << endl;
+//	Tests::testReadGraph();
+//	//Tests::testReadGraphWithColour();
+//	//Tests::testCutEdgePercent();
+//
+//	return 0;
+//}

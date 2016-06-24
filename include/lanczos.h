@@ -18,6 +18,24 @@
 #include <map>
 #include "graph.h"
 
-std::map<std::pair<int,int>, double> constructTriMat(const Graph& g, std::vector<double>& alpha, std::vector<double>& beta, std::unordered_map<int, std::vector<double>>& lanczos_vecs);
+template<typename Vector>
+class Lanczos {
+    private:
+        inline Vector multGraphVec(const Graph& g, const Vector& vec);
+        inline double dot(const Vector& v1, const Vector& v2);
+        inline double norm(const Vector& vec);
+        inline Vector& normalise(Vector& vec);
+        inline Vector& initialise(Vector& vec);
+
+    public:
+        Lanczos(const Graph& g);
+
+        Vector alpha;
+        Vector beta;
+        std::unordered_map<int, Vector> lanczos_vecs;
+        std::map<std::pair<int,int>, double> tri_mat;
+};
+
+#include "../lanczos.cc"
 
 #endif
