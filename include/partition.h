@@ -18,8 +18,25 @@
 #include <map>
 #include "graph.h"
 
-void printEigenvalues(const Graph& g);
-void partition(const Graph& g, const int subgraphs);
-void multiPartition(const Graph& g);
+class Partition {
+
+    private:
+        typedef std::vector<double> Vector;
+        typedef std::unordered_map<int, Vector> DenseMatrix;
+
+        Vector laplacian_eigen_vec_;
+        DenseMatrix laplacian_eigen_mat_;
+        
+        Vector getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index);
+        void getLapEigenMat(const Graph& g);
+
+    public:
+        Partition(const Graph& g, const int& subgraphs);
+        void usingFullMat(const Graph& g, const int& subgraphs);
+
+        void printLapEigenMat();
+        void printLapEigenvalues();
+        void outputLapEigenvalues();
+};
 
 #endif

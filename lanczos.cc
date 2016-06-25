@@ -20,7 +20,8 @@
 #include <cmath> 
 #include "lanczos.h"
 
-using namespace std;
+using std::cout;
+using std::endl;
 
 /* 
  * ===  FUNCTION  ======================================================================
@@ -81,7 +82,8 @@ inline void Lanczos<Vector>::gramSchmidt(int& iter, int& size) {
 
 template<typename Vector>
 inline double Lanczos<Vector>::dot(const Vector& v1, const Vector& v2) {
-	if (v1.size() != v2.size())	throw std::length_error("The vector sizes don't match.");
+	if (v1.size() != v2.size())	
+	throw std::length_error("The vector sizes don't match.");
 	int size = v1.size();
 	double dotprod = 0;
 	for (int index = 0; index < size; index++) {
@@ -128,13 +130,13 @@ void Lanczos<Vector>::print_tri_mat() {
 	for (int row = 0; row < size; row++) {
 		for (int col = 0; col < size; col++) {
 			if (row == col)
-				std::cout << alpha[row] << "\t";
+				cout << alpha[row] << "\t";
 			else if (col - row == 1)
-				std::cout << beta[row] << "\t";
+				cout << beta[row] << "\t";
 			else if (row - col == 1)
-				std::cout << beta[col] << "\t";
+				cout << beta[col] << "\t";
 			else
-				std::cout << "0" << "\t";
+				cout << "0" << "\t";
 		}
 		cout << endl;
 	}
@@ -187,7 +189,7 @@ Lanczos<Vector>::Lanczos(const Graph& g) {
 
 		beta_val = norm(t); 
 		beta.push_back(beta_val);	
-		if (abs(beta_val) < 1e-5) 
+		if (std::abs(beta_val) < 1e-5) 
 		try { throw std::runtime_error("Value of beta is close to 0: "); }
 		catch (std::runtime_error& e) { 
 			std::cerr << "ERROR: " << e.what(); 
@@ -210,7 +212,7 @@ Lanczos<Vector>::Lanczos(const Graph& g) {
 		cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_product << endl;
 		cout << endl;
 #endif
-		if (abs(dot_product) > 1e-5) 
+		if (std::abs(dot_product) > 1e-5) 
 		try { throw std::runtime_error("Need reorthogonalise: "); }
 		catch (std::runtime_error& e) { 
 			std::cerr << "ERROR: " << e.what(); 

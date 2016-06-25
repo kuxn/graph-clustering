@@ -162,7 +162,7 @@ bool testReadGraph() {
 	In.close();
 
 	g.printDotFormat();
-	partition(g, 4);
+	Partition partition(g, 4);
 	g.printDotFormat();
 	
 	return true;

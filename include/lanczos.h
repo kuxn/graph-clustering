@@ -38,5 +38,4 @@ class Lanczos {
 };
 
 #include "../lanczos.cc"
-
 #endif
