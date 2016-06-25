@@ -3,7 +3,7 @@
  *
  *       Filename:  lanczos.h
  *
- *    Description:  Header file for lanczos algorithm
+ *    Description:  The interface of lanczos algorithm
  *        Created:  06/11/2016 21:22:58
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
@@ -18,13 +18,13 @@
 #include <map>
 #include "graph.h"
 
-template<typename Vector>
+template<typename Vector, typename T>
 class Lanczos {
     private:
         Vector& initialise(Vector& vec);
         Vector multGraphVec(const Graph& g, const Vector& vec);
-        inline double dot(const Vector& v1, const Vector& v2);
-        inline double norm(const Vector& vec);
+        inline T dot(const Vector& v1, const Vector& v2);
+        inline T norm(const Vector& vec);
         inline Vector& normalise(Vector& vec);
         inline void gramSchmidt(int& iter, int& size);
 

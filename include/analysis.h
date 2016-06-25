@@ -17,5 +17,6 @@
 #include "graph.h"
 
 double cutEdgePercent(const Graph& g);
+void cutEdgeTable(std::ifstream& In, const int& subgraphs);
 
 #endif   

@@ -29,8 +29,8 @@ using std::endl;
  *  Description:  The first component of Lanczos iteration fomular, Laplacian matrix * vector
  * =====================================================================================
  */
-template<typename Vector>
-Vector Lanczos<Vector>::multGraphVec(const Graph& g, const Vector& vec) {
+template<typename Vector, typename T>
+Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 	Vector prod;
 	if (g.size() != vec.size())
 	throw std::length_error("The sizes don't match.");
@@ -38,7 +38,7 @@ Vector Lanczos<Vector>::multGraphVec(const Graph& g, const Vector& vec) {
 	int numofvertex = vec.size();
 	for (int vertex = 0; vertex < numofvertex; vertex++) {
 		auto it = g.find(vertex);
-		double temp = 0;
+		T temp = 0.0;
 		if (!it->second.empty())
 		for (const int& neighbour:it->second)
 			temp += vec[neighbour];
@@ -56,17 +56,17 @@ Vector Lanczos<Vector>::multGraphVec(const Graph& g, const Vector& vec) {
  * =====================================================================================
  */
 
-template<typename Vector>
-inline void Lanczos<Vector>::gramSchmidt(int& iter, int& size) {
+template<typename Vector, typename T>
+inline void Lanczos<Vector, T>::gramSchmidt(int& iter, int& size) {
 	for (int k = 1; k <= iter; k++) {
 		//cout << "i - norm of lanczos_vecs["<<k<<"] = " << norm(lanczos_vecs[k]) << endl;
 		for (int i = 0; i < k; i++) {
-			double reorthog_dot_product = dot(lanczos_vecs[i], lanczos_vecs[k]);
+			T reorthog_dot_product = dot(lanczos_vecs[i], lanczos_vecs[k]);
 			for (int j = 0; j < size; j++) {
 				lanczos_vecs[k][j] -= reorthog_dot_product * lanczos_vecs[i][j];
 			}
 		}
-		//double normalise = norm(lanczos_vecs[k]);
+		//T normalise = norm(lanczos_vecs[k]);
 		//for (int j = 0; j < size; j++) lanczos_vecs[k][j] /= normalise;
 		normalise(lanczos_vecs[k]);
 		//cout << "norm of lanczos_vecs["<<iter<<"] = " << norm(lanczos_vecs[iter]) << endl;
@@ -80,52 +80,52 @@ inline void Lanczos<Vector>::gramSchmidt(int& iter, int& size) {
  * =====================================================================================
  */
 
-template<typename Vector>
-inline double Lanczos<Vector>::dot(const Vector& v1, const Vector& v2) {
+template<typename Vector, typename T>
+inline T Lanczos<Vector, T>::dot(const Vector& v1, const Vector& v2) {
 	if (v1.size() != v2.size())	
 	throw std::length_error("The vector sizes don't match.");
 	int size = v1.size();
-	double dotprod = 0;
+	T dotprod = 0.0;
 	for (int index = 0; index < size; index++) {
 		dotprod += v1[index] * v2[index];	
 	}
 	return dotprod;
 }
 
-template<typename Vector>
-inline double Lanczos<Vector>::norm(const Vector& vec) {
-	double normret = 0;
-	for (const double& value:vec) {
+template<typename Vector, typename T>
+inline T Lanczos<Vector, T>::norm(const Vector& vec) {
+	T normret = 0.0;
+	for (const T& value:vec) {
 		normret += value * value;
 	}
 	return sqrt(normret);
 }
 
-template<typename Vector>
-inline Vector& Lanczos<Vector>::normalise(Vector& vec) {
+template<typename Vector, typename T>
+inline Vector& Lanczos<Vector, T>::normalise(Vector& vec) {
 	int size = vec.size();
-	double normal = norm(vec);
+	T normal = norm(vec);
 	for (int i = 0; i < size; i++) {
 		vec[i] /= normal;
 	}
 	return vec;
 }
 
-template<typename Vector>
-Vector& Lanczos<Vector>::initialise(Vector& vec) {
+template<typename Vector, typename T>
+Vector& Lanczos<Vector, T>::initialise(Vector& vec) {
 	int size = vec.size();
 	for (int i = 0; i < size; i++) {
 		vec[i] = drand48();
 	}
-	double normalise = norm(vec);
+	T normalise = norm(vec);
 	for (int i = 0; i < size; i++) {
 		vec[i] /= normalise;
 	}
 	return vec;
 }
 
-template<typename Vector>
-void Lanczos<Vector>::print_tri_mat() {
+template<typename Vector, typename T>
+void Lanczos<Vector, T>::print_tri_mat() {
 	int size = alpha.size();
 	for (int row = 0; row < size; row++) {
 		for (int col = 0; col < size; col++) {
@@ -165,8 +165,8 @@ void Lanczos<Vector>::print_tri_mat() {
  *  Modified Lanczos algorithm with reorthogonalisation by Gram–Schmidt
  *-----------------------------------------------------------------------------*/
 
-template<typename Vector>
-Lanczos<Vector>::Lanczos(const Graph& g) {
+template<typename Vector, typename T>
+Lanczos<Vector, T>::Lanczos(const Graph& g) {
 
     int size = g.size();
 	Vector v0(size);
@@ -174,12 +174,12 @@ Lanczos<Vector>::Lanczos(const Graph& g) {
 
 	Vector t = v0, v1 = v0, w;
 
-	double alpha_val = 0, beta_val = 0;
+	T alpha_val = 0.0, beta_val = 0.0;
 	lanczos_vecs[0] = v0;
 
 	for (int iter = 1; iter < size; iter++) {
 		w = multGraphVec(g, v1);
-		double alpha_val = dot(v1, w);
+		T alpha_val = dot(v1, w);
 		//cout << "dot(v1, v1) = " << dot(v1, v1) << endl;
 		alpha.push_back(alpha_val);
 
@@ -207,7 +207,7 @@ Lanczos<Vector>::Lanczos(const Graph& g) {
 		v1 = lanczos_vecs[iter];
 		
 		//Verify the dot product of v0 and v1 which is supposed to be 0
-		double dot_product = dot(v0, v1);
+		T dot_product = dot(v0, v1);
 #ifdef Debug
 		cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_product << endl;
 		cout << endl;

@@ -3,7 +3,7 @@
  *
  *       Filename:  partition.h
  *
- *    Description:  Header file for partition.cc
+ *    Description:  The interface of partitioning of a graph
  *        Created:  06/17/2016 14:35:37
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
@@ -31,6 +31,7 @@ class Partition {
         void getLapEigenMat(const Graph& g);
 
     public:
+        Partition() {}
         Partition(const Graph& g, const int& subgraphs);
         void usingFullMat(const Graph& g, const int& subgraphs);
 

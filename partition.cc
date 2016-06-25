@@ -106,7 +106,7 @@ void Partition::getLapEigenMat(const Graph& g) {
 	int size = g.size();
 
 	// Construct tridiagonal matrix using Lanczos algorithm
-	Lanczos<Vector> lanczos(g);
+	Lanczos<Vector, double> lanczos(g);
 	laplacian_eigen_vec_ = lanczos.alpha;
 	Vector beta = lanczos.beta;
 
@@ -151,7 +151,7 @@ Partition::Partition(const Graph& g, const int& subgraphs) {
 	int num_of_eigenvec = log2(subgraphs);
 
 	// Construct tridiagonal matrix using Lanczos algorithm
-	Lanczos<Vector> lanczos(g);
+	Lanczos<Vector, double> lanczos(g);
 	laplacian_eigen_vec_ = lanczos.alpha;
 	Vector beta = lanczos.beta;
 

@@ -91,7 +91,7 @@ bool testLanczos() {
 	int size = g.size();
 
 	// Calculate the diagonal and subdiagonal vectors
-	Lanczos<vector<double>> lanczos(g);
+	Lanczos<vector<double>, double> lanczos(g);
 	vector<double> alpha = lanczos.alpha;
 	vector<double> beta = lanczos.beta;
 
@@ -121,7 +121,6 @@ bool testLanczos() {
     }
     return true;
 }
-
 
 /* 
  * ===  FUNCTION  ======================================================================
@@ -154,8 +153,8 @@ bool testPartition() {
 bool testReadGraph() {
 	Graph g;
 	ifstream In;
-	//In.open("read_test.dot");
-	In.open("test-13.dot");
+	In.open("read_test.dot");
+	//In.open("test-13.dot");
 
 	if (In) g.readDotFormat(In);
 	
@@ -182,7 +181,6 @@ bool testReadGraphWithColour() {
 	return true;
 }
 
-
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  testCutEdgePercent
@@ -207,14 +205,36 @@ bool testCutEdgePercent() {
 	
 	return true;
 }
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  testCutEdgeTable
+ *  Description:  Test the connection of the graph after partitioning
+ * =====================================================================================
+ */
+bool testCutEdgeTable() {
+	Graph g;
+	ifstream In;
+	//In.open("table_test.dot");
+	//cutEdgeTable(In, 4);
+	
+	cout << "Test case 2:" << endl;
+	In.open("table_test2.dot");
+	cutEdgeTable(In, 4);
+
+	return true;
 }
 
-//int main() {
-//	//cout << Tests::testTqli() << endl;;
-//	//cout << Tests::testPartition() << endl;
-//	Tests::testReadGraph();
-//	//Tests::testReadGraphWithColour();
-//	//Tests::testCutEdgePercent();
-//
-//	return 0;
-//}
+
+}
+
+int main() {
+	//cout << Tests::testTqli() << endl;;
+	//cout << Tests::testPartition() << endl;
+	//Tests::testReadGraph();
+	//Tests::testReadGraphWithColour();
+	//Tests::testCutEdgePercent();
+	Tests::testCutEdgeTable();
+
+	return 0;
+}

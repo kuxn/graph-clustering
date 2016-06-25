@@ -118,8 +118,9 @@ int main(int argc, char* argv[]) {
 	g.genRandomGraph(num);
 	//g.printLaplacianMat();
 	
-	Partition partition(g, 4);
-	//partition.usingFullMat(g, 4);
+	//Partition partition(g, 4);
+	Partition partition;
+	partition.usingFullMat(g, 4);
 	g.printDotFormat();
 
 	//printEigenvalues(g);

@@ -3,7 +3,7 @@
  *
  *       Filename:  graph.h
  *
- *    Description:  Class Graph header file
+ *    Description:  The interface of a graph
  *        Created:  06/09/2016 16:22:24
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
