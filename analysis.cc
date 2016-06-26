@@ -112,15 +112,15 @@ void cutEdgeVertexTable(const Graph& g) {
 				cout << cut_edge_table[row][col] << "\t";
 		}
 		cout << endl;
-    }
+	}
 	cout << "/*-----------------------------------------------------------------------------" << endl;
 	cout << " * Vertices that have no neighbours in the same subgraph" << endl;
 	cout << "/*-----------------------------------------------------------------------------" << endl;
-    cout << "There are " << isolated_vertex.size() << " such vertices:" << endl;
-    cout << "VertexIndex(Colour)" << "\t" << "NeighboursSize" << endl;
-    for (const int& vertex:isolated_vertex) {
-        cout << vertex << "(" << g.getColour(vertex) << ")" << "\t\t\t" << g.find(vertex)->second.size() << endl;
-    }
+	cout << "There are " << isolated_vertex.size() << " such vertices:" << endl;
+	cout << "VertexIndex(Colour)" << "\t" << "NeighboursSize" << endl;
+	for (const int& vertex:isolated_vertex) {
+		cout << vertex << "(" << g.getColour(vertex) << ")" << "\t\t\t" << g.find(vertex)->second.size() << endl;
+	}
 }
 
 /* 
