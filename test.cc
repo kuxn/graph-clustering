@@ -217,8 +217,8 @@ bool testCutEdgePercent() {
 
 bool testCutEdgeVertexTable() {
 	Graph g;
-	//ifstream In("table_test.dot");
-	ifstream In("output_1000_4.dot");
+	ifstream In("table_test.dot");
+	//ifstream In("output_1000_4.dot");
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
