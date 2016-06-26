@@ -18,7 +18,7 @@ WVTEST_MAIN("lanczos algorithm tests - eigenvalues")
 	WVPASS(Tests::testLanczos());
 }
 
-WVTEST_MAIN("analysis - percentageo of cut edges") 
+WVTEST_MAIN("analysis - percentage of cut edges") 
 {
 	WVPASS(Tests::testCutEdgePercent());
 }

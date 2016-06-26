@@ -22,6 +22,7 @@ bool testPartition();
 bool testReadGraph();
 bool testReadGraphWithColour();
 bool testCutEdgePercent();
+bool testCutEdgeNodeTable();
 
 }
 

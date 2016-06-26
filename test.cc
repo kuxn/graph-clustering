@@ -29,8 +29,7 @@ using namespace std;
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  testTqli
- *  Description:  Test tqli function for the correctness of calculating eigenvalues, 
- * 				  correct eigenvalues come from Matlab.
+ *  Description:  Test tqli function for the correctness of calculating eigenvalues, correct eigenvalues come from Matlab.
  * =====================================================================================
  */
 
@@ -170,7 +169,8 @@ bool testReadGraph() {
 bool testReadGraphWithColour() {
 	Graph g;
 	ifstream In;
-	In.open("read_test.dot");
+	//In.open("read_test.dot");
+	In.open("table_test2.dot");
 
 	if (In) g.readDotFormatWithColour(In);	
 
@@ -195,14 +195,16 @@ bool testCutEdgePercent() {
 
 	if (In) g.readDotFormatWithColour(In);	
 
+	In.close();
+
 	double cut_edge_percent = cutEdgePercent(g);
 	
-	cout << "cut_edge_percent = " << cut_edge_percent << endl;
+	//cout << "cut_edge_percent = " << cut_edge_percent << endl;
 	
-	if (abs(cut_edge_percent - 0.142857) > 1e-5) {
+	if (std::abs(cut_edge_percent - 0.142857) > 1e-5) {
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -212,29 +214,54 @@ bool testCutEdgePercent() {
  *  Description:  Test the connection of the graph after partitioning
  * =====================================================================================
  */
-bool testCutEdgeTable() {
+
+bool testCutEdgeNodeTable() {
 	Graph g;
 	ifstream In;
-	//In.open("table_test.dot");
-	//cutEdgeTable(In, 4);
 	
-	cout << "Test case 2:" << endl;
-	In.open("table_test2.dot");
-	cutEdgeTable(In, 4);
+	In.open("table_test.dot");
+	g.readDotFormatWithColour(In);
+
+	cutEdgeNodeTable(g, 4);
+	
+	/*-----------------------------------------------------------------------------
+ 	 * Number of nodes in each subgraph of a graph with 20 nodes
+ 	 *-----------------------------------------------------------------------------
+	 Colour:	0	1	2	3
+	 Nodes: 	6	5	3	6
+	 *-----------------------------------------------------------------------------
+ 	 * Edges table after partitioning of a graph with 36 edges
+	 * Each element represents edges (inside)/between subgraphs
+ 	 *-----------------------------------------------------------------------------
+			0	1	2	3
+		0	4	4	5	3
+		1	4	6	0	3
+		2	5	0	2	2
+		3	3	3	2	7
+	 *-----------------------------------------------------------------------------*/
 
 	return true;
 }
 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  testManuallyPartition
+ *  Description:  Test the function manuallyPartition in analysis.cc
+ * =====================================================================================
+ */
+
 
 }
 
-int main() {
-	//cout << Tests::testTqli() << endl;;
-	//cout << Tests::testPartition() << endl;
-	//Tests::testReadGraph();
-	//Tests::testReadGraphWithColour();
-	//Tests::testCutEdgePercent();
-	Tests::testCutEdgeTable();
-
-	return 0;
-}
+//int main() {
+//	cout << Tests::testTqli() << endl;;
+//	cout << Tests::testPartition() << endl;
+//	cout << Tests::testLanczos() << endl;
+//	Tests::testReadGraph();
+//	Tests::testReadGraphWithColour();
+//	Tests::testCutEdgePercent();
+//	cout << Tests::testCutEdgePercent() << endl;
+//	Tests::testCutEdgeNodeTable();
+//
+//	return 0;
+//}

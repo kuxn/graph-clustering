@@ -29,20 +29,21 @@
 class Graph {
 
 	private:
-		int num_of_vertex = 10;
+		int edges_;
 		typedef std::unordered_set<int> SetOfNeighbours;
 		std::unordered_map<int, SetOfNeighbours> G;
 		mutable std::unordered_map<int, int> Colour;
 
 	public:
 		Graph() {}
-		Graph(int num): num_of_vertex(num) {}
+		Graph(int n); // Construct a random graph with n vertices
 		
 		void addEdge(int src, int dest);
-		void genRandomGraph(int num);
+		const int edgesNum() const;
+		const unsigned int size() const;
+
 		void printDotFormat() const;
 		void printLaplacianMat() const;
-		const unsigned int size() const;
 		std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
 		void setColour(int vertex, int colour) const;
 		const int getColour(int vertex) const;

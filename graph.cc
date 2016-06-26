@@ -27,6 +27,10 @@ using namespace std;
  * =====================================================================================
  */
 
+const int Graph::edgesNum() const {
+	return edges_/2;
+}
+
 const unsigned int Graph::size() const {
 	return G.size();
 }
@@ -69,18 +73,18 @@ void Graph::addEdge(int src, int dest) {
  */
 
 void Graph::printDotFormat() const {
-    int numofvertex = G.size();
+    int num_of_vertex = G.size();
 	cout << "Undirected Graph {" << endl;
 	if (Colour.size() == 0)
-		for (int vertex = 0; vertex < numofvertex; vertex++) {
+		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
 				cout << vertex << ";" << endl;
 		}
 	else
-		for (int vertex = 0; vertex < numofvertex; vertex++) {
+		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
 			cout << vertex << "[Colour=" << getColour(vertex) << "];" << endl;
 		}
 
-	for (int vertex = 0; vertex < numofvertex; vertex++) {
+	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
 		auto it = G.find(vertex);
 		for (const int& neighbour:it->second)
 			cout << vertex << "--" << neighbour << " ;" << endl;
@@ -96,17 +100,17 @@ void Graph::printDotFormat() const {
  */
 
 void Graph::printLaplacianMat() const {
-	int numofvertex = G.size();
+	int num_of_vertex = G.size();
 	cout << "Laplacian Matrix:" << endl;
-	for (int vertex = 0; vertex < numofvertex; vertex++) {
+	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
 		cout << "\t" << vertex;
 	}
 	cout << endl;
 	
-	for (int row = 0; row < numofvertex; row++) {
+	for (int row = 0; row < num_of_vertex; row++) {
 		cout << row << "\t";
 		auto it = G.find(row);
-		for (int col = 0; col < numofvertex; col++) {
+		for (int col = 0; col < num_of_vertex; col++) {
 			if (col == row)
 				cout << G.at(row).size() << "\t";
 			else if (it->second.find(col) != it->second.end())
@@ -125,31 +129,33 @@ void Graph::printLaplacianMat() const {
  * =====================================================================================
  */
 
-void Graph::genRandomGraph(int numofvertex) {
+Graph::Graph(int num_of_vertex) {
 	random_device seed;	mt19937 rng (seed());
-	//uniform_int_distribution<int> numofneigh(0, numofvertex - 1);
-	uniform_int_distribution<int> numofneigh(1, 3);
-	//poisson_distribution<int> numofneigh(numofvertex/2);
+	//uniform_int_distribution<int> num_of_neigh(0, num_of_vertex - 1);
+	uniform_int_distribution<int> num_of_neigh(1, 3);
+	//poisson_distribution<int> num_of_neigh(num_of_vertex/2);
 
-	for (int vertex = 0; vertex < numofvertex; vertex++) {
-		int numofneighbour = numofneigh(rng);
-        //cout << "numofneighbour = " << numofneighbour << endl;
-		uniform_int_distribution<int> randneigh(0, numofvertex - 1);
-		//poisson_distribution<int> randneigh(numofvertex/2);
+	edges_ = 0;
+	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+		int num_of_neighbour = num_of_neigh(rng);
+		edges_ += num_of_neighbour;
+        //cout << "num_of_neighbour = " << num_of_neighbour << endl;
+		uniform_int_distribution<int> randneigh(0, num_of_vertex - 1);
+		//poisson_distribution<int> randneigh(num_of_vertex/2);
 		unordered_set<int> neighbours;
-		for (int neighbour = 0; neighbour < numofneighbour; neighbour++) {
-			int randneighbour = 0;
+		for (int neighbour = 0; neighbour < num_of_neighbour; neighbour++) {
+			int rand_neighbour = 0;
 			int trials = 1000;
 			do {
-				randneighbour = randneigh(rng);
+				rand_neighbour = randneigh(rng);
 				trials--;
-			} while (vertex == randneighbour && trials);
+			} while (vertex == rand_neighbour && trials);
 			
 			if (trials <= 0) throw std::runtime_error ("Run out of trials.");
-			addEdge(vertex, randneighbour);
+			addEdge(vertex, rand_neighbour);
 		}
 	}
-	if (G.size() != (unsigned)numofvertex) throw std::length_error ("The size of generated graph is incorrect.");
+	if (G.size() != (unsigned)num_of_vertex) throw std::length_error ("The size of generated graph is incorrect.");
 	cout << "Graph generation is done." << endl;
 }
 
@@ -188,10 +194,12 @@ void Graph::readDotFormat(ifstream& In) {
 
 	int from = 0;
 	int to = 0;
+	edges_ = 0;
 	In >> to;
 	In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 	while (In.good()) {
 		addEdge(from, to);
+		edges_++;
 		In >> from;
 		In.ignore(2); // Ignore "--"
 		In >> to;
@@ -226,11 +234,13 @@ void Graph::readDotFormatWithColour(ifstream& In) {
 
 	int from = 0;
 	int to = 0;
+	edges_ = 0;
 	In.ignore(2); // Ignore "--"
 	In >> to;
 	In.ignore(INT_MAX, '\n'); 
 	while (In.good()) {
 		addEdge(from, to);
+		edges_++;
 		In >> from;
 		In.ignore(2); // Ignore "--"
 		In >> to;

@@ -11,12 +11,13 @@
  * =====================================================================================
  */
 
-#ifndef  ANALYSIS_H_
-#define  ANALYSIS_H_
+#ifndef ANALYSIS_H_
+#define ANALYSIS_H_
 
 #include "graph.h"
 
 double cutEdgePercent(const Graph& g);
-void cutEdgeTable(std::ifstream& In, const int& subgraphs);
+void cutEdgeNodeTable(const Graph& g, const int& subgraphs);
+void manuallyPartition(const Graph& g, const int& subgraphs);
 
 #endif   

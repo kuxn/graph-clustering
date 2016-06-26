@@ -22,11 +22,6 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
-	Graph g;
-
-	// Addedge function test
-
-
 	/*-----------------------------------------------------------------------------
 	 *  Test case for basic functions
 	 *-----------------------------------------------------------------------------*/
@@ -109,13 +104,13 @@ int main(int argc, char* argv[]) {
 	//g.addEdge(14,15);
 
 	istringstream ss(argv[1]);
-	int num = 0;
+	int num = 10;
 	if (!(ss >> num))
 		cerr << "Invalid number " << argv[1] << endl;
 
 	cout << "num of vertices= " << num << endl;
 
-	g.genRandomGraph(num);
+	Graph g(num);
 	//g.printLaplacianMat();
 	
 	//Partition partition(g, 4);
