@@ -22,25 +22,49 @@ using namespace std;
 
 /* 
  * ===  FUNCTION  ======================================================================
+ *         Name:  Constructor
+ *  Description:  Generate random graph using addEdge function
+ * =====================================================================================
+ */
+
+Graph::Graph(int num_of_vertex) {
+	random_device seed;	mt19937 rng (seed());
+	//uniform_int_distribution<int> num_of_neigh(0, num_of_vertex - 1);
+	uniform_int_distribution<int> num_of_neigh(1, 3);
+	//poisson_distribution<int> num_of_neigh(num_of_vertex/2);
+
+	edges_ = 0;
+	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+		int num_of_neighbour = num_of_neigh(rng);
+		edges_ += num_of_neighbour;
+        //cout << "num_of_neighbour = " << num_of_neighbour << endl;
+		uniform_int_distribution<int> randneigh(0, num_of_vertex - 1);
+		//poisson_distribution<int> randneigh(num_of_vertex/2);
+		unordered_set<int> neighbours;
+		for (int neighbour = 0; neighbour < num_of_neighbour; neighbour++) {
+			int rand_neighbour = 0;
+			int trials = 1000;
+			do {
+				rand_neighbour = randneigh(rng);
+				trials--;
+			} while (vertex == rand_neighbour && trials);
+			
+			if (trials <= 0) throw std::runtime_error ("Run out of trials.");
+			addEdge(vertex, rand_neighbour);
+		}
+	}
+	if (G.size() != (unsigned)num_of_vertex) throw std::length_error ("The size of generated graph is incorrect.");
+	cout << "Graph generation is done." << endl;
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
  *         Name:  addEdge
  *  Description:  Add edges into graph 
  * =====================================================================================
  */
 
-const int Graph::edgesNum() const {
-	return edges_/2;
-}
-
-const unsigned int Graph::size() const {
-	return G.size();
-}
-
-unordered_map<int, std::unordered_set<int>>::const_iterator Graph::find(int vertex) const {
-	return G.find(vertex);
-}
-
 void Graph::addEdge(int src, int dest) {
-
 	// Avoid the self circle
 	if (src == dest) return;
 
@@ -64,6 +88,38 @@ void Graph::addEdge(int src, int dest) {
 		G.insert(make_pair(dest, edges));
 	}
 }	
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  return graph properties
+ *  Description:  Functions to return graph properties
+ * =====================================================================================
+ */
+
+const int Graph::size() const {
+	return G.size();
+}
+
+const int Graph::edgesNum() const {
+	return edges_/2;
+}
+
+const int Graph::subgraphsNum() const {
+	if (Colour.size() == 0) {
+		cout << "WARNING:The graph hasn't been partitioned." << endl; 
+		return 1;
+	}
+	
+	unordered_map<int, int> reverse_colour_map;
+	for (const auto& it:Colour) {
+		reverse_colour_map.insert({it.second, it.first});
+	}
+	return reverse_colour_map.size();
+}
+
+const unordered_map<int, std::unordered_set<int>>::const_iterator Graph::find(int vertex) const {
+	return G.find(vertex);
+}
 
 /* 
  * ===  FUNCTION  ======================================================================
@@ -124,43 +180,6 @@ void Graph::printLaplacianMat() const {
 
 /* 
  * ===  FUNCTION  ======================================================================
- *         Name:  genRandomGraph
- *  Description:  Generate random graph using addEdge function
- * =====================================================================================
- */
-
-Graph::Graph(int num_of_vertex) {
-	random_device seed;	mt19937 rng (seed());
-	//uniform_int_distribution<int> num_of_neigh(0, num_of_vertex - 1);
-	uniform_int_distribution<int> num_of_neigh(1, 3);
-	//poisson_distribution<int> num_of_neigh(num_of_vertex/2);
-
-	edges_ = 0;
-	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-		int num_of_neighbour = num_of_neigh(rng);
-		edges_ += num_of_neighbour;
-        //cout << "num_of_neighbour = " << num_of_neighbour << endl;
-		uniform_int_distribution<int> randneigh(0, num_of_vertex - 1);
-		//poisson_distribution<int> randneigh(num_of_vertex/2);
-		unordered_set<int> neighbours;
-		for (int neighbour = 0; neighbour < num_of_neighbour; neighbour++) {
-			int rand_neighbour = 0;
-			int trials = 1000;
-			do {
-				rand_neighbour = randneigh(rng);
-				trials--;
-			} while (vertex == rand_neighbour && trials);
-			
-			if (trials <= 0) throw std::runtime_error ("Run out of trials.");
-			addEdge(vertex, rand_neighbour);
-		}
-	}
-	if (G.size() != (unsigned)num_of_vertex) throw std::length_error ("The size of generated graph is incorrect.");
-	cout << "Graph generation is done." << endl;
-}
-
-/* 
- * ===  FUNCTION  ======================================================================
  *         Name:  setColour
  *  Description:  Map colour for each vertex
  * =====================================================================================
@@ -178,6 +197,9 @@ void Graph::setColour(int vertex, int colour) const {
  */
 
 const int Graph::getColour(int vertex) const {
+	if (Colour.size() == 0) {
+		return 0;
+	}
 	return Colour.at(vertex);
 }
 
@@ -189,6 +211,10 @@ const int Graph::getColour(int vertex) const {
  */
 
 void Graph::readDotFormat(ifstream& In) {
+    if (!In.is_open()) {
+        std::cerr << "ERROR: Can't open the file" << endl;
+        exit(-1);
+    }   
 	In.ignore(INT_MAX, '-');
 	In.ignore(1); // Skip the second '-'
 
@@ -205,7 +231,7 @@ void Graph::readDotFormat(ifstream& In) {
 		In >> to;
 		In.ignore(INT_MAX, '\n');
 	}
-	In.close();
+    In.close();
 }
 
 /* 
@@ -216,7 +242,11 @@ void Graph::readDotFormat(ifstream& In) {
  */
 
 void Graph::readDotFormatWithColour(ifstream& In) {
-	
+    if (!In.is_open()) {
+        std::cerr << "ERROR: Can't open the file" << endl;
+        exit(-1);
+    }
+
 	In.ignore(INT_MAX, '='); // Ignore the chars before the value of colour
 	int vertex = 0;
 	int colour = 0;
@@ -246,5 +276,5 @@ void Graph::readDotFormatWithColour(ifstream& In) {
 		In >> to;
 		In.ignore(INT_MAX, '\n');
 	}
-	In.close();
+    In.close();
 }

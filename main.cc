@@ -113,8 +113,8 @@ int main(int argc, char* argv[]) {
 	Graph g(num);
 	//g.printLaplacianMat();
 	
-	//Partition partition(g, 4);
-	Partition partition;
+	Partition partition(g, 4);
+	g.printDotFormat();
 	partition.usingFullMat(g, 4);
 	g.printDotFormat();
 

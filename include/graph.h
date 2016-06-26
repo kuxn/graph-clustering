@@ -27,28 +27,28 @@
 #include <fstream>
 
 class Graph {
+    private:
+        int edges_;
+        typedef std::unordered_set<int> SetOfNeighbours;
+        std::unordered_map<int, SetOfNeighbours> G;
+        mutable std::unordered_map<int, int> Colour;
+    
+    public:
+        Graph() {}
+        Graph(int n); // Construct a random graph with n vertices
+        
+        void addEdge(int src, int dest);
+        const int edgesNum() const;
+        const int subgraphsNum() const;
+        const int size() const;
 
-	private:
-		int edges_;
-		typedef std::unordered_set<int> SetOfNeighbours;
-		std::unordered_map<int, SetOfNeighbours> G;
-		mutable std::unordered_map<int, int> Colour;
-
-	public:
-		Graph() {}
-		Graph(int n); // Construct a random graph with n vertices
-		
-		void addEdge(int src, int dest);
-		const int edgesNum() const;
-		const unsigned int size() const;
-
-		void printDotFormat() const;
-		void printLaplacianMat() const;
-		std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
-		void setColour(int vertex, int colour) const;
-		const int getColour(int vertex) const;
-		void readDotFormat(std::ifstream& In);
-		void readDotFormatWithColour(std::ifstream& In);
+        void printDotFormat() const;
+        void printLaplacianMat() const;
+        void setColour(int vertex, int colour) const;
+        const int getColour(int vertex) const;
+        void readDotFormat(std::ifstream& In);
+        void readDotFormatWithColour(std::ifstream& In);
+        const std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
 };
 
 #endif

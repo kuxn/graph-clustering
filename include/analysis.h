@@ -17,7 +17,7 @@
 #include "graph.h"
 
 double cutEdgePercent(const Graph& g);
-void cutEdgeNodeTable(const Graph& g, const int& subgraphs);
-void manuallyPartition(const Graph& g, const int& subgraphs);
+void cutEdgeVertexTable(const Graph& g);
+void manuallyPartition(const Graph& g);
 
 #endif   

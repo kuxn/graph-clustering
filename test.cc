@@ -151,14 +151,14 @@ bool testPartition() {
 
 bool testReadGraph() {
 	Graph g;
-	ifstream In;
-	In.open("read_test.dot");
-	//In.open("test-13.dot");
-
-	if (In) g.readDotFormat(In);
+	ifstream In("read_test.dot");
+	//ifstream In("test-13.dot");
+	if (!In.is_open()) {
+		std::cerr << "ERROR: Can't open the file" << endl;
+		exit(-1);
+	}
+	g.readDotFormat(In);
 	
-	In.close();
-
 	g.printDotFormat();
 	Partition partition(g, 4);
 	g.printDotFormat();
@@ -168,13 +168,13 @@ bool testReadGraph() {
 
 bool testReadGraphWithColour() {
 	Graph g;
-	ifstream In;
-	//In.open("read_test.dot");
-	In.open("table_test2.dot");
-
-	if (In) g.readDotFormatWithColour(In);	
-
-	In.close();
+	ifstream In("table_test2.dot");
+	//ifstream In("read_test.dot");
+	if (!In.is_open()) {
+		std::cerr << "ERROR: Can't open the file" << endl;
+		exit(-1);
+	}
+	g.readDotFormatWithColour(In);	
 
 	g.printDotFormat();
 
@@ -190,12 +190,12 @@ bool testReadGraphWithColour() {
 
 bool testCutEdgePercent() {
 	Graph g;
-	ifstream In;
-	In.open("read_test.dot");
-
-	if (In) g.readDotFormatWithColour(In);	
-
-	In.close();
+	ifstream In("read_test.dot");
+	if (!In.is_open()) {
+		std::cerr << "ERROR: Can't open the file" << endl;
+		exit(-1);
+	}
+	g.readDotFormatWithColour(In);	
 
 	double cut_edge_percent = cutEdgePercent(g);
 	
@@ -215,31 +215,38 @@ bool testCutEdgePercent() {
  * =====================================================================================
  */
 
-bool testCutEdgeNodeTable() {
+bool testCutEdgeVertexTable() {
 	Graph g;
-	ifstream In;
-	
-	In.open("table_test.dot");
+	//ifstream In("table_test.dot");
+	ifstream In("output_1000_4.dot");
+	if (!In.is_open()) {
+		std::cerr << "ERROR: Can't open the file" << endl;
+		exit(-1);
+	}
 	g.readDotFormatWithColour(In);
-
-	cutEdgeNodeTable(g, 4);
+	cutEdgeVertexTable(g);
 	
 	/*-----------------------------------------------------------------------------
- 	 * Number of nodes in each subgraph of a graph with 20 nodes
- 	 *-----------------------------------------------------------------------------
-	 Colour:	0	1	2	3
-	 Nodes: 	6	5	3	6
-	 *-----------------------------------------------------------------------------
- 	 * Edges table after partitioning of a graph with 36 edges
-	 * Each element represents edges (inside)/between subgraphs
- 	 *-----------------------------------------------------------------------------
-			0	1	2	3
-		0	4	4	5	3
-		1	4	6	0	3
-		2	5	0	2	2
-		3	3	3	2	7
-	 *-----------------------------------------------------------------------------*/
-
+ 	* Basic info of the graph
+	*-----------------------------------------------------------------------------
+	Vertices:   20
+	Edges:      36
+	Subgraphs:  4
+	*-----------------------------------------------------------------------------
+ 	* Number of nodes in each subgraph
+	*-----------------------------------------------------------------------------
+	Colour:		0	1	2	3
+	Vertices: 	6	5	3	6
+	*-----------------------------------------------------------------------------
+ 	* Edges table after partitioning
+ 	* Each element represents number of edges (inside)/between subgraphs
+	*-----------------------------------------------------------------------------
+		0	1	2	3
+	0	(4)	4	5	3
+	1	4	(6)	0	3
+	2	5	0	(2)	2
+	3	3	3	2	(7)
+	*-----------------------------------------------------------------------------*/
 	return true;
 }
 
@@ -253,15 +260,15 @@ bool testCutEdgeNodeTable() {
 
 }
 
-//int main() {
-//	cout << Tests::testTqli() << endl;;
-//	cout << Tests::testPartition() << endl;
-//	cout << Tests::testLanczos() << endl;
-//	Tests::testReadGraph();
-//	Tests::testReadGraphWithColour();
-//	Tests::testCutEdgePercent();
-//	cout << Tests::testCutEdgePercent() << endl;
-//	Tests::testCutEdgeNodeTable();
-//
-//	return 0;
-//}
+int main() {
+	//cout << Tests::testTqli() << endl;;
+	//cout << Tests::testPartition() << endl;
+	//cout << Tests::testLanczos() << endl;
+	//Tests::testReadGraph();
+	//Tests::testReadGraphWithColour();
+	//Tests::testCutEdgePercent();
+	//cout << Tests::testCutEdgePercent() << endl;
+	Tests::testCutEdgeVertexTable();
+
+	return 0;
+}
