@@ -49,6 +49,9 @@ double cutEdgePercent(const Graph& g) {
 void cutEdgeVertexTable(const Graph& g) {
 	int size = g.size();
 	int subgraphs = g.subgraphsNum();
+	subgraphs = 2;
+
+	cout << "subgraphs = " << subgraphs << endl;
 
 	std::unordered_map<int, std::vector<int>> cut_edge_table;
 	std::vector<int> cut_vertex_table(subgraphs, 0);
@@ -59,6 +62,7 @@ void cutEdgeVertexTable(const Graph& g) {
 		cut_edge_table[i] = vinitial;
 	}
 	
+	cout << "I am here1" << endl;
 	for (int vertex = 0; vertex < size; vertex++) {
         int temp = 0;
 		int vertex_subgraph = g.getColour(vertex);
@@ -76,6 +80,7 @@ void cutEdgeVertexTable(const Graph& g) {
 		cut_vertex_table[vertex_subgraph]++;
 	}	
 
+	cout << "I am here2" << endl;
 	cout << "/*-----------------------------------------------------------------------------" << endl;
 	cout << " * Basic info of the graph" << endl;
 	cout << "/*-----------------------------------------------------------------------------" << endl;

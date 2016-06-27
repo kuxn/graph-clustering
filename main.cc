@@ -17,6 +17,7 @@
 #include "lanczos.h"
 #include "tqli.h"
 #include "partition.h"
+#include "analysis.h"
 
 using namespace std;
 
@@ -111,12 +112,12 @@ int main(int argc, char* argv[]) {
 	cout << "num of vertices= " << num << endl;
 
 	Graph g(num);
-	//g.printLaplacianMat();
+	g.printLaplacianMat();
 	
-	Partition partition(g, 4);
+	
 	g.printDotFormat();
-	partition.usingFullMat(g, 4);
-	g.printDotFormat();
+	//partition.usingFullMat(g, 4);
+	//g.printDotFormat();
 
 	//printEigenvalues(g);
 

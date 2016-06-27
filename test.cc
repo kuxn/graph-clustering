@@ -130,16 +130,29 @@ bool testLanczos() {
 
 bool testPartition() {
 	
+	Graph g(500);
 	Graph g;
-	g.addEdge(0,1);
-	g.addEdge(0,2);
-	g.addEdge(1,2);
-	g.addEdge(2,3);
-	g.addEdge(3,4);
-	g.addEdge(3,5);
-	g.addEdge(4,5);
+	Partition partition(g, 2);
+	
+	cutEdgeVertexTable(g);	
+	g.printDotFormat();
+	partition.printLapEigenvalues();
 	
 	return true;
+}
+
+bool testReothogonalisation() {
+
+	ifstream In("random_200_without_orth.dot");
+	g.readDotFormatWithColour(In);
+	cutEdgeVertexTable(g);
+	cout << "Cutedge percent without orth = " << cutEdgePercent(g) << endl;
+
+	In.open("random_200_with_orth.dot");
+	g.readDotFormatWithColour(In);
+	cutEdgeVertexTable(g);
+	cutEdgePercent(g);
+	cout << "Cutedge percent with orth = " << cutEdgePercent(g) << endl;
 }
 
 /* 
@@ -217,7 +230,8 @@ bool testCutEdgePercent() {
 
 bool testCutEdgeVertexTable() {
 	Graph g;
-	ifstream In("table_test.dot");
+	//ifstream In("table_test.dot");
+	ifstream In("random_100_without_ortho_withbug.dot");
 	//ifstream In("output_1000_4.dot");
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
@@ -258,24 +272,24 @@ bool testCutEdgeVertexTable() {
  */
 
 bool testManuallyPartition() {
-	Graph g(200);
-	//Graph g;
-	//ifstream In("test_1000.dot");
+	//Graph g(200);
+	Graph g;
+	ifstream In("test_1000.dot");
 	//ifstream In("Output_200.dot");
-	//if (!In.is_open()) {
-	//	std::cerr << "ERROR: Can't open the file" << endl;
-	//	exit(-1);
-	//}
-	//g.readDotFormatWithColour(In);	
+	if (!In.is_open()) {
+		std::cerr << "ERROR: Can't open the file" << endl;
+		exit(-1);
+	}
+	g.readDotFormatWithColour(In);	
 	//g.printDotFormat();
 
-	Partition partition(g, 4);
+	//Partition partition(g, 4);
 	cutEdgeVertexTable(g);
 	cout << "cutEdgePercent = " << cutEdgePercent(g) << endl;
-	cout << "Num of edges = " << g.edgesNum() << endl;
 
 	manuallyPartition(g);
-	g.outputDotFormat("Output_200_manuallyPartition.dot");
+	//g.outputDotFormat("Output_200_manuallyPartition.dot");
+	g.outputDotFormat("Output_1000_manuallyPartition.dot");
 	cutEdgeVertexTable(g);
 	cout << "cutEdgePercent = " << cutEdgePercent(g) << endl;
 
@@ -292,8 +306,9 @@ int main() {
 	//Tests::testReadGraphWithColour();
 	//Tests::testCutEdgePercent();
 	//cout << Tests::testCutEdgePercent() << endl;
+	//Tests::testManuallyPartition();
+	Tests::testPartition();
 	//Tests::testCutEdgeVertexTable();
-	Tests::testManuallyPartition();
 
 	return 0;
 }

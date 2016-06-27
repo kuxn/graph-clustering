@@ -71,8 +71,13 @@ Partition::Partition(const Graph& g, const int& subgraphs) {
 
 	Vector auxiliary_vec = laplacian_eigenvalues_;
 	sort(auxiliary_vec.begin(), auxiliary_vec.end());
+	int fiedler_index = 2;
 	for (int i = 0; i < num_of_eigenvec; i++) {
-		auto it = hashmap.find(auxiliary_vec[i+1]);
+		auto it = hashmap.find(auxiliary_vec[fiedler_index]);
+		while (abs(it->first) < 1e-5) {
+			fiedler_index++;
+			it = hashmap.find(auxiliary_vec[fiedler_index]);
+		}
 		vector_index = it->second;
 		hashmap.erase(it);
 		laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index);
@@ -84,11 +89,13 @@ Partition::Partition(const Graph& g, const int& subgraphs) {
 
 	for (int vertex = 0; vertex < size; vertex++) {
 		int colour = 0;
-		for (int row = 0; row < num_of_eigenvec; row++) {
+		//for (int row = 0; row < num_of_eigenvec; row++) {
+		for (int row = num_of_eigenvec - 1; row >= 0; row--) {
 			colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][vertex]);
 		}
 		g.setColour(vertex, colour);
 	}
+	cout << "Partitioning is done." << endl;
 }
 
 /*-----------------------------------------------------------------------------
