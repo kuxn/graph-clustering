@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  graph.cpp
+ *       Filename:  graph.cc
  *
  *    Description:  Member functions for Class Graph.hpp
  *        Created:  06/09/2016 22:42:42
@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <random>
 #include <climits>
+#include <string>
 
 #include "graph.h"
 
@@ -33,10 +34,8 @@ Graph::Graph(int num_of_vertex) {
 	uniform_int_distribution<int> num_of_neigh(1, 3);
 	//poisson_distribution<int> num_of_neigh(num_of_vertex/2);
 
-	edges_ = 0;
 	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
 		int num_of_neighbour = num_of_neigh(rng);
-		edges_ += num_of_neighbour;
         //cout << "num_of_neighbour = " << num_of_neighbour << endl;
 		uniform_int_distribution<int> randneigh(0, num_of_vertex - 1);
 		//poisson_distribution<int> randneigh(num_of_vertex/2);
@@ -101,7 +100,11 @@ const int Graph::size() const {
 }
 
 const int Graph::edgesNum() const {
-	return edges_/2;
+	int edges = 0;
+	for (auto& it:G) {
+		edges += it.second.size(); 
+	}
+	return edges/2;
 }
 
 const int Graph::subgraphsNum() const {
@@ -148,6 +151,38 @@ void Graph::printDotFormat() const {
 	cout << "}" << endl;
 }
 
+
+/*-----------------------------------------------------------------------------
+ *  Modified function to output the graph into dot file
+ *-----------------------------------------------------------------------------*/
+
+void Graph::outputDotFormat(const string& filename) const {
+    int num_of_vertex = G.size();
+
+	//string filename("Output_");
+	//filename += to_string(num_of_vertex);
+	//filename += ".dot";
+
+	ofstream Output(filename);
+
+	Output << "Undirected Graph {" << endl;
+	if (Colour.size() == 0)
+		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+				Output << vertex << ";" << endl;
+		}
+	else
+		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+			Output << vertex << "[Colour=" << getColour(vertex) << "];" << endl;
+		}
+
+	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+		auto it = G.find(vertex);
+		for (const int& neighbour:it->second)
+			Output << vertex << "--" << neighbour << " ;" << endl;
+	}
+	Output << "}" << endl;
+}
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  printLaplacianMat
@@ -186,7 +221,8 @@ void Graph::printLaplacianMat() const {
  */
 
 void Graph::setColour(int vertex, int colour) const {
-	Colour.insert({vertex, colour});
+	//Colour.insert({vertex, colour});
+	Colour[vertex] = colour;
 }
 
 /* 
@@ -211,27 +247,24 @@ const int Graph::getColour(int vertex) const {
  */
 
 void Graph::readDotFormat(ifstream& In) {
-    if (!In.is_open()) {
-        std::cerr << "ERROR: Can't open the file" << endl;
-        exit(-1);
-    }   
+	if (!In.is_open()) {
+		std::cerr << "ERROR: Can't open the file" << endl;
+		exit(-1);
+	}
 	In.ignore(INT_MAX, '-');
 	In.ignore(1); // Skip the second '-'
-
-	int from = 0;
-	int to = 0;
-	edges_ = 0;
+	int from = 0, to = 0;
 	In >> to;
 	In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
+
 	while (In.good()) {
 		addEdge(from, to);
-		edges_++;
 		In >> from;
 		In.ignore(2); // Ignore "--"
 		In >> to;
 		In.ignore(INT_MAX, '\n');
 	}
-    In.close();
+	In.close();
 }
 
 /* 
@@ -242,14 +275,12 @@ void Graph::readDotFormat(ifstream& In) {
  */
 
 void Graph::readDotFormatWithColour(ifstream& In) {
-    if (!In.is_open()) {
-        std::cerr << "ERROR: Can't open the file" << endl;
-        exit(-1);
-    }
-
+	if (!In.is_open()) {
+		std::cerr << "ERROR: Can't open the file" << endl;
+		exit(-1);
+	}
 	In.ignore(INT_MAX, '='); // Ignore the chars before the value of colour
-	int vertex = 0;
-	int colour = 0;
+	int vertex = 0, colour = 0;
 	In >> colour;
 	In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 	
@@ -261,20 +292,17 @@ void Graph::readDotFormatWithColour(ifstream& In) {
 		In >> colour;
 		In.ignore(INT_MAX, '\n');
 	}
-
-	int from = 0;
-	int to = 0;
-	edges_ = 0;
+	
+	int from = 0, to = 0;
 	In.ignore(2); // Ignore "--"
 	In >> to;
 	In.ignore(INT_MAX, '\n'); 
 	while (In.good()) {
 		addEdge(from, to);
-		edges_++;
 		In >> from;
 		In.ignore(2); // Ignore "--"
 		In >> to;
 		In.ignore(INT_MAX, '\n');
 	}
-    In.close();
+	In.close();
 }

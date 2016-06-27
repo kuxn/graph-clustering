@@ -24,7 +24,7 @@ class Partition {
         typedef std::vector<double> Vector;
         typedef std::unordered_map<int, Vector> DenseMatrix;
 
-        Vector laplacian_eigen_vec_;
+        Vector laplacian_eigenvalues_;
         DenseMatrix laplacian_eigen_mat_;
         
         Vector getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index);

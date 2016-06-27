@@ -30,6 +30,142 @@ typedef std::unordered_map<int, Vector> DenseMatrix;
 
 /* 
  * ===  FUNCTION  ======================================================================
+ *         Name:  Constructor
+ *  Description:  Partition the graph into multiple subgraphs by only calculating the corresponding laplacian eigenvectors
+ * =====================================================================================
+ */
+
+Partition::Partition(const Graph& g, const int& subgraphs) {
+
+	int size = g.size();
+	int num_of_eigenvec = log2(subgraphs);
+
+	// Construct tridiagonal matrix using Lanczos algorithm
+	Lanczos<Vector, double> lanczos(g);
+	laplacian_eigenvalues_ = lanczos.alpha;
+	Vector beta = lanczos.beta;
+
+	beta.push_back(0);
+
+#ifdef Debug
+	cout << endl;
+	cout << "triangular matrix: " << endl;
+	lanczos.print_tri_mat();
+#endif
+
+	// Define an identity matrix as the input for TQLI algorithm
+	DenseMatrix tri_eigen_vecs;
+	Vector vinitial(size,0);
+	for(int i = 0; i < size; i++)	tri_eigen_vecs[i] = vinitial;
+	for(int i = 0; i < size; i++)	tri_eigen_vecs[i][i] = 1;
+
+	// Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
+	tqli(laplacian_eigenvalues_, beta, size, tri_eigen_vecs);
+
+	// Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha" 
+	int vector_index = 0;
+
+	unordered_multimap<double, int> hashmap;
+	for (int i = 0; i < size; i++)
+		hashmap.insert({laplacian_eigenvalues_[i], i});
+
+	Vector auxiliary_vec = laplacian_eigenvalues_;
+	sort(auxiliary_vec.begin(), auxiliary_vec.end());
+	for (int i = 0; i < num_of_eigenvec; i++) {
+		auto it = hashmap.find(auxiliary_vec[i+1]);
+		vector_index = it->second;
+		hashmap.erase(it);
+		laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index);
+	}
+
+#ifdef Debug
+	printLapEigenMat();
+#endif
+
+	for (int vertex = 0; vertex < size; vertex++) {
+		int colour = 0;
+		for (int row = 0; row < num_of_eigenvec; row++) {
+			colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][vertex]);
+		}
+		g.setColour(vertex, colour);
+	}
+}
+
+/*-----------------------------------------------------------------------------
+ *  Modified partition function to for multiple partitioning by calculating all laplacian eigenvectors
+ *-----------------------------------------------------------------------------*/
+
+void Partition::usingFullMat(const Graph& g, const int& subgraphs) {
+
+	int size = g.size();
+	getLapEigenMat(g);
+
+#ifdef Debug
+	// Print all the eigenvalues of the tridiagonal/laplacian matrix
+	cout << "laplacian eigenvalues: " << endl;
+	printLapEigenvalues();
+
+	// Print all the eigenvectors in row
+	cout << "laplacian_eigen_mat_: " << endl;
+	printLapEigenMat();
+#endif
+
+	// eigenvalues_index_sort stores the original index of the sorted eigenvalues 
+	vector<int> eigenvalues_index_sort;
+	unordered_multimap<double, int> hashmap;
+	for (int i = 0; i < size; i++)
+		hashmap.insert({laplacian_eigenvalues_[i], i});
+
+	Vector auxiliary_vec = laplacian_eigenvalues_;
+	sort(auxiliary_vec.begin(), auxiliary_vec.end());
+	for (int i = 0; i < size; i++) {
+		auto it = hashmap.find(auxiliary_vec[i]);
+		eigenvalues_index_sort.push_back(it->second);
+		hashmap.erase(it);
+	}
+
+#ifdef Debug
+	cout << endl;
+	cout << "Original index of eigenvalues in sorted order: "; 
+	for (const int& x:eigenvalues_index_sort)
+		cout <<	x << " "; 
+	cout << endl;
+
+	cout << "eigenvalues in sorted order: " << endl; 
+	for (const int& x:eigenvalues_index_sort)
+		cout <<	laplacian_eigenvalues_[x] << " "; 
+	cout << endl;
+
+	cout << "Laplacian eigenvectors in sorted order: " << endl;
+	for (const int& row:eigenvalues_index_sort) {
+		for (int col = 0; col < size; col++) {
+			cout << laplacian_eigen_mat_[row][col] << " ";
+		}
+		cout << endl;
+	}
+
+	cout << "Laplacian eigenvectors in sorted order: " << endl;
+	for (const int& row:eigenvalues_index_sort) {
+		for (int col = 0; col < size; col++) {
+			cout << Sign(laplacian_eigen_mat_[row][col])<< " ";
+		}
+		cout << endl;
+	}
+#endif
+
+	int num = log2(subgraphs); // number of eigenvectors to partition the graph, start from the second smallest.
+	for (int vertex = 0; vertex < size; vertex++) {
+		int colour = 0;
+		for (int eigenvec_index = 1; eigenvec_index <= num; eigenvec_index++) {
+			int row = eigenvalues_index_sort[eigenvec_index];
+			colour += pow(2, eigenvec_index - 1) * Sign(laplacian_eigen_mat_[row][vertex]);
+		}
+		g.setColour(vertex, colour);
+	}
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
  *         Name:  utilities
  *  Description:  Print vector, matrix for debug
  * =====================================================================================
@@ -47,18 +183,22 @@ void Partition::printLapEigenMat() {
 }
 
 void Partition::printLapEigenvalues() {
-	for (const double& x:laplacian_eigen_vec_) {
+	for (const double& x:laplacian_eigenvalues_) {
 		cout << x <<  " ";
 	}
 	cout << endl;
 }
 
 void Partition::outputLapEigenvalues() {
-	ofstream Output;
-	Output.open("eigenvalues.dat");
 
-	for (unsigned int i = 0; i < laplacian_eigen_vec_.size(); i++)	{
-		Output << i << " " << laplacian_eigen_vec_[i] << endl;
+	string filename("eigenvalues_");
+	filename += to_string(laplacian_eigenvalues_.size());
+	filename += ".dat";
+
+	ofstream Output(filename);
+
+	for (unsigned int i = 0; i < laplacian_eigenvalues_.size(); i++)	{
+		Output << i << " " << laplacian_eigenvalues_[i] << endl;
 	}
 
 	Output.close();
@@ -107,7 +247,7 @@ void Partition::getLapEigenMat(const Graph& g) {
 
 	// Construct tridiagonal matrix using Lanczos algorithm
 	Lanczos<Vector, double> lanczos(g);
-	laplacian_eigen_vec_ = lanczos.alpha;
+	laplacian_eigenvalues_ = lanczos.alpha;
 	Vector beta = lanczos.beta;
 
 	beta.push_back(0);
@@ -125,7 +265,7 @@ void Partition::getLapEigenMat(const Graph& g) {
 	}
 
 	// Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
-	tqli(laplacian_eigen_vec_, beta, size, tri_eigen_vecs);
+	tqli(laplacian_eigenvalues_, beta, size, tri_eigen_vecs);
 
 	// Calculate all the eigenvectors of original Laplacian matrix using 
 	// the eigenvectors of the tridiagonal matrix computed by TQLI 
@@ -138,138 +278,3 @@ void Partition::getLapEigenMat(const Graph& g) {
 	}
 }
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  partition
- *  Description:  Partition the graph into multiple subgraphs by only calculating the corresponding laplacian eigenvectors
- * =====================================================================================
- */
-
-Partition::Partition(const Graph& g, const int& subgraphs) {
-
-	int size = g.size();
-	int num_of_eigenvec = log2(subgraphs);
-
-	// Construct tridiagonal matrix using Lanczos algorithm
-	Lanczos<Vector, double> lanczos(g);
-	laplacian_eigen_vec_ = lanczos.alpha;
-	Vector beta = lanczos.beta;
-
-	beta.push_back(0);
-
-#ifdef Debug
-	cout << endl;
-	cout << "triangular matrix: " << endl;
-	lanczos.print_tri_mat();
-#endif
-
-	// Define an identity matrix as the input for TQLI algorithm
-	DenseMatrix tri_eigen_vecs;
-	Vector vinitial(size,0);
-	for(int i = 0; i < size; i++)	tri_eigen_vecs[i] = vinitial;
-	for(int i = 0; i < size; i++)	tri_eigen_vecs[i][i] = 1;
-
-	// Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
-	tqli(laplacian_eigen_vec_, beta, size, tri_eigen_vecs);
-
-	// Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha" 
-	int vector_index = 0;
-
-	unordered_multimap<double, int> hashmap;
-	for (int i = 0; i < size; i++)
-		hashmap.insert({laplacian_eigen_vec_[i], i});
-
-	Vector auxiliary_vec = laplacian_eigen_vec_;
-	sort(auxiliary_vec.begin(), auxiliary_vec.end());
-	for (int i = 0; i < num_of_eigenvec; i++) {
-		auto it = hashmap.find(auxiliary_vec[i+1]);
-		vector_index = it->second;
-		hashmap.erase(it);
-		laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index);
-	}
-
-#ifdef Debug
-	printLapEigenMat();
-#endif
-
-	for (int vertex = 0; vertex < size; vertex++) {
-		int colour = 0;
-		for (int row = 0; row < num_of_eigenvec; row++) {
-			colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][vertex]);
-		}
-		g.setColour(vertex, colour);
-	}
-}
-
-/*-----------------------------------------------------------------------------
- *  Modified partition function to for multiple partitioning by calculating all laplacian eigenvectors
- *-----------------------------------------------------------------------------*/
-
-void Partition::usingFullMat(const Graph& g, const int& subgraphs) {
-
-	int size = g.size();
-	getLapEigenMat(g);
-
-#ifdef Debug
-	// Print all the eigenvalues of the tridiagonal/laplacian matrix
-	cout << "laplacian eigenvalues: " << endl;
-	printLapEigenvalues();
-
-	// Print all the eigenvectors in row
-	cout << "laplacian_eigen_mat_: " << endl;
-	printLapEigenMat();
-#endif
-
-	// eigenvalues_index_sort stores the original index of the sorted eigenvalues 
-	vector<int> eigenvalues_index_sort;
-	unordered_multimap<double, int> hashmap;
-	for (int i = 0; i < size; i++)
-		hashmap.insert({laplacian_eigen_vec_[i], i});
-
-	Vector auxiliary_vec = laplacian_eigen_vec_;
-	sort(auxiliary_vec.begin(), auxiliary_vec.end());
-	for (int i = 0; i < size; i++) {
-		auto it = hashmap.find(auxiliary_vec[i]);
-		eigenvalues_index_sort.push_back(it->second);
-		hashmap.erase(it);
-	}
-
-#ifdef Debug
-	cout << endl;
-	cout << "Original index of eigenvalues in sorted order: "; 
-	for (const int& x:eigenvalues_index_sort)
-		cout <<	x << " "; 
-	cout << endl;
-
-	cout << "eigenvalues in sorted order: " << endl; 
-	for (const int& x:eigenvalues_index_sort)
-		cout <<	laplacian_eigen_vec_[x] << " "; 
-	cout << endl;
-
-	cout << "Laplacian eigenvectors in sorted order: " << endl;
-	for (const int& row:eigenvalues_index_sort) {
-		for (int col = 0; col < size; col++) {
-			cout << laplacian_eigen_mat_[row][col] << " ";
-		}
-		cout << endl;
-	}
-
-	cout << "Laplacian eigenvectors in sorted order: " << endl;
-	for (const int& row:eigenvalues_index_sort) {
-		for (int col = 0; col < size; col++) {
-			cout << Sign(laplacian_eigen_mat_[row][col])<< " ";
-		}
-		cout << endl;
-	}
-#endif
-
-	int num = log2(subgraphs); // number of eigenvectors to partition the graph, start from the second smallest.
-	for (int vertex = 0; vertex < size; vertex++) {
-		int colour = 0;
-		for (int eigenvec_index = 1; eigenvec_index <= num; eigenvec_index++) {
-			int row = eigenvalues_index_sort[eigenvec_index];
-			colour += pow(2, eigenvec_index - 1) * Sign(laplacian_eigen_mat_[row][vertex]);
-		}
-		g.setColour(vertex, colour);
-	}
-}

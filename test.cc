@@ -257,6 +257,30 @@ bool testCutEdgeVertexTable() {
  * =====================================================================================
  */
 
+bool testManuallyPartition() {
+	Graph g(200);
+	//Graph g;
+	//ifstream In("test_1000.dot");
+	//ifstream In("Output_200.dot");
+	//if (!In.is_open()) {
+	//	std::cerr << "ERROR: Can't open the file" << endl;
+	//	exit(-1);
+	//}
+	//g.readDotFormatWithColour(In);	
+	//g.printDotFormat();
+
+	Partition partition(g, 4);
+	cutEdgeVertexTable(g);
+	cout << "cutEdgePercent = " << cutEdgePercent(g) << endl;
+	cout << "Num of edges = " << g.edgesNum() << endl;
+
+	manuallyPartition(g);
+	g.outputDotFormat("Output_200_manuallyPartition.dot");
+	cutEdgeVertexTable(g);
+	cout << "cutEdgePercent = " << cutEdgePercent(g) << endl;
+
+	return true;
+}
 
 }
 
@@ -268,7 +292,8 @@ int main() {
 	//Tests::testReadGraphWithColour();
 	//Tests::testCutEdgePercent();
 	//cout << Tests::testCutEdgePercent() << endl;
-	Tests::testCutEdgeVertexTable();
+	//Tests::testCutEdgeVertexTable();
+	Tests::testManuallyPartition();
 
 	return 0;
 }

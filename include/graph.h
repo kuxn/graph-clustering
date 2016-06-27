@@ -25,10 +25,10 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <fstream>
+#include <string>
 
 class Graph {
     private:
-        int edges_;
         typedef std::unordered_set<int> SetOfNeighbours;
         std::unordered_map<int, SetOfNeighbours> G;
         mutable std::unordered_map<int, int> Colour;
@@ -43,6 +43,7 @@ class Graph {
         const int size() const;
 
         void printDotFormat() const;
+        void outputDotFormat(const std::string& filename) const;
         void printLaplacianMat() const;
         void setColour(int vertex, int colour) const;
         const int getColour(int vertex) const;

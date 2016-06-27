@@ -116,11 +116,13 @@ void cutEdgeVertexTable(const Graph& g) {
 	cout << "/*-----------------------------------------------------------------------------" << endl;
 	cout << " * Vertices that have no neighbours in the same subgraph" << endl;
 	cout << "/*-----------------------------------------------------------------------------" << endl;
-	cout << "There are " << isolated_vertex.size() << " such vertices:" << endl;
-	cout << "VertexIndex(Colour)" << "\t" << "NeighboursSize" << endl;
-	for (const int& vertex:isolated_vertex) {
-		cout << vertex << "(" << g.getColour(vertex) << ")" << "\t\t\t" << g.find(vertex)->second.size() << endl;
-	}
+	cout << "There are " << isolated_vertex.size() << " such vertices." << endl;
+    if (isolated_vertex.size() != 0) {
+	    cout << "VertexIndex(Colour)" << "\t" << "NeighboursSize" << endl;
+	    for (const int& vertex:isolated_vertex) {
+		    cout << vertex << "(" << g.getColour(vertex) << ")" << "\t\t\t" << g.find(vertex)->second.size() << endl;
+	    }
+    }
 }
 
 /* 
@@ -138,7 +140,7 @@ void manuallyPartition(const Graph& g) {
 	for (int vertex = 0; vertex < size; vertex++) {
 		g.setColour(vertex, colour);
 		num++;
-		if (num == subgraph_size - 1) {
+		if (num == subgraph_size) {
 			colour++;
 			num = 0;
 		}
