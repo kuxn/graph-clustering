@@ -35,13 +35,13 @@ typedef std::unordered_map<int, Vector> DenseMatrix;
  * =====================================================================================
  */
 
-Partition::Partition(const Graph& g, const int& subgraphs) {
+Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisation) {
 
 	int size = g.size();
 	int num_of_eigenvec = log2(subgraphs);
 
 	// Construct tridiagonal matrix using Lanczos algorithm
-	Lanczos<Vector, double> lanczos(g);
+	Lanczos<Vector, double> lanczos(g, reorthogonalisation);
 	laplacian_eigenvalues_ = lanczos.alpha;
 	Vector beta = lanczos.beta;
 
@@ -71,41 +71,43 @@ Partition::Partition(const Graph& g, const int& subgraphs) {
 
 	Vector auxiliary_vec = laplacian_eigenvalues_;
 	sort(auxiliary_vec.begin(), auxiliary_vec.end());
-	int fiedler_index = 2;
+	int fiedler_index = 1;
 	for (int i = 0; i < num_of_eigenvec; i++) {
 		auto it = hashmap.find(auxiliary_vec[fiedler_index]);
-		while (abs(it->first) < 1e-5) {
+		while (abs(it->first) < 1e-2) {
 			fiedler_index++;
 			it = hashmap.find(auxiliary_vec[fiedler_index]);
 		}
-		vector_index = it->second;
+		fiedler_index++;
 		hashmap.erase(it);
+		cout << "eigenvalue used: " << it->first << ", Index: " << it->second <<endl;
+		vector_index = it->second;
 		laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index);
 	}
 
-#ifdef Debug
-	printLapEigenMat();
-#endif
-
 	for (int vertex = 0; vertex < size; vertex++) {
 		int colour = 0;
-		//for (int row = 0; row < num_of_eigenvec; row++) {
-		for (int row = num_of_eigenvec - 1; row >= 0; row--) {
+		for (int row = 0; row < num_of_eigenvec; row++) {
 			colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][vertex]);
 		}
 		g.setColour(vertex, colour);
 	}
-	cout << "Partitioning is done." << endl;
+
+	if (reorthogonalisation) {
+		cout << "Partitioning WITH reorthogonalisation is done." << endl;
+	} else {
+		cout << "Partitioning WITHOUT reorthogonalisation is done." << endl;
+	}
 }
 
 /*-----------------------------------------------------------------------------
  *  Modified partition function to for multiple partitioning by calculating all laplacian eigenvectors
  *-----------------------------------------------------------------------------*/
 
-void Partition::usingFullMat(const Graph& g, const int& subgraphs) {
+void Partition::usingFullMat(const Graph& g, const int& subgraphs, bool reorthogonalisation) {
 
 	int size = g.size();
-	getLapEigenMat(g);
+	getLapEigenMat(g, reorthogonalisation);
 
 #ifdef Debug
 	// Print all the eigenvalues of the tridiagonal/laplacian matrix
@@ -248,12 +250,12 @@ Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_
  * =====================================================================================
  */
 
-void Partition::getLapEigenMat(const Graph& g) {
+void Partition::getLapEigenMat(const Graph& g, bool reorthogonalisation) {
 
 	int size = g.size();
 
 	// Construct tridiagonal matrix using Lanczos algorithm
-	Lanczos<Vector, double> lanczos(g);
+	Lanczos<Vector, double> lanczos(g, reorthogonalisation);
 	laplacian_eigenvalues_ = lanczos.alpha;
 	Vector beta = lanczos.beta;
 

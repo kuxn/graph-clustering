@@ -31,7 +31,7 @@ clean:
 
 $(TESTTARGET): $(OBJECTS) test.o
 	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^
-	./$(TESTTARGET)
+	time ./$(TESTTARGET)
 
 output: main
 	time ./main > graph.dot

@@ -29,7 +29,7 @@ class Lanczos {
         inline void gramSchmidt(int& iter, int& size);
 
     public:
-        Lanczos(const Graph& g);
+        Lanczos(const Graph& g, bool reorthogonalisation);
 
         Vector alpha;
         Vector beta;

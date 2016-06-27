@@ -47,7 +47,7 @@ using std::endl;
  *-----------------------------------------------------------------------------*/
 
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g) {
+Lanczos<Vector, T>::Lanczos(const Graph& g, bool reorthogonalisation) {
 
     int size = g.size();
 	Vector v0(size);
@@ -77,15 +77,19 @@ Lanczos<Vector, T>::Lanczos(const Graph& g) {
 			cout << "beta[" << iter-1 << "]: " << beta_val << endl;
 		}
 
-		//v0 = v1;
+		if (!reorthogonalisation) {
+			v0 = v1;
+		}
 		for (int index = 0; index < size; index++) {
 			v1[index] = t[index]/beta_val;
 		}
 
 		lanczos_vecs[iter] = v1;
-		gramSchmidt(iter, size);
-		v0 = lanczos_vecs[iter-1];
-		v1 = lanczos_vecs[iter];
+		if (reorthogonalisation) {
+			gramSchmidt(iter, size);
+			v0 = lanczos_vecs[iter-1];
+			v1 = lanczos_vecs[iter];
+		}
 		
 		//Verify the dot product of v0 and v1 which is supposed to be 0
 		T dot_product = dot(v0, v1);
@@ -103,7 +107,11 @@ Lanczos<Vector, T>::Lanczos(const Graph& g) {
 	w = multGraphVec(g, v1);
 	alpha_val = dot(v1, w);
 	alpha.push_back(alpha_val);
-	cout << "Lanczos algorithm is done." << endl;
+	if (reorthogonalisation) {
+		cout << "Lanczos algorithm WITH reorthogonalisation is done." << endl;
+	} else {
+		cout << "Lanczos algorithm WITHOUT reorthogonalisation is done." << endl; 
+	}
 }
 
 /* 
@@ -135,7 +143,7 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  gramSchmidt
- *  Description:  Reorthogonalization
+ *  Description:  Reorthogonalisation
  * =====================================================================================
  */
 

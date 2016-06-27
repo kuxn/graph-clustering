@@ -90,7 +90,7 @@ bool testLanczos() {
 	int size = g.size();
 
 	// Calculate the diagonal and subdiagonal vectors
-	Lanczos<vector<double>, double> lanczos(g);
+	Lanczos<vector<double>, double> lanczos(g, true);
 	vector<double> alpha = lanczos.alpha;
 	vector<double> beta = lanczos.beta;
 
@@ -130,12 +130,11 @@ bool testLanczos() {
 
 bool testPartition() {
 	
-	Graph g(500);
-	Graph g;
-	Partition partition(g, 2);
+	Graph g(100);
+	Partition partition(g, 2, true);
 	
 	cutEdgeVertexTable(g);	
-	g.printDotFormat();
+	cout << "cut edges percent = " << cutEdgePercent(g) << endl;
 	partition.printLapEigenvalues();
 	
 	return true;
@@ -143,16 +142,21 @@ bool testPartition() {
 
 bool testReothogonalisation() {
 
-	ifstream In("random_200_without_orth.dot");
-	g.readDotFormatWithColour(In);
-	cutEdgeVertexTable(g);
-	cout << "Cutedge percent without orth = " << cutEdgePercent(g) << endl;
-
-	In.open("random_200_with_orth.dot");
-	g.readDotFormatWithColour(In);
+    Graph g(100);
+    Partition partition1(g, 4, false);
+    g.outputDotFormat("random_1000_without_orthog.dot");
 	cutEdgeVertexTable(g);
 	cutEdgePercent(g);
-	cout << "Cutedge percent with orth = " << cutEdgePercent(g) << endl;
+    partition1.printLapEigenMat();
+	cout << "Cutedge percent without reorthogonalisation = " << cutEdgePercent(g) << endl;
+
+    Partition partition2(g, 4, true);
+	cutEdgeVertexTable(g);
+	cutEdgePercent(g);
+    partition2.printLapEigenMat();
+	cout << "Cutedge percent with reorthogonalisation = " << cutEdgePercent(g) << endl;
+
+    return true;
 }
 
 /* 
@@ -173,7 +177,7 @@ bool testReadGraph() {
 	g.readDotFormat(In);
 	
 	g.printDotFormat();
-	Partition partition(g, 4);
+	Partition partition(g, 4, true);
 	g.printDotFormat();
 	
 	return true;
@@ -283,7 +287,7 @@ bool testManuallyPartition() {
 	g.readDotFormatWithColour(In);	
 	//g.printDotFormat();
 
-	//Partition partition(g, 4);
+	//Partition partition(g, 4, true);
 	cutEdgeVertexTable(g);
 	cout << "cutEdgePercent = " << cutEdgePercent(g) << endl;
 
@@ -298,17 +302,18 @@ bool testManuallyPartition() {
 
 }
 
-int main() {
-	//cout << Tests::testTqli() << endl;;
-	//cout << Tests::testPartition() << endl;
-	//cout << Tests::testLanczos() << endl;
-	//Tests::testReadGraph();
-	//Tests::testReadGraphWithColour();
-	//Tests::testCutEdgePercent();
-	//cout << Tests::testCutEdgePercent() << endl;
-	//Tests::testManuallyPartition();
-	Tests::testPartition();
-	//Tests::testCutEdgeVertexTable();
-
-	return 0;
-}
+//int main() {
+//	//cout << Tests::testTqli() << endl;;
+//	//cout << Tests::testPartition() << endl;
+//	//cout << Tests::testLanczos() << endl;
+//	//Tests::testReadGraph();
+//	//Tests::testReadGraphWithColour();
+//	//Tests::testCutEdgePercent();
+//	//cout << Tests::testCutEdgePercent() << endl;
+//	//Tests::testManuallyPartition();
+//	//Tests::testPartition();
+//	//Tests::testCutEdgeVertexTable();
+//	Tests::testReothogonalisation();
+//
+//	return 0;
+//}
