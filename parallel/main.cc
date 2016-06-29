@@ -34,24 +34,25 @@ int main(int argc, char* argv[]) {
 	if (!(ss >> rank))
 		cerr << "Invalid number " << argv[1] << endl;
 
-	int num = 200;
+	int num = 8;
 	//cout << "num of vertices= " << num << endl;
 
     Graph g;
-    ifstream In("read_test_200.dot");
+    ifstream In("test_8.dot");
 
-    g.readDotFormat(In, world.rank(), 200/world.size());
+	g.init(world.rank(), num, num/world.size());
+
+    g.readDotFormat(In);
 
     if (world.rank() == rank) {
-	    g.printDotFormat(world.rank(), 200/world.size());
+	    g.printDotFormat();
         cout << "rank = " << world.rank() << endl;
         cout << "size of graph = " << g.size() << endl;
         cout << "num of edges = " << g.edgesNum() << endl;
+		g.printLaplacianMat();
     }
-	//partition.usingFullMat(g, 4);
-	//g.printDotFormat();
 
-	//printEigenvalues(g);
+	
 
 	return 0;
 }

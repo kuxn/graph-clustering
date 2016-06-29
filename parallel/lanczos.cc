@@ -124,18 +124,22 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool reorthogonalisation) {
 template<typename Vector, typename T>
 Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 	Vector prod;
-	if (g.size() != (int)vec.size())
-	throw std::length_error("The sizes don't match.");
+	//if (g.size() != (int)vec.size())
+	//throw std::length_error("The sizes don't match.");
 
-	int numofvertex = vec.size();
-	for (int vertex = 0; vertex < numofvertex; vertex++) {
-		auto it = g.find(vertex);
+    /*-----------------------------------------------------------------------------
+     *  Calcualte a partial result in each process, the index starts from zero in vector "prod"
+     *-----------------------------------------------------------------------------*/
+
+	int size = g.localSize();
+	for (int vertex = 0; vertex < size; vertex++) {
+		auto it = g.find(globalIndex(vertex));
 		T temp = 0.0;
 		if (!it->second.empty())
 		for (const int& neighbour:it->second)
 			temp += vec[neighbour];
 
-		prod.push_back(it->second.size() * vec[vertex] - temp);
+		prod.push_back(it->second.size() * vec[globalIndex(vertex)] - temp);
 	}
 	return prod;
 }
@@ -173,13 +177,16 @@ inline void Lanczos<Vector, T>::gramSchmidt(int& iter, int& size) {
 
 template<typename Vector, typename T>
 inline T Lanczos<Vector, T>::dot(const Vector& v1, const Vector& v2) {
-	if (v1.size() != v2.size())	
-	throw std::length_error("The vector sizes don't match.");
-	int size = v1.size();
-	T dotprod = 0.0;
-	for (int index = 0; index < size; index++) {
-		dotprod += v1[index] * v2[index];	
+	//if (v1.size() != v2.size())	
+	//throw std::length_error("The vector sizes don't match.");
+	int size = v2.size();
+	T dot_local = 0.0, dot_global;
+	for (int i = 0; i < size; i++) {
+		dot_local += v1[i] * v2[i];	// !!!Index for v1 should be global index.
 	}
+
+    mpi::all_reduce(world, dot_local, dot_global, std::plus<T>());
+
 	return dotprod;
 }
 

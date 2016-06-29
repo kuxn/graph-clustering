@@ -58,6 +58,39 @@ Graph::Graph(int num_of_vertex) {
 
 /* 
  * ===  FUNCTION  ======================================================================
+ *         Name:  init
+ *  Description:  Initilise the subgraph
+ * =====================================================================================
+ */
+
+void Graph::init(int rank, int global_size, int local_size) {
+	rank_ = rank;
+	global_size_ = global_size;
+	local_size_ = local_size;
+}
+
+const int Graph::globalSize() const {
+	return global_size_;
+}
+
+const int Graph::localSize() const {
+	return local_size_;
+}
+
+const int Graph::rank() const {
+	return rank_;
+}
+
+const int Graph::globalIndex(int local_index) const {
+	return local_index + rank_ * local_size_;
+}
+
+const int Graph::localIndex(int global_index) const {
+	return global_index - rank_ * local_size_;
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
  *         Name:  addEdge
  *  Description:  Add edges into graph 
  * =====================================================================================
@@ -132,26 +165,23 @@ const unordered_map<int, std::unordered_set<int>>::const_iterator Graph::find(in
  * =====================================================================================
  */
 
-void Graph::printDotFormat(int rank, int local_size) const {
+void Graph::printDotFormat() const {
     int num_of_vertex = G.size();
 	cout << "Undirected Graph {" << endl;
 
-	int start = rank * local_size;
-	int end = start + num_of_vertex;
-
 	if (Colour.size() == 0)
-		for (int vertex = start; vertex < end; vertex++) {
-				cout << vertex << ";" << endl;
+		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+				cout << globalIndex(vertex) << ";" << endl;
 		}
 	else
-		for (int vertex = start; vertex < end; vertex++) {
-			cout << vertex << "[Colour=" << getColour(vertex) << "];" << endl;
+		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+			cout << vertex << "[Colour=" << getColour(globalIndex(vertex)) << "];" << endl;
 		}
 
-	for (int vertex = start; vertex < end; vertex++) {
-		auto it = G.find(vertex);
+	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+		auto it = G.find(globalIndex(vertex));
 		for (const int& neighbour:it->second)
-			cout << vertex << "--" << neighbour << " ;" << endl;
+			cout << globalIndex(vertex) << "--" << neighbour << " ;" << endl;
 	}
 	cout << "}" << endl;
 }
@@ -196,18 +226,24 @@ void Graph::outputDotFormat(const string& filename) const {
 
 void Graph::printLaplacianMat() const {
 	int num_of_vertex = G.size();
+	
+	int start = rank_ * num_of_vertex;
+	int end = start + num_of_vertex;
+
 	cout << "Laplacian Matrix:" << endl;
-	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-		cout << "\t" << vertex;
+	for (int vertex = 0; vertex < end; vertex++) {
+		cout << "\t";
+		if (vertex >= start)
+			cout << vertex;
 	}
 	cout << endl;
 	
 	for (int row = 0; row < num_of_vertex; row++) {
-		cout << row << "\t";
-		auto it = G.find(row);
-		for (int col = 0; col < num_of_vertex; col++) {
-			if (col == row)
-				cout << G.at(row).size() << "\t";
+		cout << globalIndex(row) << "\t";
+		auto it = G.find(globalIndex(row));
+		for (int col = 0; col < global_size_; col++) {
+			if (col == globalIndex(row))
+				cout << G.at(globalIndex(row)).size() << "\t";
 			else if (it->second.find(col) != it->second.end())
 				cout << "-1\t";
 			else
@@ -250,7 +286,7 @@ const int Graph::getColour(int vertex) const {
  * =====================================================================================
  */
 
-void Graph::readDotFormat(ifstream& In, int rank, int local_size) {
+void Graph::readDotFormat(ifstream& In) {
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
@@ -264,7 +300,7 @@ void Graph::readDotFormat(ifstream& In, int rank, int local_size) {
 	//int procs = 4; // if input is 200, then each proc has 50 vertices.
 	
 	while (In.good()) {
-		if (from >= rank * local_size && from <= (rank + 1) * local_size - 1) {
+		if (from >= rank_ * local_size_ && from <= (rank_ + 1) * local_size_ - 1) {
 			//cout << "from = " << from << " to = " << to << endl;
 			addEdge(from, to);
 			In >> from;
@@ -277,7 +313,7 @@ void Graph::readDotFormat(ifstream& In, int rank, int local_size) {
 			In.ignore(2); // Ignore "--"
 			In >> to;
 			In.ignore(INT_MAX, '\n');
-			if (from > (rank + 1) * local_size - 1) break;
+			if (from > (rank_ + 1) * local_size_ - 1) break;
 		}
 	}
 	In.close();
