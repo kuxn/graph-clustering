@@ -1,5 +1,5 @@
 CXX 		= g++
-CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
+CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DDebug
 INCPATH		= include
 
 OBJECTS 	= graph.o lanczos.o tqli.o partition.o analysis.o

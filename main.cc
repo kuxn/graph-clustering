@@ -111,15 +111,21 @@ int main(int argc, char* argv[]) {
 
 	cout << "num of vertices= " << num << endl;
 
-	Graph g(num);
-	g.printLaplacianMat();
-	
-	
-	g.printDotFormat();
-	//partition.usingFullMat(g, 4);
-	//g.printDotFormat();
+	//Graph g(num);
 
-	//printEigenvalues(g);
+	
+	//g.printDotFormat();
+	//g.outputDotFormat("test_8.dot");
+
+	Graph g;
+	ifstream In("parallel_test_8.dot");
+	g.readDotFormatWithColour(In);
+	g.printLaplacianMat();
+	Partition partition;
+	partition.usingFullMat(g, 4, true);
+	partition.printLapEigenvalues();
+	partition.printLapEigenMat();
+
 
 	return 0;
 }
