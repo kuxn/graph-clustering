@@ -175,7 +175,7 @@ void Graph::printDotFormat() const {
 		}
 	else
 		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-			cout << vertex << "[Colour=" << getColour(globalIndex(vertex)) << "];" << endl;
+			cout << globalIndex(vertex) << "[Colour=" << getColour(globalIndex(vertex)) << "];" << endl;
 		}
 
 	for (int vertex = 0; vertex < num_of_vertex; vertex++) {

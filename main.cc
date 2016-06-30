@@ -118,13 +118,13 @@ int main(int argc, char* argv[]) {
 	//g.outputDotFormat("test_8.dot");
 
 	Graph g;
-	ifstream In("parallel_test_8.dot");
+	ifstream In("par_test_200.dot");
 	g.readDotFormatWithColour(In);
-	g.printLaplacianMat();
-	Partition partition;
-	partition.usingFullMat(g, 4, false);
+	//g.printLaplacianMat();
+	Partition partition(g, 4, true);
+	//partition.usingFullMat(g, 4, false);
 	partition.printLapEigenvalues();
-	partition.printLapEigenMat();
+	//partition.printLapEigenMat();
 
 
 	return 0;

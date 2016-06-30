@@ -15,6 +15,8 @@
 #define LANCZOS_CPP_
 
 #include <iostream> 
+#include <random> 
+#include <chrono> 
 #include <stdexcept>
 #include <utility> 
 #include <cmath> 
@@ -53,7 +55,7 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 
     int local_size = g_local.localSize();
 	Vector v0_local(local_size);
-	srand48(g_local.rank());
+	//srand48(time(NULL));
 	v0_local = init(v0_local, g_local.globalSize());
 
 #ifdef Debug
@@ -128,9 +130,13 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 		lanczos_vecs_global[iter] = v1_global;
 
 		if (reorthogonalisation) {
-			//gramSchmidt(iter,local_size);
+			gramSchmidt(iter, g_local.globalSize());
 			v0_global = lanczos_vecs_global[iter-1];
 			v1_global = lanczos_vecs_global[iter];
+			for (int i = 0; i < local_size; i++) {
+				v0_local[i] = v0_global[g_local.globalIndex(i)];
+				v1_local[i] = v1_global[g_local.globalIndex(i)];
+			}
 		}
 		
 		//Verify the dot product of v0 and v1 which is supposed to be 0
@@ -198,13 +204,13 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
  *  Description:  Reorthogonalisation
  * =====================================================================================
  */
-/*
+
 template<typename Vector, typename T>
-inline void Lanczos<Vector, T>::gramSchmidt(int& iter, int& size) {
+inline void Lanczos<Vector, T>::gramSchmidt(int& iter, const int& size) {
 	for (int k = 1; k <= iter; k++) {
 		//cout << "i - norm of lanczos_vecs_global["<<k<<"] = " << norm(lanczos_vecs_global[k]) << endl;
 		for (int i = 0; i < k; i++) {
-			T reorthog_dot_product = dot(lanczos_vecs_global[i], lanczos_vecs_global[k]);
+			T reorthog_dot_product = dot_local(lanczos_vecs_global[i], lanczos_vecs_global[k]);
 			for (int j = 0; j < size; j++) {
 				lanczos_vecs_global[k][j] -= reorthog_dot_product * lanczos_vecs_global[i][j];
 			}
@@ -215,7 +221,7 @@ inline void Lanczos<Vector, T>::gramSchmidt(int& iter, int& size) {
 		//cout << "norm of lanczos_vecs_global["<<iter<<"] = " << norm(lanczos_vecs_global[iter]) << endl;
 	}
 }
-*/
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  utilities
@@ -240,12 +246,25 @@ inline T Lanczos<Vector, T>::dot(mpi::communicator& world, const Vector& v1, con
 }
 
 template<typename Vector, typename T>
+inline T Lanczos<Vector, T>::dot_local(const Vector& v1, const Vector& v2) {
+	//if (v1.size() != v2.size())	
+	//throw std::length_error("The vector sizes don't match.");
+
+	int local_size = v1.size();
+	T dot_local = 0.0;
+	for (int i = 0; i < local_size; i++) {
+		dot_local += v1[i] * v2[i];	// !!!Index for v1 should be global index.
+	}
+
+	return dot_local;
+}
+
+template<typename Vector, typename T>
 inline T Lanczos<Vector, T>::norm(const Vector& vec) {
 	T norm_local = 0.0;
 	for (const T& value:vec) {
 		norm_local += value * value;
 	}
-
 	return sqrt(norm_local);
 }
 
@@ -262,8 +281,11 @@ inline Vector& Lanczos<Vector, T>::normalise(Vector& vec) {
 template<typename Vector, typename T>
 Vector& Lanczos<Vector, T>::init(Vector& vec, int global_size) {
 	int local_size = vec.size();
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine generator(seed);
+	std::uniform_real_distribution<double> gen(0.0,1.0);
 	for (int i = 0; i < local_size; i++) {
-		vec[i] = drand48();
+		vec[i] = gen(generator);
 	}
 	T norm_local = norm(vec);
 	for (int i = 0; i < local_size; i++) {

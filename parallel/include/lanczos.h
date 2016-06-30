@@ -25,9 +25,10 @@ class Lanczos {
         Vector& init(Vector& vec, int global_size);
         Vector multGraphVec(const Graph& g, const Vector& vec);
         inline T dot(boost::mpi::communicator& world, const Vector& v1, const Vector& v2);
+        inline T dot_local(const Vector& v1, const Vector& v2);
         inline T norm(const Vector& vec);
         inline Vector& normalise(Vector& vec);
-        inline void gramSchmidt(int& iter, int& size);
+        inline void gramSchmidt(int& iter, const int& size);
 
     public:
         Lanczos(boost::mpi::communicator& world, const Graph& g, bool reorthogonalisation);

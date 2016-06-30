@@ -34,29 +34,33 @@ int main(int argc, char* argv[]) {
 	if (!(ss >> rank))
 		cerr << "Invalid number " << argv[1] << endl;
 
-	int num = 8;
+	int num = 200;
 	//cout << "num of vertices= " << num << endl;
 
     Graph g;
-    ifstream In("test_8.dot");
+    //ifstream In("par_test_8.dot");
+    ifstream In("par_test_200.dot");
 
 	g.init(world.rank(), num, num/world.size());
 
     g.readDotFormat(In);
 
-    if (world.rank() == rank) {
-	    g.printDotFormat();
-        cout << "rank = " << world.rank() << endl;
-        cout << "size of graph = " << g.size() << endl;
-        cout << "num of edges = " << g.edgesNum() << endl;
-		g.printLaplacianMat();
-    }
+    //if (world.rank() == rank) {
+	//    g.printDotFormat();
+    //    cout << "rank = " << world.rank() << endl;
+    //    cout << "size of graph = " << g.size() << endl;
+    //    cout << "num of edges = " << g.edgesNum() << endl;
+	//	g.printLaplacianMat();
+    //}
 
 	world.barrier();
 
-	typedef std::vector<double> Vector;
-	Lanczos<Vector, double> lanczos(world, g, false);
-	lanczos.print_tri_mat();
+    Partition partition(world, g, 4, true);
+	if (world.rank() == 0) {
+		partition.printLapEigenvalues();
+		//partition.printLapEigenMat();
+		//g.printDotFormat();
+	}
 
 	env.~environment();
 	//cout << "finalized = " << env.finalized() << endl;

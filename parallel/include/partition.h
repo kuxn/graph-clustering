@@ -16,6 +16,7 @@
 
 #include <vector>
 #include <map>
+#include <boost/mpi.hpp>
 #include "graph.h"
 
 class Partition {
@@ -28,12 +29,12 @@ class Partition {
         DenseMatrix laplacian_eigen_mat_;
         
         Vector getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index);
-        void getLapEigenMat(const Graph& g, bool reorthogonalisation);
+        void getLapEigenMat(boost::mpi::communicator& world, const Graph& g, bool reorthogonalisation);
 
     public:
         Partition() {}
-        Partition(const Graph& g, const int& subgraphs, bool reorthogonalisation);
-        void usingFullMat(const Graph& g, const int& subgraphs, bool reorthogonalisation);
+        Partition(boost::mpi::communicator& world, const Graph& g, const int& subgraphs, bool reorthogonalisation);
+        void usingFullMat(boost::mpi::communicator& world, const Graph& g, const int& subgraphs, bool reorthogonalisation);
 
         void printLapEigenMat();
         void printLapEigenvalues();
