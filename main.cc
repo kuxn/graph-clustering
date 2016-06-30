@@ -122,7 +122,7 @@ int main(int argc, char* argv[]) {
 	g.readDotFormatWithColour(In);
 	g.printLaplacianMat();
 	Partition partition;
-	partition.usingFullMat(g, 4, true);
+	partition.usingFullMat(g, 4, false);
 	partition.printLapEigenvalues();
 	partition.printLapEigenMat();
 

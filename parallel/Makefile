@@ -4,7 +4,8 @@ INCPATH		= include
 LIBDIR		= -L/usr/local/lib
 LDFLAGS		= -lboost_mpi -lboost_serialization
 
-OBJECTS 	= graph.o lanczos.o tqli.o partition.o analysis.o
+#OBJECTS 	= graph.o lanczos.o tqli.o partition.o analysis.o
+OBJECTS 	= graph.o lanczos.o tqli.o analysis.o
 TARGET 		= main
 TESTTARGET 	= test
 

@@ -21,18 +21,19 @@
 template<typename Vector, typename T>
 class Lanczos {
     private:
-        Vector& initialise(Vector& vec);
+        Vector& init(Vector& vec, int global_size);
         Vector multGraphVec(const Graph& g, const Vector& vec);
-        inline T dot(const Vector& v1, const Vector& v2);
+        inline T dot(boost::mpi::communicator& world, const Vector& v1, const Vector& v2);
         inline T norm(const Vector& vec);
         inline Vector& normalise(Vector& vec);
         inline void gramSchmidt(int& iter, int& size);
 
     public:
-        Lanczos(const Graph& g, bool reorthogonalisation);
+        Lanczos(boost::mpi::communicator& world, const Graph& g, bool reorthogonalisation);
 
-        Vector alpha;
-        Vector beta;
+        Vector alpha_global;
+        Vector beta_global;
+        std::unordered_map<int, std::vector<Vector>> lanczos_vecs_global;
         std::unordered_map<int, Vector> lanczos_vecs;
         void print_tri_mat();
 };

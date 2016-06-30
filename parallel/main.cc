@@ -52,7 +52,14 @@ int main(int argc, char* argv[]) {
 		g.printLaplacianMat();
     }
 
-	
+	world.barrier();
+
+	typedef std::vector<double> Vector;
+	Lanczos<Vector, double> lanczos(world, g, false);
+	lanczos.print_tri_mat();
+
+	env.~environment();
+	cout << "finalized = " << env.finalized() << endl;
 
 	return 0;
 }

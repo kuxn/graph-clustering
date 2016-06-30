@@ -259,6 +259,12 @@ void Partition::getLapEigenMat(const Graph& g, bool reorthogonalisation) {
 	laplacian_eigenvalues_ = lanczos.alpha;
 	Vector beta = lanczos.beta;
 
+#ifdef Debug
+	cout << endl;
+	cout << "triangular matrix: " << endl;
+	lanczos.print_tri_mat();
+#endif
+
 	beta.push_back(0);
 
 	// Define an identity matrix as the input for TQLI algorithm
