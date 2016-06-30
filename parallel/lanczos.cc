@@ -19,8 +19,6 @@
 #include <utility> 
 #include <cmath> 
 
-#include <boost/mpi.hpp>
-
 #include "lanczos.h"
 
 namespace mpi = boost::mpi;
@@ -55,22 +53,54 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 
     int local_size = g_local.localSize();
 	Vector v0_local(local_size);
+	srand48(g_local.rank());
 	v0_local = init(v0_local, g_local.globalSize());
+
+#ifdef Debug
+	cout << "rank " << g_local.rank() << ": ";
+	for (int i = 0; i < local_size; i++) {
+		cout << "v0_local[" << i << "] = " << v0_local[i] << " ";
+	}
+	cout << endl;
+	cout << "global dot of these vectors = " << dot(world, v0_local, v0_local) << endl;
+#endif
 
 	Vector t_local = v0_local, v1_local = v0_local, w_local;
 
 	T alpha_val_global = 0.0, beta_val_global = 0.0;
 
-	std::vector<Vector> v0_global, v1_global;
-	mpi::all_gather(world, v0_local, v0_global); // Gather all local vectors to global
+	std::vector<Vector> v0_global_gather, v1_global_gather;
+	Vector v0_global, v1_global;
+	mpi::all_gather(world, v0_local, v0_global_gather); // Gather all local vectors to global
+	v0_global = transform(v0_global_gather, local_size);
+	v1_global = v0_global;
+
+#ifdef Debug
+	cout << "v1_global:";
+	for (auto x:v1_global)
+		cout << x << " ";
+#endif
 
 	lanczos_vecs_global[0] = v0_global;
 
 	for (int iter = 1; iter < g_local.globalSize(); iter++) {
-		w_local = multGraphVec(g_local, v1_local);
+		w_local = multGraphVec(g_local, v1_global);
+
+#ifdef Debug
+		cout << "w_local, rank " << g_local.rank() << ": ";
+		for (auto x:w_local)
+			cout << x << " ";
+		cout << endl;
+#endif
+
 		T alpha_val_global = dot(world, v1_local, w_local);
 		//cout << "dot(v1, v1) = " << dot(v1, v1) << endl;
 		alpha_global.push_back(alpha_val_global);
+
+#ifdef Debug
+		cout << "rank " << g_local.rank() << ": ";
+		cout << "alpha[" << iter - 1 << "] =  " << alpha_val_global << endl;
+#endif
 
 		for (int i = 0; i < local_size; i++) {
 			t_local[i] = w_local[i] - alpha_val_global * v1_local[i] - beta_val_global * v0_local[i];
@@ -93,7 +123,8 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 			v1_local[i] = t_local[i]/beta_val_global;
 		}
 		
-		mpi::all_gather(world, v1_local, v1_global); // Gather all local vectors to global
+		mpi::all_gather(world, v1_local, v1_global_gather); // Gather all local vectors to global
+		v1_global = transform(v1_global_gather, local_size);
 		lanczos_vecs_global[iter] = v1_global;
 
 		if (reorthogonalisation) {
@@ -115,20 +146,9 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 			cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_global << endl;
 		}
 	}
-	w_local = multGraphVec(g_local, v1_local);
+	w_local = multGraphVec(g_local, v1_global);
 	alpha_val_global = dot(world, v1_local, w_local);
 	alpha_global.push_back(alpha_val_global);
-
-	// transfer <int, vector<Vector>> to <int, Vector>	
-	Vector temp;
-	for (int row = 0; row < g_local.globalSize(); row++) {
-		auto it = lanczos_vecs_global.find(row);
-		for (unsigned int i = 0; i < it->second.size(); i++) {
-			for (int j = 0; j < local_size; j++) {
-				lanczos_vecs[row].push_back(lanczos_vecs_global[row][i][j]);
-			}	
-		}
-	}
 
 	if (reorthogonalisation) {
 		cout << "Lanczos algorithm WITH reorthogonalisation is done." << endl;
@@ -159,9 +179,14 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 		auto it = g.find(g.globalIndex(vertex));
 		T temp = 0.0;
 		if (!it->second.empty())
-		for (const int& neighbour:it->second)
+		for (const int& neighbour:it->second) {
 			temp += vec[neighbour];
+			//if (g.rank() == 3)
+			//cout << "rank " << g.rank() << " vec[" << neighbour << "] = " << vec[neighbour] << endl;
+		}
 
+		//if (g.rank() == 3)
+		//cout << "push_back " << it->second.size() << " * " << vec[g.globalIndex(vertex)] << endl;
 		prod.push_back(it->second.size() * vec[g.globalIndex(vertex)] - temp);
 	}
 	return prod;
@@ -248,6 +273,18 @@ Vector& Lanczos<Vector, T>::init(Vector& vec, int global_size) {
 	return vec;
 }
 
+template<typename Vector, typename T>
+Vector Lanczos<Vector, T>::transform(std::vector<Vector>& vec_gather, int local_size) {
+	Vector global_vec;
+	
+	for (unsigned int i = 0; i < vec_gather.size(); i++) {
+		for (int j = 0; j < local_size; j++) {
+			global_vec.push_back(vec_gather[i][j]);
+		}	
+	}
+	return global_vec;
+}
+	
 template<typename Vector, typename T>
 void Lanczos<Vector, T>::print_tri_mat() {
 	int size = alpha_global.size();

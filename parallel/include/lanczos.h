@@ -4,7 +4,7 @@
  *       Filename:  lanczos.h
  *
  *    Description:  The interface of lanczos algorithm
- *        Created:  06/11/2016 21:22:58
+ *        Created:  06/29/2016 21:22:58
  *
  *         Author:  Ken Hu, xnchnhu@gmail.com
  *
@@ -16,6 +16,7 @@
 
 #include <vector>
 #include <map>
+#include <boost/mpi.hpp>
 #include "graph.h"
 
 template<typename Vector, typename T>
@@ -33,9 +34,10 @@ class Lanczos {
 
         Vector alpha_global;
         Vector beta_global;
-        std::unordered_map<int, std::vector<Vector>> lanczos_vecs_global;
-        std::unordered_map<int, Vector> lanczos_vecs;
+        std::unordered_map<int, Vector> lanczos_vecs_global;
         void print_tri_mat();
+        
+        Vector transform(std::vector<Vector>& vec_gather, int local_size);
 };
 
 #include "../lanczos.cc"

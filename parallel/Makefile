@@ -19,7 +19,7 @@ $(TARGET): $(OBJECTS) main.o
 
 # Explicit dependencies required for headers
 $(OBJECTS): 		$(INCPATH)/graph.h
-test.o partition.o: $(INCPATH)/*.h lanczos.cc
+main.o test.o partition.o: $(INCPATH)/*.h lanczos.cc
 
 define OBJECT_DEPENDS_ON_CORRESPONDING_HEADER
     $(1) : $(INCPATH)/${1:.o=.h}

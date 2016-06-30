@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 	lanczos.print_tri_mat();
 
 	env.~environment();
-	cout << "finalized = " << env.finalized() << endl;
+	//cout << "finalized = " << env.finalized() << endl;
 
 	return 0;
 }
