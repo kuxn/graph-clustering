@@ -114,18 +114,24 @@ int main(int argc, char* argv[]) {
 	//Graph g(num);
 
 	
-	//g.printDotFormat();
 	//g.outputDotFormat("test_8.dot");
 
 	Graph g;
 	ifstream In("par_test_200.dot");
-	g.readDotFormatWithColour(In);
+	//ifstream In("random-500.dot");
+	//ifstream In("par_test_8.dot");
+	g.readDotFormat(In);
+	Partition partition(g, 8, true);
+	g.printDotFormat();
 	//g.printLaplacianMat();
-	Partition partition(g, 4, true);
 	//partition.usingFullMat(g, 4, false);
-	partition.printLapEigenvalues();
+	//partition.printLapEigenvalues();
 	//partition.printLapEigenMat();
-
+	cutEdgeVertexTable(g);
+	cout << "CutEdgePercent = " << cutEdgePercent(g) << endl; 
+	manuallyPartition(g);
+	cutEdgeVertexTable(g);
+	cout << "CutEdgePercent = " << cutEdgePercent(g) << endl; 
 
 	return 0;
 }

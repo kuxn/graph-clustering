@@ -79,9 +79,9 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
 			it = hashmap.find(auxiliary_vec[fiedler_index]);
 		}
 		fiedler_index++;
-		hashmap.erase(it);
-		cout << "eigenvalue used: " << it->first << ", Index: " << it->second <<endl;
 		vector_index = it->second;
+		cout << "eigenvalue used: " << it->first << ", Vector_Index: " << vector_index <<endl;
+		hashmap.erase(it); // Deal with identical eigenvalues
 		laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index);
 	}
 
