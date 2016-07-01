@@ -14,6 +14,7 @@
 #include <iostream>
 #include <sstream>
 #include <boost/mpi.hpp>
+#include <boost/optional/optional_io.hpp>
 
 #include "graph.h"
 #include "lanczos.h"
@@ -39,6 +40,7 @@ int main(int argc, char* argv[]) {
 
     Graph g;
     //ifstream In("par_test_8.dot");
+    //ifstream In("par_test_500.dot");
     ifstream In("par_test_200.dot");
 
 	g.init(world.rank(), num, num/world.size());
@@ -55,12 +57,48 @@ int main(int argc, char* argv[]) {
 
 	world.barrier();
 
-    Partition partition(world, g, 4, true);
+    Partition partition(world, g, 8, true);
 	if (world.rank() == 0) {
 		partition.printLapEigenvalues();
-		//partition.printLapEigenMat();
+		partition.printLapEigenMat();
 		//g.printDotFormat();
 	}
+	
+	world.barrier();
+	// Print coloured graph from each process to a single file
+
+	string filename("output_rank_");
+	filename += to_string(world.rank());
+	filename += ".dot";
+
+	g.outputDotFormat(filename);
+
+	//fstream Output;
+	//for (int proc = 0; proc < world.size(); proc++) {
+	//	if (world.rank() == proc) {
+	//		//Output.open("output.dot", std::ofstream::ate);
+	//		Output.open("output.dot", std::fstream::in | std::fstream::out | std::fstream:: ate);
+	//		for (int vertex = 0; vertex < g.localSize(); vertex++) {
+	//			//Output << g.globalIndex(vertex) << "[Colour=" << g.getColour(g.globalIndex(vertex)) << "];" << endl;	
+	//			cout << g.globalIndex(vertex) << "[Colour=" << g.getColour(g.globalIndex(vertex)) << "];" << endl;	
+	//		}
+	//		Output.close();
+	//	}
+	//}
+	//world.barrier();
+	//for (int proc = 0; proc < world.size(); proc++) {
+	//	if (world.rank() == proc) {
+	//		//Output.open("output.dot", std::ofstream::ate);
+	//		Output.open("output.dot", std::fstream::in | std::fstream::out | std::fstream:: ate);
+	//		for (int vertex = 0; vertex < g.localSize(); vertex++) {
+	//			auto it = g.find(g.globalIndex(vertex));
+	//			for (auto neighbour:it->second)
+	//				//Output << g.globalIndex(vertex) << "--" << neighbour << ";" << endl;
+	//				cout << g.globalIndex(vertex) << "--" << neighbour << ";" << endl;
+	//		}
+	//		Output.close();
+	//	}
+	//}
 
 	env.~environment();
 	//cout << "finalized = " << env.finalized() << endl;

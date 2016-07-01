@@ -129,14 +129,25 @@ bool testLanczos() {
  */
 
 bool testPartition() {
-	
-	Graph g(100);
-	Partition partition(g, 2, true);
-	
-	cutEdgeVertexTable(g);	
-	cout << "cut edges percent = " << cutEdgePercent(g) << endl;
-	partition.printLapEigenvalues();
-	
+
+    mpi::environment env;
+    mpi::communicator world;
+    
+    Graph g;
+    ifstream In("par_test_8.dot");
+	if (!In.is_open()) {
+		std::cerr << "ERROR: Can't open the file" << endl;
+		exit(-1);
+	}
+    Partition partition(world, g, 4, true);
+	if (world.rank() == 0) {
+		partition.printLapEigenvalues();
+		partition.printLapEigenMat();
+		g.printDotFormat();
+	}
+
+	env.~environment();
+
 	return true;
 }
 
@@ -167,19 +178,31 @@ bool testReothogonalisation() {
  */
 
 bool testReadGraph() {
-	Graph g;
-	ifstream In("read_test_200.dot");
-	//ifstream In("test-13.dot");
+
+    mpi::environment env;
+    mpi::communicator world;
+
+    Graph g;
+    //ifstream In("par_test_8.dot");
+    ifstream In("par_test_500.dot");
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
 	}
-	g.readDotFormat(In);
-	
-	g.printDotFormat();
-	//Partition partition(g, 4, true);
-	//g.printDotFormat();
-	
+
+	g.init(world.rank(), num, num/world.size());
+    g.readDotFormat(In);
+
+    int rank = 0;
+    if (world.rank() == rank) {
+	    g.printDotFormat();
+        cout << "rank = " << world.rank() << endl;
+        cout << "size of graph = " << g.size() << endl;
+        cout << "num of edges = " << g.edgesNum() << endl;
+		g.printLaplacianMat();
+    }
+
+	env.~environment();
 	return true;
 }
 

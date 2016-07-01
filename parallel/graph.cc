@@ -202,17 +202,17 @@ void Graph::outputDotFormat(const string& filename) const {
 	Output << "Undirected Graph {" << endl;
 	if (Colour.size() == 0)
 		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-				Output << vertex << ";" << endl;
+				Output << globalIndex(vertex) << ";" << endl;
 		}
 	else
 		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-			Output << vertex << "[Colour=" << getColour(vertex) << "];" << endl;
+			Output << globalIndex(vertex) << "[Colour=" << getColour(globalIndex(vertex)) << "];" << endl;
 		}
 
 	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-		auto it = G.find(vertex);
+		auto it = G.find(globalIndex(vertex));
 		for (const int& neighbour:it->second)
-			Output << vertex << "--" << neighbour << " ;" << endl;
+			Output << globalIndex(vertex) << "--" << neighbour << " ;" << endl;
 	}
 	Output << "}" << endl;
 }

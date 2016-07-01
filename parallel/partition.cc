@@ -79,9 +79,9 @@ Partition::Partition(boost::mpi::communicator& world, const Graph& g, const int&
 			it = hashmap.find(auxiliary_vec[fiedler_index]);
 		}
 		fiedler_index++;
-		hashmap.erase(it);
-		cout << "eigenvalue used: " << it->first << ", Index: " << it->second <<endl;
 		vector_index = it->second;
+		cout << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
+		hashmap.erase(it);
 		laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs_global, tri_eigen_vecs, vector_index);
 	}
 
