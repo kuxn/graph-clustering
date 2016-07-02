@@ -15,7 +15,7 @@
 #define LANCZOS_CPP_
 
 #include <iostream> 
-#include <stdexcept>
+#include <exception>
 #include <utility> 
 #include <cmath> 
 #include "lanczos.h"

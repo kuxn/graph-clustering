@@ -12,8 +12,9 @@
  */
 
 #include <iostream>
-#include <stdexcept>
+#include <exception>
 #include <random>
+#include <chrono>
 #include <climits>
 #include <string>
 
@@ -29,16 +30,15 @@ using namespace std;
  */
 
 Graph::Graph(int num_of_vertex) {
-	random_device seed;	mt19937 rng (seed());
-	//uniform_int_distribution<int> num_of_neigh(0, num_of_vertex - 1);
+
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine rng(seed);
 	uniform_int_distribution<int> num_of_neigh(1, 3);
-	//poisson_distribution<int> num_of_neigh(num_of_vertex/2);
 
 	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
 		int num_of_neighbour = num_of_neigh(rng);
         //cout << "num_of_neighbour = " << num_of_neighbour << endl;
 		uniform_int_distribution<int> randneigh(0, num_of_vertex - 1);
-		//poisson_distribution<int> randneigh(num_of_vertex/2);
 		unordered_set<int> neighbours;
 		for (int neighbour = 0; neighbour < num_of_neighbour; neighbour++) {
 			int rand_neighbour = 0;

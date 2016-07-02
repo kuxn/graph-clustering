@@ -24,10 +24,14 @@ using namespace std;
  * =====================================================================================
  */
 
-double cutEdgePercent(const Graph& g) {
+double Analysis::cutEdgePercent(const Graph& g) {
 
 	int size = g.size();
 	int cut_edge_num = 0;
+
+	if (g.subgraphsNum() == 1) {
+		return 0.0;
+	}
 
 	for (int vertex = 0; vertex < size; vertex++) {
 		int vertex_colour = g.getColour(vertex);
@@ -46,7 +50,7 @@ double cutEdgePercent(const Graph& g) {
  *  Modified cutEdgePercent function calculating percentage of cut edges between different subgraphs
  *-----------------------------------------------------------------------------*/
 
-void cutEdgeVertexTable(const Graph& g) {
+void Analysis::cutEdgeVertexTable(const Graph& g) {
 	int size = g.size();
 	int subgraphs = g.subgraphsNum();
 
@@ -88,6 +92,7 @@ void cutEdgeVertexTable(const Graph& g) {
 	cout << "Vertices:  " << g.size() << endl;
 	cout << "Edges:     " << g.edgesNum() << endl;
 	cout << "Subgraphs: " << subgraphs << endl;
+	cout << "Cut Edge Percent: " << cutEdgePercent(g) << endl;
 	cout << "/*-----------------------------------------------------------------------------" << endl;
 	cout << " * Number of vertices in each subgraph" << endl;
 	cout << "/*-----------------------------------------------------------------------------" << endl;
@@ -138,7 +143,7 @@ void cutEdgeVertexTable(const Graph& g) {
  * =====================================================================================
  */
 
-void manuallyPartition(const Graph& g) {
+void Analysis::manuallyPartition(const Graph& g) {
 	int size = g.size();
 	int subgraph_size = size/g.subgraphsNum();
 	

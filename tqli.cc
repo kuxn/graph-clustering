@@ -11,7 +11,7 @@
  * =====================================================================================
  */
 
-#include <stdexcept>
+#include <exception>
 #include <iostream>
 #include <cmath>
 #include <utility>

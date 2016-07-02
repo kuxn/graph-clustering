@@ -133,8 +133,7 @@ bool testPartition() {
 	Graph g(100);
 	Partition partition(g, 2, true);
 	
-	cutEdgeVertexTable(g);	
-	cout << "cut edges percent = " << cutEdgePercent(g) << endl;
+	Analysis::cutEdgeVertexTable(g);	
 	partition.printLapEigenvalues();
 	
 	return true;
@@ -144,17 +143,16 @@ bool testReothogonalisation() {
 
     Graph g(100);
     Partition partition1(g, 4, false);
-    g.outputDotFormat("random_1000_without_orthog.dot");
-	cutEdgeVertexTable(g);
-	cutEdgePercent(g);
+	cout << "WITHOUT reorthogonalisation: " << endl;
+	Analysis::cutEdgeVertexTable(g);
+    partition1.printLapEigenvalues();
     partition1.printLapEigenMat();
-	cout << "Cutedge percent without reorthogonalisation = " << cutEdgePercent(g) << endl;
 
     Partition partition2(g, 4, true);
-	cutEdgeVertexTable(g);
-	cutEdgePercent(g);
+	cout << "WITH reorthogonalisation: " << endl;
+	Analysis::cutEdgeVertexTable(g);
+    partition2.printLapEigenvalues();
     partition2.printLapEigenMat();
-	cout << "Cutedge percent with reorthogonalisation = " << cutEdgePercent(g) << endl;
 
     return true;
 }
@@ -168,8 +166,7 @@ bool testReothogonalisation() {
 
 bool testReadGraph() {
 	Graph g;
-	ifstream In("read_test.dot");
-	//ifstream In("test-13.dot");
+	ifstream In("test_read_20.dot");
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
@@ -185,8 +182,7 @@ bool testReadGraph() {
 
 bool testReadGraphWithColour() {
 	Graph g;
-	ifstream In("table_test2.dot");
-	//ifstream In("read_test.dot");
+	ifstream In("test_read_20.dot");
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
@@ -207,15 +203,14 @@ bool testReadGraphWithColour() {
 
 bool testCutEdgePercent() {
 	Graph g;
-	ifstream In("read_test.dot");
+	ifstream In("test_read_20.dot");
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
 	}
 	g.readDotFormatWithColour(In);	
 
-	double cut_edge_percent = cutEdgePercent(g);
-	
+	double cut_edge_percent = Analysis::cutEdgePercent(g);
 	//cout << "cut_edge_percent = " << cut_edge_percent << endl;
 	
 	if (std::abs(cut_edge_percent - 0.142857) > 1e-5) {
@@ -234,15 +229,13 @@ bool testCutEdgePercent() {
 
 bool testCutEdgeVertexTable() {
 	Graph g;
-	//ifstream In("table_test.dot");
-	ifstream In("random_100_without_ortho_withbug.dot");
-	//ifstream In("output_1000_4.dot");
+	ifstream In("test_table_1000.dot");
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
 	}
 	g.readDotFormatWithColour(In);
-	cutEdgeVertexTable(g);
+	Analysis::cutEdgeVertexTable(g);
 	
 	/*-----------------------------------------------------------------------------
  	* Basic info of the graph
@@ -276,44 +269,37 @@ bool testCutEdgeVertexTable() {
  */
 
 bool testManuallyPartition() {
-	//Graph g(200);
 	Graph g;
-	ifstream In("test_1000.dot");
-	//ifstream In("Output_200.dot");
+	ifstream In("test_table_1000.dot");
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
 	}
 	g.readDotFormatWithColour(In);	
 	//g.printDotFormat();
-
 	//Partition partition(g, 4, true);
-	cutEdgeVertexTable(g);
-	cout << "cutEdgePercent = " << cutEdgePercent(g) << endl;
+	Analysis::cutEdgeVertexTable(g);
 
-	manuallyPartition(g);
-	//g.outputDotFormat("Output_200_manuallyPartition.dot");
+	Analysis::manuallyPartition(g);
 	g.outputDotFormat("Output_1000_manuallyPartition.dot");
-	cutEdgeVertexTable(g);
-	cout << "cutEdgePercent = " << cutEdgePercent(g) << endl;
+	Analysis::cutEdgeVertexTable(g);
 
 	return true;
 }
 
 }
 
-//int main() {
-//	//cout << Tests::testTqli() << endl;;
-//	//cout << Tests::testPartition() << endl;
-//	//cout << Tests::testLanczos() << endl;
-//	//Tests::testReadGraph();
-//	//Tests::testReadGraphWithColour();
-//	//Tests::testCutEdgePercent();
-//	//cout << Tests::testCutEdgePercent() << endl;
-//	//Tests::testManuallyPartition();
-//	//Tests::testPartition();
-//	//Tests::testCutEdgeVertexTable();
-//	Tests::testReothogonalisation();
-//
-//	return 0;
-//}
+int main() {
+	//cout << Tests::testTqli() << endl;;
+	//cout << Tests::testPartition() << endl;
+	//cout << Tests::testLanczos() << endl;
+	//cout << Tests::testCutEdgePercent() << endl;
+	//Tests::testReadGraph();
+	//Tests::testReadGraphWithColour();
+	//Tests::testManuallyPartition();
+	//Tests::testPartition();
+	//Tests::testCutEdgeVertexTable();
+	Tests::testReothogonalisation();
+
+	return 0;
+}

@@ -16,8 +16,13 @@
 
 #include "graph.h"
 
-double cutEdgePercent(const Graph& g);
-void cutEdgeVertexTable(const Graph& g);
-void manuallyPartition(const Graph& g);
+class Analysis {
+
+    public:
+        static double cutEdgePercent(const Graph& g);
+        static void cutEdgeVertexTable(const Graph& g);
+        static void manuallyPartition(const Graph& g);
+
+};
 
 #endif   
