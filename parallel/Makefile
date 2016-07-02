@@ -2,7 +2,7 @@ CXX 		= mpic++
 CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 INCPATH		= include
 LIBDIR		= -L/usr/local/lib
-LDFLAGS		= -lboost_mpi -lboost_serialization
+LDFLAGS		= -lboost_mpi -lboost_serialization -lboost_program_options
 
 OBJECTS 	= graph.o lanczos.o tqli.o partition.o analysis.o
 #OBJECTS 	= graph.o lanczos.o tqli.o analysis.o

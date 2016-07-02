@@ -158,11 +158,6 @@ void Graph::printDotFormat() const {
 
 void Graph::outputDotFormat(const string& filename) const {
     int num_of_vertex = G.size();
-
-	//string filename("Output_");
-	//filename += to_string(num_of_vertex);
-	//filename += ".dot";
-
 	ofstream Output(filename);
 
 	Output << "Undirected Graph {" << endl;

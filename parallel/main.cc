@@ -14,7 +14,7 @@
 #include <iostream>
 #include <sstream>
 #include <boost/mpi.hpp>
-#include <boost/optional/optional_io.hpp>
+#include <boost/program_options.hpp>
 
 #include "graph.h"
 #include "lanczos.h"
@@ -23,56 +23,87 @@
 #include "analysis.h"
 
 namespace mpi = boost::mpi;
+namespace po = boost::program_options;
 using namespace std;
 
 int main(int argc, char* argv[]) {
 
-    mpi::environment env;
-    mpi::communicator world;
+	mpi::environment env;
+	mpi::communicator world;
+	
+	int vertices, subgraphs;
+	string filename;
 
-    int rank;
-	istringstream ss(argv[1]);
-	if (!(ss >> rank))
-		cerr << "Invalid number " << argv[1] << endl;
+	po::options_description desc("Allowed options");
+	desc.add_options()
+		("help,h", ":produce help message")
+		("output,o", ":output the partitioned graph into dot files")
+		("vertices,v", po::value<int>(), ":number of vertices of the input file")
+		("subgraphs,s", po::value<int>(), ":set number of subgraphs, has to be the power of 2")
+		("input-file,f", po::value<string>(), ":input file name")
+	;
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::notify(vm);
+	
+	bool read_graph = vm.count("input-file") && vm.count("vertices"), output = vm.count("output");
 
-	int num = 200;
-	//cout << "num of vertices= " << num << endl;
-
-    Graph g;
-    //ifstream In("par_test_8.dot");
-    //ifstream In("par_test_500.dot");
-    ifstream In("par_test_200.dot");
-
-	g.init(world.rank(), num, num/world.size());
-
-    g.readDotFormat(In);
-
-    //if (world.rank() == rank) {
-	//    g.printDotFormat();
-    //    cout << "rank = " << world.rank() << endl;
-    //    cout << "size of graph = " << g.size() << endl;
-    //    cout << "num of edges = " << g.edgesNum() << endl;
-	//	g.printLaplacianMat();
-    //}
-
-	world.barrier();
-
-    Partition partition(world, g, 8, true);
-	if (world.rank() == 0) {
-		partition.printLapEigenvalues();
-		partition.printLapEigenMat();
-		//g.printDotFormat();
+	if (vm.count("help") && world.rank() == 0) {
+		cout << desc << endl;
+		return 0;
+	}
+	if (vm.count("subgraphs")) {
+		subgraphs = vm["subgraphs"].as<int>();
+		if (world.rank() == 0 && read_graph) {
+			cout << "argument: subgraphs = " << subgraphs << "." << endl;
+		}
+	} else {
+		subgraphs = 2;
+		if (world.rank() == 0 && read_graph) {
+			cout << "default argument: subgraphs = " << subgraphs << "." << endl;
+		}
+	}
+	
+	Graph* g;
+	if (read_graph) {
+		g = new Graph;
+		vertices = vm["vertices"].as<int>();
+		g->init(world.rank(), vertices, vertices/world.size());
+		filename = vm["input-file"].as<string>();
+		if (world.rank() == 0) {
+			cout << "Input file is \"" << filename  << "\""<< endl;
+		}
+		ifstream In(filename);
+		g->readDotFormat(In);
+	} else {
+		if (world.rank() == 0) {
+			cout << "Please set file name and number of vertices" << endl;
+			cout << desc << endl;
+		}
+		return 0;
 	}
 	
 	world.barrier();
-	// Print coloured graph from each process to a single file
+	Partition partition(world, *g, subgraphs, true);
+	world.barrier();
 
-	string filename("output_rank_");
-	filename += to_string(world.rank());
-	filename += ".dot";
-
-	g.outputDotFormat(filename);
-
+	if (output) {
+		string filename("parallel_");
+		filename += to_string(g->localSize());
+		filename += "v_";
+		filename += to_string(g->rank());
+		filename += "r.dot";
+		g->outputDotFormat(filename);
+	} else if (world.rank() == 0) {
+		//g->printDotFormat();
+		//partition.printLapEigenvalues();
+		//partition.printLapEigenMat();
+		cout << "rank = " << world.rank() << endl;
+		cout << "size of graph = " << g->size() << endl;
+		cout << "local size of graph = " << g->localSize() << endl;
+		cout << "num of edges = " << g->edgesNum() << endl;
+	}
+	
 	//fstream Output;
 	//for (int proc = 0; proc < world.size(); proc++) {
 	//	if (world.rank() == proc) {
@@ -100,9 +131,10 @@ int main(int argc, char* argv[]) {
 	//	}
 	//}
 
-	env.~environment();
+	//env.~environment();
 	//cout << "finalized = " << env.finalized() << endl;
 
+	delete g;
 	return 0;
 }
 

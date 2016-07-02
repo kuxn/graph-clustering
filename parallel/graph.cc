@@ -16,7 +16,6 @@
 #include <random>
 #include <chrono>
 #include <climits>
-#include <string>
 
 #include "graph.h"
 
@@ -192,11 +191,6 @@ void Graph::printDotFormat() const {
 
 void Graph::outputDotFormat(const string& filename) const {
     int num_of_vertex = G.size();
-
-	//string filename("Output_");
-	//filename += to_string(num_of_vertex);
-	//filename += ".dot";
-
 	ofstream Output(filename);
 
 	Output << "Undirected Graph {" << endl;
@@ -297,8 +291,6 @@ void Graph::readDotFormat(ifstream& In) {
 	In >> to;
 	In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 
-	//int procs = 4; // if input is 200, then each proc has 50 vertices.
-	
 	while (In.good()) {
 		if (from >= rank_ * local_size_ && from <= (rank_ + 1) * local_size_ - 1) {
 			//cout << "from = " << from << " to = " << to << endl;

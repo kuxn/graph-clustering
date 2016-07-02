@@ -1,6 +1,8 @@
 CXX 		= g++
 CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 INCPATH		= include
+LIBDIR		= -L/usr/local/lib
+LDFLAGS		= -lboost_program_options
 
 OBJECTS 	= graph.o lanczos.o tqli.o partition.o analysis.o
 TARGET 		= main
@@ -9,10 +11,10 @@ TESTTARGET 	= test
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS) main.o
-	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^
+	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^ $(LIBDIR) $(LDFLAGS)
 
 %.o:%.cc
-	$(CXX) $(CXXFLAGS) -I $(INCPATH) -c $<
+	$(CXX) $(CXXFLAGS) -I $(INCPATH) -c $< $(LIBDIR) $(LDFLAGS)
 
 # Explicit dependencies required for headers
 $(OBJECTS): 		$(INCPATH)/graph.h
@@ -30,7 +32,7 @@ clean:
 	rm -f *.o $(TARGET) $(TESTTARGET)
 
 $(TESTTARGET): $(OBJECTS) test.o
-	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^
+	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^ $(LIBDIR) $(LDFLAGS)
 	time ./$(TESTTARGET)
 
 output: main

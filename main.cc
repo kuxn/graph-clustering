@@ -12,127 +12,85 @@
  */
 
 #include <iostream>
-#include <sstream>
+#include <string>
+#include <boost/program_options.hpp>
+
 #include "graph.h"
-#include "lanczos.h"
-#include "tqli.h"
 #include "partition.h"
 #include "analysis.h"
 
 using namespace std;
+namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
 
-	/*-----------------------------------------------------------------------------
-	 *  Test case for basic functions
-	 *-----------------------------------------------------------------------------*/
+	int vertices, subgraphs;
+	string filename; 
+
+	po::options_description desc("Allowed options");
+	desc.add_options()
+		("help,h", ":produce help message")
+		("output,o", ":output the partitioned graph into a dot file")
+		("vertices,v", po::value<int>(), ":set number of vertices")
+		("subgraphs,s", po::value<int>(), ":set number of subgraphs, has to be the power of 2")
+		("input-file,f", po::value<string>(), ":input file name")
+	;
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::notify(vm);
+
+	if (vm.count("help")) {
+		cout << desc << "\n";
+		return 1;
+	}
+	if (vm.count("subgraphs")) {
+		subgraphs = vm["subgraphs"].as<int>();
+		cout << "argument: subgraphs = " << subgraphs << "." << endl;	
+	} else {
+		subgraphs = 2;
+		cout << "default argument: subgraphs = " << subgraphs << "." << endl;	
+	}
+
+	bool random_graph = vm.count("vertices"), 
+	     read_graph = vm.count("input-file"), 
+	     output = vm.count("output");
+
+	Graph* g;
+
+	if (random_graph) {
+		vertices = vm["vertices"].as<int>();
+		cout << "argument: vertices =  " << vertices << "." << endl;	
+		g = new Graph(vertices);
+	} else if (read_graph) {
+		g = new Graph;
+		filename = vm["input-file"].as<string>();
+		cout << "Input file is \"" << filename  << "\""<< endl;
+		ifstream In(filename);
+		g->readDotFormat(In);
+	} else {
+		vertices = 20;
+		cout << "default argument: vertices = " << vertices << "." << endl;	
+		g = new Graph(vertices);
+	}
 	
-	//g.addEdge(0,1);
-	//g.addEdge(0,4);
-	//g.addEdge(1,2);
-	//g.addEdge(2,3);
-	//g.addEdge(2,4);
-	//g.addEdge(3,4);
+	Partition partition(*g, subgraphs, true);
 
+	if (output) {
+		string filename("serial_");
+		filename += to_string(g->size());
+		filename += "v_";
+		filename += to_string(g->subgraphsNum());
+		filename += "s.dot";
+		g->outputDotFormat(filename);
+	} else {
+		//g->printDotFormat();
+		//g->printLaplacianMat();
+		//partition.printLapEigenvalues();
+		//partition.printLapEigenMat();
+		Analysis::cutEdgeVertexTable(*g);
+	}
 
-	/*-----------------------------------------------------------------------------
-	 *  Special test case for two partitioning
-	 *-----------------------------------------------------------------------------*/
-	
-	// Have complex eigenvalue
-	//g.addEdge(0,1);
-	//g.addEdge(0,2);
-	//g.addEdge(1,2);
-	//g.addEdge(2,3);
-	//g.addEdge(3,4);
-	//g.addEdge(3,5);
-	//g.addEdge(3,6);
-	//g.addEdge(3,7);
-	//g.addEdge(5,6);
-	//g.addEdge(4,6);
-	//g.addEdge(4,7);
-
-
-	//g.addEdge(0,1);
-	//g.addEdge(0,2);
-	//g.addEdge(1,2);
-	//g.addEdge(2,3);
-	//g.addEdge(3,4);
-	//g.addEdge(3,5);
-	//g.addEdge(4,5);
-
-
-	/*-----------------------------------------------------------------------------
-	 *  Special case for multiple partition
-	 *-----------------------------------------------------------------------------*/
-
-	//g.addEdge(0,1);
-	//g.addEdge(0,2);
-	//g.addEdge(1,2);
-	//g.addEdge(2,9);
-	//g.addEdge(3,4);
-	//g.addEdge(3,5);
-	//g.addEdge(4,5);
-	//g.addEdge(5,9);
-	//g.addEdge(6,7);
-	//g.addEdge(6,8);
-	//g.addEdge(7,8);
-	//g.addEdge(8,9);
-
-	/*-----------------------------------------------------------------------------
-	 *  Special case for multiple partition2
-	 *-----------------------------------------------------------------------------*/
-
-	//g.addEdge(0,1);
-	//g.addEdge(0,2);
-	//g.addEdge(1,2);
-	//g.addEdge(2,12);
-	//g.addEdge(3,4);
-	//g.addEdge(3,5);
-	//g.addEdge(4,5);
-	//g.addEdge(5,12);
-	//g.addEdge(6,7);
-	//g.addEdge(6,8);
-	//g.addEdge(7,8);
-	//g.addEdge(8,12);
-	//g.addEdge(9,10);
-	//g.addEdge(9,11);
-	//g.addEdge(10,11);
-	//g.addEdge(10,12);
-	//g.addEdge(13,12);
-	//g.addEdge(13,14);
-	//g.addEdge(13,15);
-	//g.addEdge(14,15);
-
-	istringstream ss(argv[1]);
-	int num = 10;
-	if (!(ss >> num))
-		cerr << "Invalid number " << argv[1] << endl;
-
-	cout << "num of vertices= " << num << endl;
-
-	//Graph g(num);
-
-	
-	//g.outputDotFormat("test_8.dot");
-
-	Graph g;
-	ifstream In("par_test_200.dot");
-	//ifstream In("random-500.dot");
-	//ifstream In("par_test_8.dot");
-	g.readDotFormat(In);
-	Partition partition(g, 8, true);
-	g.printDotFormat();
-	//g.printLaplacianMat();
-	//partition.usingFullMat(g, 4, false);
-	//partition.printLapEigenvalues();
-	//partition.printLapEigenMat();
-	cutEdgeVertexTable(g);
-	cout << "CutEdgePercent = " << cutEdgePercent(g) << endl; 
-	manuallyPartition(g);
-	cutEdgeVertexTable(g);
-	cout << "CutEdgePercent = " << cutEdgePercent(g) << endl; 
-
+	delete g;
 	return 0;
 }
 
