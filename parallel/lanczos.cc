@@ -22,6 +22,7 @@
 #include <cmath> 
 
 #include "lanczos.h"
+#include "vt_user.h"
 
 namespace mpi = boost::mpi;
 using std::cout;
@@ -52,10 +53,10 @@ using std::endl;
 
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool reorthogonalisation) {
-
-    int local_size = g_local.localSize();
+    
+	VT_TRACER("LANCZOS");
+	int local_size = g_local.localSize();
 	Vector v0_local(local_size);
-	//srand48(time(NULL));
 	v0_local = init(v0_local, g_local.globalSize());
 
 #ifdef Debug
@@ -175,10 +176,8 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 	Vector prod;
 	//if (g.size() != (int)vec.size())
 	//throw std::length_error("The sizes don't match.");
-
-    /*-----------------------------------------------------------------------------
-     *  Calcualte a partial result in each process, the index starts from zero in vector "prod"
-     *-----------------------------------------------------------------------------*/
+	
+	// Calcualte a partial result in each process, the index starts from zero in vector "prod"
 
 	int size = g.localSize();
 	for (int vertex = 0; vertex < size; vertex++) {
@@ -207,6 +206,7 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 
 template<typename Vector, typename T>
 inline void Lanczos<Vector, T>::gramSchmidt(int& iter, const int& size) {
+	VT_TRACER("GramSchmidt");
 	for (int k = 1; k <= iter; k++) {
 		//cout << "i - norm of lanczos_vecs_global["<<k<<"] = " << norm(lanczos_vecs_global[k]) << endl;
 		for (int i = 0; i < k; i++) {

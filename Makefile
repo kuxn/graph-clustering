@@ -1,8 +1,9 @@
-CXX 		= g++
+#CXX 		= g++
+CXX 		= vtcxx -vt:c++ g++ -DVTRACE
 CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 INCPATH		= include
 LIBDIR		= -L/usr/local/lib
-LDFLAGS		= -lboost_program_options
+LDLIBS		= -lboost_program_options
 
 OBJECTS 	= graph.o lanczos.o tqli.o partition.o analysis.o
 TARGET 		= main
@@ -11,10 +12,10 @@ TESTTARGET 	= test
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS) main.o
-	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^ $(LIBDIR) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^ $(LIBDIR) $(LDLIBS)
 
 %.o:%.cc
-	$(CXX) $(CXXFLAGS) -I $(INCPATH) -c $< $(LIBDIR) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -I $(INCPATH) -c $< $(LIBDIR) $(LDLIBS)
 
 # Explicit dependencies required for headers
 $(OBJECTS): 		$(INCPATH)/graph.h
@@ -29,10 +30,10 @@ $(foreach object_file,$(OBJECTS),$(eval $(call OBJECT_DEPENDS_ON_CORRESPONDING_H
 # Phony target to get around problem of having a file called 'clean'
 .PHONY: clean
 clean:
-	rm -f *.o $(TARGET) $(TESTTARGET)
+	rm -rf *.o *.z *.dSYM *.otf $(TARGET) $(TESTTARGET)
 
 $(TESTTARGET): $(OBJECTS) test.o
-	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^ $(LIBDIR) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -I $(INCPATH) -o $@ $^ $(LIBDIR) $(LDLIBS)
 	time ./$(TESTTARGET)
 
 output: main

@@ -141,18 +141,20 @@ bool testPartition() {
 
 bool testReothogonalisation() {
 
-    Graph g(100);
+    Graph g(1000);
     Partition partition1(g, 4, false);
 	cout << "WITHOUT reorthogonalisation: " << endl;
 	Analysis::cutEdgeVertexTable(g);
+    cout << "eigenvalues:";
     partition1.printLapEigenvalues();
-    partition1.printLapEigenMat();
+    //partition1.printLapEigenMat();
 
-    Partition partition2(g, 4, true);
-	cout << "WITH reorthogonalisation: " << endl;
-	Analysis::cutEdgeVertexTable(g);
-    partition2.printLapEigenvalues();
-    partition2.printLapEigenMat();
+    //Partition partition2(g, 4, true);
+	//cout << "WITH reorthogonalisation: " << endl;
+	//Analysis::cutEdgeVertexTable(g);
+    //cout << "eigenvalues:";
+    //partition2.printLapEigenvalues();
+    //partition2.printLapEigenMat();
 
     return true;
 }

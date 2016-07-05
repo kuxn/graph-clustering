@@ -20,6 +20,7 @@
 #include "partition.h"
 #include "lanczos.h"
 #include "tqli.h"
+#include "vt_user.h"
 
 #define Sign(a) (a >= 0.0 ? 1:0)
 
@@ -37,6 +38,7 @@ typedef std::unordered_map<int, Vector> DenseMatrix;
 
 Partition::Partition(boost::mpi::communicator& world, const Graph& g, const int& subgraphs, bool reorthogonalisation) {
 
+	VT_TRACER("PARTITION");
 	int size = g.globalSize();
 	int num_of_eigenvec = log2(subgraphs);
 
@@ -221,6 +223,7 @@ void Partition::outputLapEigenvalues() {
  */
 
 Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index) {
+	VT_TRACER("EigenVec");
 	// Find the eigenvector from the vector matrix of the Tridiagonal eigenvector matrix (each column represents a vector)
 	int size = tri_eigen_vecs.size(); // Size of vertices/vectors
 	Vector tri_eigen_vec(size, 0);

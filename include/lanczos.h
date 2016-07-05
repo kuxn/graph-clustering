@@ -27,6 +27,7 @@ class Lanczos {
         inline T norm(const Vector& vec);
         inline Vector& normalise(Vector& vec);
         inline void gramSchmidt(int& iter, int& size);
+        inline T l2norm(const Vector& alpha, const Vector& beta);
 
     public:
         Lanczos(const Graph& g, bool reorthogonalisation);

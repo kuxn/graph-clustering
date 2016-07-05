@@ -16,6 +16,7 @@
 #include <cmath>
 #include <utility>
 #include "tqli.h"
+#include "vt_user.h"
 
 #define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a)) // Magnitude of a times sign of b
 
@@ -66,6 +67,7 @@ double pythag(double a, double b) {
  
 void tqli (vector<double>& d, vector<double>& e, int n, unordered_map<int, vector<double>>& z) {
 
+	VT_TRACER("TQLI");
 	int m,l,iter,i,k;
 	double s,r,p,g,f,dd,c,b;
 	

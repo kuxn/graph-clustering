@@ -18,12 +18,14 @@
 #include "graph.h"
 #include "partition.h"
 #include "analysis.h"
+#include "vt_user.h"
 
 using namespace std;
 namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
 
+	VT_TRACER("MAIN");
 	int vertices, subgraphs;
 	string filename; 
 
