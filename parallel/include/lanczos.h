@@ -37,7 +37,7 @@ class Lanczos {
         Vector beta_global;
         std::unordered_map<int, Vector> lanczos_vecs_global;
         void print_tri_mat();
-        
+
         Vector transform(std::vector<Vector>& vec_gather, int local_size);
 };
 

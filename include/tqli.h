@@ -21,5 +21,3 @@ void tqli (std::vector<double>& d, std::vector<double>& e, int n, std::unordered
 
 #endif
 
-
-

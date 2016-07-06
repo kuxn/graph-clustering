@@ -22,7 +22,7 @@ $(OBJECTS): 				$(INCPATH)/graph.h
 main.o test.o partition.o:	$(INCPATH)/*.h lanczos.cc
 
 define OBJECT_DEPENDS_ON_CORRESPONDING_HEADER
-    $(1) : $(INCPATH)/${1:.o=.h}
+$(1) : $(INCPATH)/${1:.o=.h}
 endef
 
 $(foreach object_file,$(OBJECTS),$(eval $(call OBJECT_DEPENDS_ON_CORRESPONDING_HEADER,$(object_file))))

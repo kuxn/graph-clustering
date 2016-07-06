@@ -36,7 +36,7 @@ Graph::Graph(int num_of_vertex) {
 
 	for (int vertex = 0; vertex < num_of_vertex; vertex++) {
 		int num_of_neighbour = num_of_neigh(rng);
-        //cout << "num_of_neighbour = " << num_of_neighbour << endl;
+		//cout << "num_of_neighbour = " << num_of_neighbour << endl;
 		uniform_int_distribution<int> randneigh(0, num_of_vertex - 1);
 		unordered_set<int> neighbours;
 		for (int neighbour = 0; neighbour < num_of_neighbour; neighbour++) {
@@ -46,7 +46,7 @@ Graph::Graph(int num_of_vertex) {
 				rand_neighbour = randneigh(rng);
 				trials--;
 			} while (vertex == rand_neighbour && trials);
-			
+
 			if (trials <= 0) throw std::runtime_error ("Run out of trials.");
 			addEdge(vertex, rand_neighbour);
 		}
@@ -108,17 +108,17 @@ void Graph::addEdge(int src, int dest) {
 		edges.insert(dest);
 		G.insert(make_pair(src, edges));
 	}
-/*	
+	/*	
 	// Since graph is undirected, add edge dest->src	
 	it = G.find(dest);
 	if (it != G.end())
-		it->second.insert(src);
+	it->second.insert(src);
 	else {
-		unordered_set<int> edges;
-		edges.insert(src);
-		G.insert(make_pair(dest, edges));
+	unordered_set<int> edges;
+	edges.insert(src);
+	G.insert(make_pair(dest, edges));
 	}
-*/
+	*/
 }	
 
 /* 
@@ -145,7 +145,7 @@ const int Graph::subgraphsNum() const {
 		cout << "WARNING:The graph hasn't been partitioned." << endl; 
 		return 1;
 	}
-	
+
 	unordered_map<int, int> reverse_colour_map;
 	for (const auto& it:Colour) {
 		reverse_colour_map.insert({it.second, it.first});
@@ -165,12 +165,11 @@ const unordered_map<int, std::unordered_set<int>>::const_iterator Graph::find(in
  */
 
 void Graph::printDotFormat() const {
-    int num_of_vertex = G.size();
+	int num_of_vertex = G.size();
 	cout << "Undirected Graph {" << endl;
-
 	if (Colour.size() == 0)
 		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-				cout << globalIndex(vertex) << ";" << endl;
+			cout << globalIndex(vertex) << ";" << endl;
 		}
 	else
 		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
@@ -190,13 +189,13 @@ void Graph::printDotFormat() const {
  *-----------------------------------------------------------------------------*/
 
 void Graph::outputDotFormat(const string& filename) const {
-    int num_of_vertex = G.size();
+	int num_of_vertex = G.size();
 	ofstream Output(filename);
 
 	Output << "Undirected Graph {" << endl;
 	if (Colour.size() == 0)
 		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-				Output << globalIndex(vertex) << ";" << endl;
+			Output << globalIndex(vertex) << ";" << endl;
 		}
 	else
 		for (int vertex = 0; vertex < num_of_vertex; vertex++) {
@@ -220,7 +219,7 @@ void Graph::outputDotFormat(const string& filename) const {
 
 void Graph::printLaplacianMat() const {
 	int num_of_vertex = G.size();
-	
+
 	int start = rank_ * num_of_vertex;
 	int end = start + num_of_vertex;
 
@@ -231,7 +230,7 @@ void Graph::printLaplacianMat() const {
 			cout << vertex;
 	}
 	cout << endl;
-	
+
 	for (int row = 0; row < num_of_vertex; row++) {
 		cout << globalIndex(row) << "\t";
 		auto it = G.find(globalIndex(row));
@@ -280,7 +279,9 @@ const int Graph::getColour(int vertex) const {
  * =====================================================================================
  */
 
-void Graph::readDotFormat(ifstream& In) {
+void Graph::readDotFormat(const string& filename) {
+
+	ifstream In(filename);
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
@@ -318,26 +319,36 @@ void Graph::readDotFormat(ifstream& In) {
  * =====================================================================================
  */
 
-void Graph::readDotFormatWithColour(ifstream& In) {
+void Graph::readDotFormatWithColour(const string& filename) {
+
+	ifstream In(filename);
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
 	}
-	In.ignore(INT_MAX, '='); // Ignore the chars before the value of colour
+	In.ignore(INT_MAX, '{'); // Ignore the chars before the value of colour
 	int vertex = 0, colour = 0;
+	In >> vertex;
+	int first_vertex = vertex;
+	cout << "vertex = " << vertex << endl;
+	In.ignore(INT_MAX, '='); // Ignore the chars before the value of colour
 	In >> colour;
+	cout << "colour = " << colour << endl;
 	In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
-	
+
+	local_size_ = G.size();
 	while (In.good()) {
 		setColour(vertex, colour);
+		local_size_++;
 		In >> vertex;
-		if (vertex == 0) break; // Break the loop at the beginning of edge line
+		if (vertex == first_vertex) break; // Break the loop at the beginning of edge line
 		In.ignore(INT_MAX, '='); 
 		In >> colour;
 		In.ignore(INT_MAX, '\n');
 	}
-	
-	int from = 0, to = 0;
+
+	int from = first_vertex, to = 0;
+	cout << "first vertex = " << first_vertex << endl;
 	In.ignore(2); // Ignore "--"
 	In >> to;
 	In.ignore(INT_MAX, '\n'); 

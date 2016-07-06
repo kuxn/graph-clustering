@@ -32,11 +32,11 @@ class Graph {
         typedef std::unordered_set<int> SetOfNeighbours;
         std::unordered_map<int, SetOfNeighbours> G;
         mutable std::unordered_map<int, int> Colour;
-    
+
     public:
         Graph() {}
         Graph(int n); // Construct a random graph with n vertices
-        
+
         void addEdge(int src, int dest);
         const int edgesNum() const;
         const int subgraphsNum() const;

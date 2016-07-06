@@ -26,7 +26,7 @@ class Partition {
 
         Vector laplacian_eigenvalues_;
         DenseMatrix laplacian_eigen_mat_;
-        
+
         Vector getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index);
         void getLapEigenMat(const Graph& g, bool reorthogonalisation);
 

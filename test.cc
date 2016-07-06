@@ -22,8 +22,6 @@
 #include "partition.h"
 #include "analysis.h"
 
-namespace Tests {
-
 using namespace std;
 
 /* 
@@ -33,31 +31,31 @@ using namespace std;
  * =====================================================================================
  */
 
-bool testTqli() {
-	int size = 5;
-	unordered_map<int, vector<double>> eigenvecs;
-	vector<double> vinitial(size, 0);
-	for(int i = 0; i < size; i++) {
-		eigenvecs.insert({i, vinitial});
-	}
+bool Tests::testTqli() {
+    int size = 5;
+    unordered_map<int, vector<double>> eigenvecs;
+    vector<double> vinitial(size, 0);
+    for(int i = 0; i < size; i++) {
+        eigenvecs.insert({i, vinitial});
+    }
 
-	for(int i = 0; i < size; i++) {
-		eigenvecs[i][i] = 1;
-	}
+    for(int i = 0; i < size; i++) {
+        eigenvecs[i][i] = 1;
+    }
 
-	vector<double> diagonal, subdiagonal;
-	diagonal = {0.569893, 3.81259, 3.02478, 3.39064, 3.2021};
-	subdiagonal = {1.45159, 0.550477, 1.06987, 1.25114, 0.0};
+    vector<double> diagonal, subdiagonal;
+    diagonal = {0.569893, 3.81259, 3.02478, 3.39064, 3.2021};
+    subdiagonal = {1.45159, 0.550477, 1.06987, 1.25114, 0.0};
 
-	tqli(diagonal, subdiagonal, size, eigenvecs);
-	vector<double> result = {0.0, 1.58578, 3.00000, 4.41421, 5.00000};
-	
-	for (int i = 0; i < size; i++) {
-		if (abs(diagonal[i] - result[i]) > 1e-5)
-			return false;
-	}
-	
-	return true;
+    tqli(diagonal, subdiagonal, size, eigenvecs);
+    vector<double> result = {0.0, 1.58578, 3.00000, 4.41421, 5.00000};
+
+    for (int i = 0; i < size; i++) {
+        if (abs(diagonal[i] - result[i]) > 1e-5)
+            return false;
+    }
+
+    return true;
 }
 
 /* 
@@ -67,54 +65,54 @@ bool testTqli() {
  * =====================================================================================
  */
 
-bool testLanczos() {
-	// Initialise the graph
-	Graph g;
-	g.addEdge(0,1);
-	g.addEdge(0,4);
-	g.addEdge(1,2);
-	g.addEdge(2,3);
-	g.addEdge(2,4);
-	g.addEdge(3,4);
+bool Tests::testLanczos() {
+    // Initialise the graph
+    Graph g;
+    g.addEdge(0,1);
+    g.addEdge(0,4);
+    g.addEdge(1,2);
+    g.addEdge(2,3);
+    g.addEdge(2,4);
+    g.addEdge(3,4);
 
-	// The Laplacian matrix of the undirected graph above:
-	/*-----------------------------------------------------------------------------
-			0	1	2	3	4
-		0	2	-1	0	0	-1
-		1	-1	2	-1	0	0
-		2	0	-1	3	-1	-1
-		3	0	0	-1	2	-1
-		4	-1	0	-1	-1	3
-	 *-----------------------------------------------------------------------------*/
+    // The Laplacian matrix of the undirected graph above:
+    /*-----------------------------------------------------------------------------
+      0	1	2	3	4
+      0	2	-1	0	0	-1
+      1	-1	2	-1	0	0
+      2	0	-1	3	-1	-1
+      3	0	0	-1	2	-1
+      4	-1	0	-1	-1	3
+     *-----------------------------------------------------------------------------*/
 
-	int size = g.size();
+    int size = g.size();
 
-	// Calculate the diagonal and subdiagonal vectors
-	Lanczos<vector<double>, double> lanczos(g, true);
-	vector<double> alpha = lanczos.alpha;
-	vector<double> beta = lanczos.beta;
+    // Calculate the diagonal and subdiagonal vectors
+    Lanczos<vector<double>, double> lanczos(g, true);
+    vector<double> alpha = lanczos.alpha;
+    vector<double> beta = lanczos.beta;
 
-	beta.push_back(0);
+    beta.push_back(0);
 
-	// Initialise the input matrix for storing eigenvectors
-	unordered_map<int, vector<double>> eigenvecs;
-	vector<double> vinitial(size, 0);
-	for(int i = 0; i < size; i++) {
-		eigenvecs.insert({i, vinitial});
-	}
+    // Initialise the input matrix for storing eigenvectors
+    unordered_map<int, vector<double>> eigenvecs;
+    vector<double> vinitial(size, 0);
+    for(int i = 0; i < size; i++) {
+        eigenvecs.insert({i, vinitial});
+    }
 
-	// Create the identity matrix used as input for TQLI
-	for(int i = 0; i < size; i++) {
-		eigenvecs[i][i] = 1;
-	}
-	
-	tqli(alpha, beta, size, eigenvecs);
+    // Create the identity matrix used as input for TQLI
+    for(int i = 0; i < size; i++) {
+        eigenvecs[i][i] = 1;
+    }
 
-	// result stores the eigenvalues of orginal Laplacian matrix, calculated by Matlab
-	vector<double> result = {0, 1.381966, 2.381966, 3.61803, 4.61803};
+    tqli(alpha, beta, size, eigenvecs);
 
-	// Verify if the eigenvalues of the diagonalised the matrix are same as result
-	for (int i = 0; i < size; i++) {
+    // result stores the eigenvalues of orginal Laplacian matrix, calculated by Matlab
+    vector<double> result = {0, 1.381966, 2.381966, 3.61803, 4.61803};
+
+    // Verify if the eigenvalues of the diagonalised the matrix are same as result
+    for (int i = 0; i < size; i++) {
         if (abs(alpha[i] - result[i]) > 1e-5)
             return false;
     }
@@ -128,30 +126,30 @@ bool testLanczos() {
  * =====================================================================================
  */
 
-bool testPartition() {
-	
-	Graph g(100);
-	Partition partition(g, 2, true);
-	
-	Analysis::cutEdgeVertexTable(g);	
-	partition.printLapEigenvalues();
-	
-	return true;
+bool Tests::testPartition() {
+
+    Graph g(100);
+    Partition partition(g, 2, true);
+
+    Analysis::cutEdgeVertexTable(g);	
+    partition.printLapEigenvalues();
+
+    return true;
 }
 
-bool testReothogonalisation() {
+bool Tests::testReothogonalisation() {
 
     Graph g(1000);
     Partition partition1(g, 4, false);
-	cout << "WITHOUT reorthogonalisation: " << endl;
-	Analysis::cutEdgeVertexTable(g);
+    cout << "WITHOUT reorthogonalisation: " << endl;
+    Analysis::cutEdgeVertexTable(g);
     cout << "eigenvalues:";
     partition1.printLapEigenvalues();
     //partition1.printLapEigenMat();
 
     //Partition partition2(g, 4, true);
-	//cout << "WITH reorthogonalisation: " << endl;
-	//Analysis::cutEdgeVertexTable(g);
+    //cout << "WITH reorthogonalisation: " << endl;
+    //Analysis::cutEdgeVertexTable(g);
     //cout << "eigenvalues:";
     //partition2.printLapEigenvalues();
     //partition2.printLapEigenMat();
@@ -166,34 +164,34 @@ bool testReothogonalisation() {
  * =====================================================================================
  */
 
-bool testReadGraph() {
-	Graph g;
-	ifstream In("test_read_20.dot");
-	if (!In.is_open()) {
-		std::cerr << "ERROR: Can't open the file" << endl;
-		exit(-1);
-	}
-	g.readDotFormat(In);
-	
-	g.printDotFormat();
-	Partition partition(g, 4, true);
-	g.printDotFormat();
-	
-	return true;
+bool Tests::testReadGraph() {
+    Graph g;
+    ifstream In("test_read_20.dot");
+    if (!In.is_open()) {
+        std::cerr << "ERROR: Can't open the file" << endl;
+        exit(-1);
+    }
+    g.readDotFormat(In);
+
+    g.printDotFormat();
+    Partition partition(g, 4, true);
+    g.printDotFormat();
+
+    return true;
 }
 
-bool testReadGraphWithColour() {
-	Graph g;
-	ifstream In("test_read_20.dot");
-	if (!In.is_open()) {
-		std::cerr << "ERROR: Can't open the file" << endl;
-		exit(-1);
-	}
-	g.readDotFormatWithColour(In);	
+bool Tests::testReadGraphWithColour() {
+    Graph g;
+    ifstream In("test_read_20.dot");
+    if (!In.is_open()) {
+        std::cerr << "ERROR: Can't open the file" << endl;
+        exit(-1);
+    }
+    g.readDotFormatWithColour(In);	
 
-	g.printDotFormat();
+    g.printDotFormat();
 
-	return true;
+    return true;
 }
 
 /* 
@@ -203,23 +201,23 @@ bool testReadGraphWithColour() {
  * =====================================================================================
  */
 
-bool testCutEdgePercent() {
-	Graph g;
-	ifstream In("test_read_20.dot");
-	if (!In.is_open()) {
-		std::cerr << "ERROR: Can't open the file" << endl;
-		exit(-1);
-	}
-	g.readDotFormatWithColour(In);	
+bool Tests::testCutEdgePercent() {
+    Graph g;
+    ifstream In("test_read_20.dot");
+    if (!In.is_open()) {
+        std::cerr << "ERROR: Can't open the file" << endl;
+        exit(-1);
+    }
+    g.readDotFormatWithColour(In);	
 
-	double cut_edge_percent = Analysis::cutEdgePercent(g);
-	//cout << "cut_edge_percent = " << cut_edge_percent << endl;
-	
-	if (std::abs(cut_edge_percent - 0.142857) > 1e-5) {
-		return false;
-	}
+    double cut_edge_percent = Analysis::cutEdgePercent(g);
+    //cout << "cut_edge_percent = " << cut_edge_percent << endl;
 
-	return true;
+    if (std::abs(cut_edge_percent - 0.142857) > 1e-5) {
+        return false;
+    }
+
+    return true;
 }
 
 /* 
@@ -229,38 +227,38 @@ bool testCutEdgePercent() {
  * =====================================================================================
  */
 
-bool testCutEdgeVertexTable() {
-	Graph g;
-	ifstream In("test_table_1000.dot");
-	if (!In.is_open()) {
-		std::cerr << "ERROR: Can't open the file" << endl;
-		exit(-1);
-	}
-	g.readDotFormatWithColour(In);
-	Analysis::cutEdgeVertexTable(g);
-	
-	/*-----------------------------------------------------------------------------
- 	* Basic info of the graph
-	*-----------------------------------------------------------------------------
-	Vertices:   20
-	Edges:      36
-	Subgraphs:  4
-	*-----------------------------------------------------------------------------
- 	* Number of nodes in each subgraph
-	*-----------------------------------------------------------------------------
-	Colour:		0	1	2	3
-	Vertices: 	6	5	3	6
-	*-----------------------------------------------------------------------------
- 	* Edges table after partitioning
- 	* Each element represents number of edges (inside)/between subgraphs
-	*-----------------------------------------------------------------------------
-		0	1	2	3
-	0	(4)	4	5	3
-	1	4	(6)	0	3
-	2	5	0	(2)	2
-	3	3	3	2	(7)
-	*-----------------------------------------------------------------------------*/
-	return true;
+bool Tests::testCutEdgeVertexTable() {
+    Graph g;
+    ifstream In("test_table_1000.dot");
+    if (!In.is_open()) {
+        std::cerr << "ERROR: Can't open the file" << endl;
+        exit(-1);
+    }
+    g.readDotFormatWithColour(In);
+    Analysis::cutEdgeVertexTable(g);
+
+    /*-----------------------------------------------------------------------------
+     * Basic info of the graph
+     *-----------------------------------------------------------------------------
+    Vertices:   20
+    Edges:      36
+    Subgraphs:  4
+     *-----------------------------------------------------------------------------
+     * Number of nodes in each subgraph
+     *-----------------------------------------------------------------------------
+    Colour:		0	1	2	3
+    Vertices: 	6	5	3	6
+     *-----------------------------------------------------------------------------
+     * Edges table after partitioning
+     * Each element represents number of edges (inside)/between subgraphs
+     *-----------------------------------------------------------------------------
+        0	1	2	3
+     0	(4)	4	5	3
+     1	4	(6)	0	3
+     2	5	0	(2)	2
+     3	3	3	2	(7)
+     *-----------------------------------------------------------------------------*/
+    return true;
 }
 
 /* 
@@ -270,38 +268,36 @@ bool testCutEdgeVertexTable() {
  * =====================================================================================
  */
 
-bool testManuallyPartition() {
-	Graph g;
-	ifstream In("test_table_1000.dot");
-	if (!In.is_open()) {
-		std::cerr << "ERROR: Can't open the file" << endl;
-		exit(-1);
-	}
-	g.readDotFormatWithColour(In);	
-	//g.printDotFormat();
-	//Partition partition(g, 4, true);
-	Analysis::cutEdgeVertexTable(g);
+bool Tests::testManuallyPartition() {
+    Graph g;
+    ifstream In("test_table_1000.dot");
+    if (!In.is_open()) {
+        std::cerr << "ERROR: Can't open the file" << endl;
+        exit(-1);
+    }
+    g.readDotFormatWithColour(In);	
+    //g.printDotFormat();
+    //Partition partition(g, 4, true);
+    Analysis::cutEdgeVertexTable(g);
 
-	Analysis::manuallyPartition(g);
-	g.outputDotFormat("Output_1000_manuallyPartition.dot");
-	Analysis::cutEdgeVertexTable(g);
+    Analysis::manuallyPartition(g);
+    g.outputDotFormat("Output_1000_manuallyPartition.dot");
+    Analysis::cutEdgeVertexTable(g);
 
-	return true;
-}
-
+    return true;
 }
 
 int main() {
-	//cout << Tests::testTqli() << endl;;
-	//cout << Tests::testPartition() << endl;
-	//cout << Tests::testLanczos() << endl;
-	//cout << Tests::testCutEdgePercent() << endl;
-	//Tests::testReadGraph();
-	//Tests::testReadGraphWithColour();
-	//Tests::testManuallyPartition();
-	//Tests::testPartition();
-	//Tests::testCutEdgeVertexTable();
-	Tests::testReothogonalisation();
+    //cout << Tests::testTqli() << endl;;
+    //cout << Tests::testPartition() << endl;
+    //cout << Tests::testLanczos() << endl;
+    //cout << Tests::testCutEdgePercent() << endl;
+    //Tests::testReadGraph();
+    //Tests::testReadGraphWithColour();
+    //Tests::testManuallyPartition();
+    //Tests::testPartition();
+    //Tests::testCutEdgeVertexTable();
+    Tests::testReothogonalisation();
 
-	return 0;
+    return 0;
 }

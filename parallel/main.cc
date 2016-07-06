@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 	VT_TRACER("MAIN");
 	mpi::environment env;
 	mpi::communicator world;
-	
+
 	int vertices, subgraphs;
 	string filename;
 
@@ -43,11 +43,11 @@ int main(int argc, char* argv[]) {
 		("vertices,v", po::value<int>(), ":number of vertices of the input file")
 		("subgraphs,s", po::value<int>(), ":set number of subgraphs, has to be the power of 2")
 		("input-file,f", po::value<string>(), ":input file name")
-	;
+		;
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
-	
+
 	bool read_graph = vm.count("input-file") && vm.count("vertices"), output = vm.count("output");
 
 	if (vm.count("help") && world.rank() == 0) {
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 			cout << "default argument: subgraphs = " << subgraphs << "." << endl;
 		}
 	}
-	
+
 	Graph* g;
 	if (read_graph) {
 		g = new Graph;
@@ -75,8 +75,7 @@ int main(int argc, char* argv[]) {
 		if (world.rank() == 0) {
 			cout << "Input file is \"" << filename  << "\""<< endl;
 		}
-		ifstream In(filename);
-		g->readDotFormat(In);
+		g->readDotFormat(filename);
 	} else {
 		if (world.rank() == 0) {
 			cout << "Please set file name and number of vertices" << endl;
@@ -84,9 +83,9 @@ int main(int argc, char* argv[]) {
 		}
 		return 0;
 	}
-	
+
 	world.barrier();
-	Partition partition(world, *g, subgraphs, true);
+	Partition partition(world, *g, subgraphs, false);
 	world.barrier();
 
 	if (output) {
@@ -97,15 +96,30 @@ int main(int argc, char* argv[]) {
 		filename += "r.dot";
 		g->outputDotFormat(filename);
 	} else if (world.rank() == 0) {
-		//g->printDotFormat();
-		//partition.printLapEigenvalues();
-		//partition.printLapEigenMat();
 		cout << "rank = " << world.rank() << endl;
 		cout << "size of graph = " << g->size() << endl;
 		cout << "local size of graph = " << g->localSize() << endl;
 		cout << "num of edges = " << g->edgesNum() << endl;
 	}
-	
+
+	world.barrier();
+	// Read all the vertices to rank 0
+	if (world.rank() == 0) {
+		for (int rank = 0; rank < world.size(); rank++) {
+			filename = "parallel_";
+			filename += to_string(vertices/world.size());
+			filename += "v_";
+			filename += to_string(rank);
+			filename += "r.dot";
+			cout << "filename = " << filename << endl;
+			g->readDotFormatWithColour(filename);
+		}
+		g->printDotFormat();
+		partition.printLapEigenvalues();
+		partition.printLapEigenMat();
+		Analysis::cutEdgeVertexTable(*g);
+	}
+
 	//fstream Output;
 	//for (int proc = 0; proc < world.size(); proc++) {
 	//	if (world.rank() == proc) {

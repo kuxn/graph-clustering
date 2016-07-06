@@ -14,18 +14,17 @@
 #ifndef TEST_H_
 #define TEST_H_
 
-namespace Tests {
-
-bool testTqli();
-bool testLanczos();
-bool testPartition();
-bool testReothogonalisation();
-bool testReadGraph();
-bool testReadGraphWithColour();
-bool testCutEdgePercent();
-bool testCutEdgeNodeTable();
-
-}
+class Tests {
+    public:
+        static bool testTqli();
+        static bool testLanczos();
+        static bool testPartition();
+        static bool testReothogonalisation();
+        static bool testReadGraph();
+        static bool testReadGraphWithColour();
+        static bool testCutEdgePercent();
+        static bool testCutEdgeNodeTable();
+};
 
 #endif
 
