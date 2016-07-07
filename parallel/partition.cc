@@ -62,7 +62,13 @@ Partition::Partition(boost::mpi::communicator& world, const Graph& g, const int&
     for(int i = 0; i < size; i++)	tri_eigen_vecs[i][i] = 1;
 
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
-    tqli(laplacian_eigenvalues_, beta, 10, tri_eigen_vecs); // !!!No need to calculate all eigenvalues for colouring.
+    tqli(laplacian_eigenvalues_, beta, size, tri_eigen_vecs); 
+#ifdef Debug
+	cout << "Eigenvalues after TQLI: ";
+	for (auto x:laplacian_eigenvalues_) {
+		cout << x << " ";
+	}
+#endif
 
     // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha" 
     int vector_index = 0;
