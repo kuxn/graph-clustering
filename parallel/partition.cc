@@ -49,6 +49,17 @@ Partition::Partition(boost::mpi::communicator& world, const Graph& g, const int&
 
     beta.push_back(0);
 
+    cout << endl;
+    if (g.rank() == 0) {
+    cout << "lanczos matrix: " << endl;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            cout << lanczos.lanczos_vecs_global[i][j] << "\t";
+        }
+        cout << endl; 
+    }
+    }
+
 #ifdef Debug
     cout << endl;
     cout << "triangular matrix: " << endl;
@@ -70,6 +81,15 @@ Partition::Partition(boost::mpi::communicator& world, const Graph& g, const int&
 	}
 #endif
 
+    if (g.rank() == 0) {
+    cout << "tridiagonal matrix: " << endl;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            cout << tri_eigen_vecs[i][j] << "\t";
+        }
+        cout << endl; 
+    }
+    }
     // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha" 
     int vector_index = 0;
 

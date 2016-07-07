@@ -78,11 +78,11 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
     v0_global = transform(v0_global_gather, local_size);
     v1_global = v0_global;
 
-#ifdef Debug
+//#ifdef Debug
     cout << "v1_global:";
     for (auto x:v1_global)
         cout << x << " ";
-#endif
+//#endif
 
     lanczos_vecs_global[0] = v0_global;
 
@@ -285,7 +285,8 @@ Vector& Lanczos<Vector, T>::init(Vector& vec, int global_size) {
     std::default_random_engine generator(seed);
     std::uniform_real_distribution<double> gen(0.0,1.0);
     for (int i = 0; i < local_size; i++) {
-        vec[i] = gen(generator);
+        //vec[i] = gen(generator);
+        vec[i] = i;
     }
     T norm_local = norm(vec);
     for (int i = 0; i < local_size; i++) {
