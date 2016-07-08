@@ -36,7 +36,7 @@ $(foreach object_file,$(OBJECTS),$(eval $(call OBJECT_DEPENDS_ON_CORRESPONDING_H
 # Phony target to get around problem of having a file called 'clean'
 .PHONY: clean
 clean:
-	rm -rf *.z *.dSYM *.otf $(BUILDDIR) $(TARGET)
+	rm -rf *.z *.dSYM *.otf *.thumb $(BUILDDIR) $(TARGET)
 
 tester: $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBDIR) $(LDLIBS)
