@@ -23,7 +23,8 @@ class Tests {
         static bool testReadGraph();
         static bool testReadGraphWithColour();
         static bool testCutEdgePercent();
-        static bool testCutEdgeNodeTable();
+        static bool testCutEdgeVertexTable();
+        static bool testManuallyPartition();
 };
 
 #endif

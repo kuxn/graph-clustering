@@ -47,5 +47,5 @@ class Lanczos {
         void transform(boost::mpi::communicator& world, const Graph& g);
 };
 
-#include "../lanczos.cc"
+#include "../src/lanczos.cc"
 #endif

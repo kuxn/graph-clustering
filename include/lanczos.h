@@ -38,5 +38,5 @@ class Lanczos {
         void print_tri_mat();
 };
 
-#include "../lanczos.cc"
+#include "../src/lanczos.cc"
 #endif

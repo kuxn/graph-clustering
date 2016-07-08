@@ -203,7 +203,7 @@ bool Tests::testReadGraphWithColour() {
 
 bool Tests::testCutEdgePercent() {
     Graph g;
-    ifstream In("test_read_20.dot");
+    ifstream In("test_cut_percent.dot");
     if (!In.is_open()) {
         std::cerr << "ERROR: Can't open the file" << endl;
         exit(-1);
@@ -287,17 +287,17 @@ bool Tests::testManuallyPartition() {
     return true;
 }
 
-int main() {
-    //cout << Tests::testTqli() << endl;;
-    //cout << Tests::testPartition() << endl;
-    //cout << Tests::testLanczos() << endl;
-    //cout << Tests::testCutEdgePercent() << endl;
-    //Tests::testReadGraph();
-    //Tests::testReadGraphWithColour();
-    //Tests::testManuallyPartition();
-    //Tests::testPartition();
-    //Tests::testCutEdgeVertexTable();
-    Tests::testReothogonalisation();
-
-    return 0;
-}
+//int main() {
+//    //cout << Tests::testTqli() << endl;;
+//    //cout << Tests::testPartition() << endl;
+//    //cout << Tests::testLanczos() << endl;
+//    //cout << Tests::testCutEdgePercent() << endl;
+//    //Tests::testReadGraph();
+//    //Tests::testReadGraphWithColour();
+//    //Tests::testManuallyPartition();
+//    //Tests::testPartition();
+//    //Tests::testCutEdgeVertexTable();
+//    Tests::testReothogonalisation();
+//
+//    return 0;
+//}

@@ -1,12 +1,15 @@
 CXX 		= g++
 CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 INCPATH		= include
+VTINC		= /usr/local/include/vampirtrace
 
 all: t/wvtest
+SRCDIR      = ../src
+CXXFILES  	= $(shell find $(SRCDIR) -name '*.cc')
 
 # EDIT HERE: add any "../*.c" files that you need to test
-t/wvtest: wvtestmain.cc wvtest.cc t/wvtest.t.cc ../graph.cc ../lanczos.cc ../tqli.cc ../partition.cc ../test.cc ../analysis.cc
-	$(CXX) $(CXXFLAGS) -D WVTEST_CONFIGURED -o $@ -I. -I../$(INCPATH) $^
+t/wvtest: wvtestmain.cc wvtest.cc t/wvtest.t.cc $(filter-out $(SRCDIR)/main.cc, $(CXXFILES))
+	$(CXX) $(CXXFLAGS) -D WVTEST_CONFIGURED -o $@ -I. -I../$(INCPATH) -I$(VTINC) $^
 
 runtests: all
 	t/wvtest
