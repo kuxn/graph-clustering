@@ -52,28 +52,29 @@ double Analysis::cutEdgePercent(const Graph& g) {
 
 void Analysis::cutEdgeVertexTable(const Graph& g) {
     int size = g.size();
+	cout << "size of the graph = " << size << endl;
     int subgraphs = g.subgraphsNum();
 
     //cout << "subgraphs = " << subgraphs << endl;
 
-    std::unordered_map<int, std::vector<int>> cut_edge_table;
-    std::vector<int> cut_vertex_table(subgraphs, 0);
-    std::vector<int> isolated_vertex;
+	std::unordered_map<int, std::vector<int>> cut_edge_table;
+	std::vector<int> cut_vertex_table(subgraphs, 0);
+	std::vector<int> isolated_vertex;
 
-    std::vector<int> vinitial(subgraphs, 0);
-    for (int i = 0; i < subgraphs; i++) {
-        cut_edge_table[i] = vinitial;
-    }
+	std::vector<int> vinitial(subgraphs, 0);
+	for (int i = 0; i < subgraphs; i++) {
+		cut_edge_table[i] = vinitial;
+	}
 
-    for (int vertex = 0; vertex < size; vertex++) {
-        int temp = 0;
-        int vertex_subgraph = g.getColour(vertex);
-        if (vertex_subgraph >= subgraphs)
-            vertex_subgraph = (vertex_subgraph/subgraphs)%subgraphs;
-        auto it = g.find(vertex);
-        for (const int& neighbour:it->second) {
-            int neighbour_subgraph = g.getColour(neighbour);
-            if (neighbour_subgraph >= subgraphs)
+	for (int vertex = 0; vertex < size; vertex++) {
+		int temp = 0;
+		int vertex_subgraph = g.getColour(vertex);
+		if (vertex_subgraph >= subgraphs)
+			vertex_subgraph = (vertex_subgraph/subgraphs)%subgraphs;
+		auto it = g.find(vertex);
+		for (const int& neighbour:it->second) {
+			int neighbour_subgraph = g.getColour(neighbour);
+			if (neighbour_subgraph >= subgraphs)
                 neighbour_subgraph = (neighbour_subgraph/subgraphs)%subgraphs;
             cut_edge_table[vertex_subgraph][neighbour_subgraph]++;
             if (vertex_subgraph == neighbour_subgraph) {

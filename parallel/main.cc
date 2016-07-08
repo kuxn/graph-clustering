@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
 	world.barrier();
 
 	if (output) {
-		string filename("parallel_");
+		string filename("./output/parallel_");
 		filename += to_string(g->localSize());
 		filename += "v_";
 		filename += to_string(g->rank());
@@ -104,9 +104,9 @@ int main(int argc, char* argv[]) {
 
 	world.barrier();
 	// Read all the vertices to rank 0
-	if (world.rank() == 0) {
+	if (output && world.rank() == 0) {
 		for (int rank = 0; rank < world.size(); rank++) {
-			filename = "parallel_";
+			filename = "./output/parallel_";
 			filename += to_string(vertices/world.size());
 			filename += "v_";
 			filename += to_string(rank);
@@ -119,7 +119,6 @@ int main(int argc, char* argv[]) {
 		//partition.printLapEigenMat();
 		Analysis::cutEdgeVertexTable(*g);
 	}
-
 	//fstream Output;
 	//for (int proc = 0; proc < world.size(); proc++) {
 	//	if (world.rank() == proc) {

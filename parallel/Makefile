@@ -3,7 +3,7 @@ CXX 		= vtcxx -vt:c++ mpic++ -DVTRACE
 CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 INCPATH		= include
 LIBDIR		= -L/usr/local/lib
-LDLIBS		= -lboost_mpi -lboost_serialization -lboost_program_options -lmpi
+LDLIBS		= -lboost_mpi -lboost_serialization -lboost_program_options
 
 OBJECTS 	= graph.o lanczos.o tqli.o partition.o analysis.o
 TARGET 		= main
