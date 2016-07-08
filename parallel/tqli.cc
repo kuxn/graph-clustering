@@ -81,7 +81,7 @@ void tqli (vector<double>& d, vector<double>& e, int n, unordered_map<int, vecto
     //cout << endl;
 
     for (l = 0; l < n; l++) {
-        cout << "tqli" << l << endl;
+        //cout << "tqli" << l << endl;
         iter = 0;
         do {
             // Look for a single small subdiagonal element to split the matrix.

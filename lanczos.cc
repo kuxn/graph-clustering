@@ -76,6 +76,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool reorthogonalisation) {
 
         beta_val = norm(t); 
         beta.push_back(beta_val);	
+        //cout << "beta[" << iter - 1 << "] =  " << beta_val << endl;
         if (std::abs(beta_val) < 1e-5) 
             try { throw std::runtime_error("Value of beta is close to 0: "); }
         catch (std::runtime_error& e) { 
@@ -113,6 +114,18 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool reorthogonalisation) {
     w = multGraphVec(g, v1);
     alpha_val = dot(v1, w);
     alpha.push_back(alpha_val);
+
+#ifdef Debug
+	cout << "lanczos vectors:" << endl;
+	for (unsigned int i = 0; i < lanczos_vecs.size(); i++) {
+		auto it = lanczos_vecs.find(i);
+		for (auto x:it->second) {
+			cout << x << "\t";
+		}
+		cout << endl;
+	}
+#endif
+
     if (reorthogonalisation) {
         cout << "Lanczos algorithm WITH reorthogonalisation is done." << endl;
     } else {
@@ -344,7 +357,7 @@ Vector& Lanczos<Vector, T>::initialise(Vector& vec) {
         vec[i] /= normalise;
     }
 
-    //vec = {0.111055, 0.487511, 0.0456078, 0.497916, 0.492569, 0.0858796, 0.335885, 0.37038};
+    //vec = {0, 0.5, 0, 0.5, 0, 0.5, 0, 0.5};
 
     return vec;
 }

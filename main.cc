@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
         g = new Graph(vertices);
     }
 
-    Partition partition(*g, subgraphs, true);
+    Partition partition(*g, subgraphs, false);
 
     if (output) {
         string filename("serial_");
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
     } else {
         //g->printDotFormat();
         //g->printLaplacianMat();
-        //partition.printLapEigenvalues();
+        partition.printLapEigenvalues();
         //partition.printLapEigenMat();
         Analysis::cutEdgeVertexTable(*g);
     }
