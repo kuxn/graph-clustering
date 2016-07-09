@@ -36,14 +36,14 @@ typedef std::unordered_map<int, Vector> DenseMatrix;
  * =====================================================================================
  */
 
-Partition::Partition(boost::mpi::communicator& world, const Graph& g, const int& subgraphs, bool reorthogonalisation) {
+Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisation) {
 
     VT_TRACER("PARTITION");
     int size = g.globalSize();
     int num_of_eigenvec = log2(subgraphs);
 
     // Construct tridiagonal matrix using Lanczos algorithm
-    Lanczos<Vector, double> lanczos(world, g, reorthogonalisation);
+    Lanczos<Vector, double> lanczos(g, reorthogonalisation);
     laplacian_eigenvalues_ = lanczos.alpha_global;
     Vector beta = lanczos.beta_global;
 
@@ -130,10 +130,10 @@ Partition::Partition(boost::mpi::communicator& world, const Graph& g, const int&
  *  Modified partition function to for multiple partitioning by calculating all laplacian eigenvectors
  *-----------------------------------------------------------------------------*/
 
-void Partition::usingFullMat(boost::mpi::communicator& world, const Graph& g, const int& subgraphs, bool reorthogonalisation) {
+void Partition::usingFullMat(const Graph& g, const int& subgraphs, bool reorthogonalisation) {
 
     int size = g.size();
-    getLapEigenMat(world, g, reorthogonalisation);
+    getLapEigenMat(g, reorthogonalisation);
 
 #ifdef Debug
     // Print all the eigenvalues of the tridiagonal/laplacian matrix
@@ -277,12 +277,12 @@ Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_
  * =====================================================================================
  */
 
-void Partition::getLapEigenMat(boost::mpi::communicator& world, const Graph& g, bool reorthogonalisation) {
+void Partition::getLapEigenMat(const Graph& g, bool reorthogonalisation) {
 
     int size = g.globalSize();
 
     // Construct tridiagonal matrix using Lanczos algorithm
-    Lanczos<Vector, double> lanczos(world, g, reorthogonalisation);
+    Lanczos<Vector, double> lanczos(g, reorthogonalisation);
     laplacian_eigenvalues_ = lanczos.alpha_global;
     Vector beta = lanczos.beta_global;
 

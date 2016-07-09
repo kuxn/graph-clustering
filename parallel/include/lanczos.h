@@ -22,23 +22,24 @@
 template<typename Vector, typename T>
 class Lanczos {
     private:
+	    boost::mpi::communicator world;
         Vector& init(Vector& v_local, const Graph& g);
         Vector multGraphVec(const Graph& g, const Vector& vec);
-        inline T dot(boost::mpi::communicator& world, const Vector& v1, const Vector& v2);
+        inline T dot(const Vector& v1, const Vector& v2);
         inline T dot_local(const Vector& v1, const Vector& v2);
         inline T norm(const Vector& vec);
         inline void normalise(Vector& vec, const Graph& g, const T& norm_global);
-        inline void gramSchmidt(boost::mpi::communicator& world, int& iter, const Graph& g);
+        inline void gramSchmidt(int& iter, const Graph& g);
         
         std::unordered_map<int, std::unordered_set<int>> halo_recv; // <rank, halo_neighbours to receive>
         std::unordered_map<int, std::unordered_set<int>> halo_send; // <rank, halo_neighbours to send>
-        void haloInit(boost::mpi::communicator& world, const Graph& g);
-        void haloUpdate(boost::mpi::communicator& world, const Graph& g, Vector& v_local, Vector& v_halo);
-        void transform(boost::mpi::communicator& world, const Graph& g);
+        void haloInit(const Graph& g);
+        void haloUpdate(const Graph& g, Vector& v_local, Vector& v_halo);
+        void transform(const Graph& g);
         std::unordered_map<int, Vector> lanczos_vecs_local;
 
     public:
-        Lanczos(boost::mpi::communicator& world, const Graph& g, bool reorthogonalisation);
+        Lanczos(const Graph& g, bool reorthogonalisation);
 
         Vector alpha_global;
         Vector beta_global;

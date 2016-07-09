@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	world.barrier();
-	Partition partition(world, *g, subgraphs, vm["gram-schmidt"].as<bool>());
+	Partition partition(*g, subgraphs, vm["gram-schmidt"].as<bool>());
 	world.barrier();
 
 	if (output) {

@@ -55,7 +55,7 @@ using std::endl;
  *-----------------------------------------------------------------------------*/
 
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool reorthogonalisation) {
+Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool reorthogonalisation) {
 
 	VT_TRACER("LANCZOS");
 	int local_size = g_local.localSize();
@@ -70,7 +70,7 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 		cout << "v0_local[" << i << "] = " << v0_local[i] << " ";
 	}
 	cout << endl;
-	cout << "global dot of these vectors = " << dot(world, v0_local, v0_local) << endl;
+	cout << "global dot of these vectors = " << dot(v0_local, v0_local) << endl;
 #endif
 
 	Vector t_local = v0_local, v1_local = v0_local, w_local;
@@ -85,8 +85,7 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 #endif
 
 	lanczos_vecs_local[0] = v1_local;
-	haloInit(world, g_local);
-	//haloUpdate(world, g_local, v1_local, v1_halo);
+	haloInit(g_local);
 
 #ifdef Debug
 	cout << "IN rank " << g_local.rank() << " before halo update v1_halo:";
@@ -98,7 +97,7 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 #endif
 
 	for (int iter = 1; iter < g_local.globalSize(); iter++) {
-		haloUpdate(world, g_local, v1_local, v1_halo);
+		haloUpdate(g_local, v1_local, v1_halo);
 
 #ifdef Debug
 		if (g_local.rank() == 0) {
@@ -118,7 +117,7 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 		cout << endl;
 #endif
 
-		T alpha_val_global = dot(world, v1_local, w_local);
+		T alpha_val_global = dot(v1_local, w_local);
 		//cout << "dot(v1, v1) = " << dot(v1, v1) << endl;
 		alpha_global.push_back(alpha_val_global);
 
@@ -131,7 +130,7 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 			t_local[i] = w_local[i] - alpha_val_global * v1_local[i] - beta_val_global * v0_local[i];
 		}
 
-		beta_val_global = sqrt(dot(world, t_local, t_local)); 
+		beta_val_global = sqrt(dot(t_local, t_local)); 
 		beta_global.push_back(beta_val_global);	
 		//cout << "beta[" << iter-1 << "]: " << beta_val_global << endl;
 
@@ -152,13 +151,13 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 		lanczos_vecs_local[iter] = v1_local;
 
 		if (reorthogonalisation) {
-			gramSchmidt(world, iter, g_local);
+			gramSchmidt(iter, g_local);
 			v0_local = lanczos_vecs_local[iter-1];
 			v1_local = lanczos_vecs_local[iter];
 		}
 
 		//Verify the dot product of v0 and v1 which is supposed to be 0
-		T dot_global = dot(world, v0_local, v1_local);
+		T dot_global = dot(v0_local, v1_local);
 #ifdef Debug
 		cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_global << endl;
 		cout << endl;
@@ -170,12 +169,12 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 			cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_global << endl;
 		}
 	}
-	haloUpdate(world, g_local, v1_local, v1_halo);
+	haloUpdate(g_local, v1_local, v1_halo);
 	w_local = multGraphVec(g_local, v1_halo);
-	alpha_val_global = dot(world, v1_local, w_local);
+	alpha_val_global = dot(v1_local, w_local);
 	alpha_global.push_back(alpha_val_global);
 
-	transform(world, g_local);	
+	transform(g_local);	
 	if (reorthogonalisation) {
 		cout << "Lanczos algorithm WITH reorthogonalisation is done." << endl;
 	} else {
@@ -191,7 +190,8 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
  */
 
 template<typename Vector, typename T>
-void Lanczos<Vector, T>::haloInit(boost::mpi::communicator& world, const Graph& g) { 
+//void Lanczos<Vector, T>::haloInit(boost::mpi::communicator& world, const Graph& g) { 
+void Lanczos<Vector, T>::haloInit(const Graph& g) { 
 	// Find out which rank and the corresponding data need to receive
 	int size = g.localSize();
 	for (int vertex = 0; vertex < size; vertex++) {
@@ -254,7 +254,7 @@ void Lanczos<Vector, T>::haloInit(boost::mpi::communicator& world, const Graph& 
  */
 
 template<typename Vector, typename T>
-void Lanczos<Vector, T>::haloUpdate(boost::mpi::communicator& world, const Graph& g, Vector& v_local, Vector& v_halo) {
+void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_halo) {
 	for (int rank = 0; rank < world.size(); rank++) {
 		if (rank != g.rank()) {
 			mpi::request reqs[g.globalSize()];
@@ -334,23 +334,27 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
  */
 
 template<typename Vector, typename T>
-inline void Lanczos<Vector, T>::gramSchmidt(mpi::communicator& world, int& iter, const Graph& g) {
-	VT_TRACER("GramSchmidt");
-	for (int k = 1; k <= iter; k++) {
-		//cout << "i - norm of lanczos_vecs_local["<<k<<"] = " << norm(lanczos_vecs_local[k]) << endl;
-		for (int i = 0; i < k; i++) {
-			T dot_global = dot(world, lanczos_vecs_local[i], lanczos_vecs_local[k]);
-			//if (world.rank() == 0) {
-			//	cout << "iter " << iter << " gramSchmidt global dot product " << dot_global << endl;
-			//}
-			for (int j = 0; j < g.localSize(); j++) {
-				lanczos_vecs_local[k][j] -= dot_global * lanczos_vecs_local[i][j];
-			}
-		}
-		T norm_global = std::sqrt(dot(world, lanczos_vecs_local[k], lanczos_vecs_local[k]));
-		normalise(lanczos_vecs_local[k], g, norm_global);
-		//cout << "global dot of lanczos_vecs_local[k] = " << dot(world, lanczos_vecs_local[k], lanczos_vecs_local[k]) << endl;
-	}
+inline void Lanczos<Vector, T>::gramSchmidt(int& iter, const Graph& g) {
+    //VT_TRACER("GramSchmidt");
+    for (int k = 1; k <= iter; k++) {
+        //cout << "i - norm of lanczos_vecs_local["<<k<<"] = " << norm(lanczos_vecs_local[k]) << endl;
+        for (int i = 0; i < k; i++) {
+            T dot_global = dot(lanczos_vecs_local[i], lanczos_vecs_local[k]);
+            //if (world.rank() == 0) {
+            //	cout << "iter " << iter << " gramSchmidt global dot product " << dot_global << endl;
+            //}
+            for (int j = 0; j < g.localSize(); j++) {
+                lanczos_vecs_local[k][j] -= dot_global * lanczos_vecs_local[i][j];
+            }
+        }
+        T norm_global = std::sqrt(dot(lanczos_vecs_local[k], lanczos_vecs_local[k]));
+        //if (g.rank() == 0 && (norm_global - 1) > 1e-2) {
+        //    cout << "global dot of lanczos_vecs_local[k] = " << norm_global<< endl;
+        //}
+        normalise(lanczos_vecs_local[k], g, norm_global);
+        //cout << "local dot of lanczos_vecs_local[k] = " << dot_local(lanczos_vecs_local[k], lanczos_vecs_local[k]) << endl;
+        //cout << "global dot of lanczos_vecs_local[k] = " << dot(world, lanczos_vecs_local[k], lanczos_vecs_local[k]) << endl;
+    }
 }
 
 /* 
@@ -361,7 +365,7 @@ inline void Lanczos<Vector, T>::gramSchmidt(mpi::communicator& world, int& iter,
  */
 
 template<typename Vector, typename T>
-inline T Lanczos<Vector, T>::dot(mpi::communicator& world, const Vector& v1, const Vector& v2) {
+inline T Lanczos<Vector, T>::dot(const Vector& v1, const Vector& v2) {
 	//if (v1.size() != v2.size())	
 	//throw std::length_error("The vector sizes don't match.");
 
@@ -425,7 +429,7 @@ Vector& Lanczos<Vector, T>::init(Vector& vec, const Graph& g) {
 }
 
 template<typename Vector, typename T>
-void Lanczos<Vector, T>::transform(boost::mpi::communicator& world, const Graph& g) {
+void Lanczos<Vector, T>::transform(const Graph& g) {
 #ifdef Debug
 	for (unsigned int i = 0; i < lanczos_vecs_local.size(); i++) {
 		auto it = lanczos_vecs_local.find(i);
@@ -438,7 +442,7 @@ void Lanczos<Vector, T>::transform(boost::mpi::communicator& world, const Graph&
 #endif
 	std::vector<std::unordered_map<int, Vector>> gather;
 	all_gather(world, lanczos_vecs_local, gather);
-	cout << "size of all_gather = " << gather.size() << endl;
+	//cout << "size of all_gather = " << gather.size() << endl;
 
 	Vector vinitial(g.globalSize(), 0);
 	for(int i = 0; i < g.globalSize(); i++)	lanczos_vecs_global[i] = vinitial;

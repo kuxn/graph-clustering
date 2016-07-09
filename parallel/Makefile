@@ -51,5 +51,3 @@ eigenvalues_figure:
 unit_tests: $(BUILDDIR)/$(TARGET).o
 	make -C unit_tests test
 
-
-

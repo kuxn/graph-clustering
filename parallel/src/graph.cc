@@ -137,7 +137,7 @@ const int Graph::edgesNum() const {
 	for (auto& it:G) {
 		edges += it.second.size(); 
 	}
-	return edges;
+	return edges/2;
 }
 
 const int Graph::subgraphsNum() const {
