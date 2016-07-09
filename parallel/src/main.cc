@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
 		("vertices,v", po::value<int>(), ":number of vertices of the input file")
 		("subgraphs,s", po::value<int>(), ":set number of subgraphs, has to be the power of 2")
 		("input-file,f", po::value<string>(), ":input file name")
+		("gram-schmidt,g", po::value<bool>(), ":Gram Schmidt in Lanczos")
 		;
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -85,7 +86,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	world.barrier();
-	Partition partition(world, *g, subgraphs, false);
+	Partition partition(world, *g, subgraphs, vm["gram-schmidt"].as<bool>());
 	world.barrier();
 
 	if (output) {

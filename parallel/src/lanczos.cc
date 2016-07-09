@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  lanczos.cpp
+ *       Filename:  lanczos.cc
  *
  *    Description:  Lanczos algorithm
  *        Created:  06/29/2016 21:33:49
@@ -148,23 +148,15 @@ Lanczos<Vector, T>::Lanczos(mpi::communicator& world, const Graph& g_local, bool
 		for (int i = 0; i < local_size; i++) {
 			v1_local[i] = t_local[i]/beta_val_global;
 		}
-		/*
-		   mpi::all_gather(world, v1_local, v1_halo_gather); // Gather all local vectors to global
-		   v1_halo = transform(v1_halo_gather, local_size);
 
-*/
 		lanczos_vecs_local[iter] = v1_local;
-		/*
-		   if (reorthogonalisation) {
-		   gramSchmidt(iter, g_local.globalSize());
-		   v0_halo = lanczos_vecs_global[iter-1];
-		   v1_halo = lanczos_vecs_global[iter];
-		   for (int i = 0; i < local_size; i++) {
-		   v0_local[i] = v0_halo[g_local.globalIndex(i)];
-		   v1_local[i] = v1_halo[g_local.globalIndex(i)];
-		   }
-		   }
-		   */
+
+		if (reorthogonalisation) {
+			gramSchmidt(world, iter, g_local);
+			v0_local = lanczos_vecs_local[iter-1];
+			v1_local = lanczos_vecs_local[iter];
+		}
+
 		//Verify the dot product of v0 and v1 which is supposed to be 0
 		T dot_global = dot(world, v0_local, v1_local);
 #ifdef Debug
@@ -340,25 +332,27 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
  *  Description:  Reorthogonalisation
  * =====================================================================================
  */
-/*
-   template<typename Vector, typename T>
-   inline void Lanczos<Vector, T>::gramSchmidt(int& iter, const int& size) {
-   VT_TRACER("GramSchmidt");
-   for (int k = 1; k <= iter; k++) {
-//cout << "i - norm of lanczos_vecs_global["<<k<<"] = " << norm(lanczos_vecs_global[k]) << endl;
-for (int i = 0; i < k; i++) {
-T reorthog_dot_product = dot_local(lanczos_vecs_global[i], lanczos_vecs_global[k]);
-for (int j = 0; j < size; j++) {
-lanczos_vecs_global[k][j] -= reorthog_dot_product * lanczos_vecs_global[i][j];
+
+template<typename Vector, typename T>
+inline void Lanczos<Vector, T>::gramSchmidt(mpi::communicator& world, int& iter, const Graph& g) {
+	VT_TRACER("GramSchmidt");
+	for (int k = 1; k <= iter; k++) {
+		//cout << "i - norm of lanczos_vecs_local["<<k<<"] = " << norm(lanczos_vecs_local[k]) << endl;
+		for (int i = 0; i < k; i++) {
+			T dot_global = dot(world, lanczos_vecs_local[i], lanczos_vecs_local[k]);
+			//if (world.rank() == 0) {
+			//	cout << "iter " << iter << " gramSchmidt global dot product " << dot_global << endl;
+			//}
+			for (int j = 0; j < g.localSize(); j++) {
+				lanczos_vecs_local[k][j] -= dot_global * lanczos_vecs_local[i][j];
+			}
+		}
+		T norm_global = std::sqrt(dot(world, lanczos_vecs_local[k], lanczos_vecs_local[k]));
+		normalise(lanczos_vecs_local[k], g, norm_global);
+		//cout << "global dot of lanczos_vecs_local[k] = " << dot(world, lanczos_vecs_local[k], lanczos_vecs_local[k]) << endl;
+	}
 }
-}
-//T normalise = norm(lanczos_vecs_global[k]);
-//for (int j = 0; j < size; j++) lanczos_vecs_global[k][j] /= normalise;
-normalise(lanczos_vecs_global[k]);
-//cout << "norm of lanczos_vecs_global["<<iter<<"] = " << norm(lanczos_vecs_global[iter]) << endl;
-}
-}
-*/
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  utilities
@@ -374,9 +368,8 @@ inline T Lanczos<Vector, T>::dot(mpi::communicator& world, const Vector& v1, con
 	int local_size = v1.size();
 	T dot_local = 0.0, dot_global;
 	for (int i = 0; i < local_size; i++) {
-		dot_local += v1[i] * v2[i];	// !!!Index for v1 should be global index.
+		dot_local += v1[i] * v2[i];
 	}
-
 	mpi::all_reduce(world, dot_local, dot_global, std::plus<T>());
 
 	return dot_global;
@@ -406,13 +399,11 @@ inline T Lanczos<Vector, T>::norm(const Vector& vec) {
 }
 
 template<typename Vector, typename T>
-inline Vector& Lanczos<Vector, T>::normalise(Vector& vec) {
+inline void Lanczos<Vector, T>::normalise(Vector& vec, const Graph& g, const T& norm_global) {
 	int local_size = vec.size();
-	T norm_local = norm(vec);
 	for (int i = 0; i < local_size; i++) {
-		vec[i] /= norm_local;
+		vec[i] /= norm_global;
 	}
-	return vec;
 }
 
 template<typename Vector, typename T>
@@ -422,8 +413,8 @@ Vector& Lanczos<Vector, T>::init(Vector& vec, const Graph& g) {
 	std::default_random_engine generator(seed);
 	std::uniform_real_distribution<double> gen(0.0,1.0);
 	for (int i = 0; i < local_size; i++) {
-		vec[i] = gen(generator);
-		//vec[i] = i;
+		//vec[i] = gen(generator);
+		vec[i] = i;
 	}
 	T norm_local = norm(vec);
 	for (int i = 0; i < local_size; i++) {

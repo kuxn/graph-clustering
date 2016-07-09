@@ -241,7 +241,7 @@ template<typename Vector, typename T>
 Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
     Vector prod;
     if (g.size() != (int)vec.size())
-        throw std::length_error("The sizes don't match.");
+        throw std::length_error("Lanczos - multGraphVec: The sizes don't match.");
 
     int numofvertex = vec.size();
     for (int vertex = 0; vertex < numofvertex; vertex++) {
@@ -270,14 +270,13 @@ inline void Lanczos<Vector, T>::gramSchmidt(int& iter, int& size) {
         //cout << "i - norm of lanczos_vecs["<<k<<"] = " << norm(lanczos_vecs[k]) << endl;
         for (int i = 0; i < k; i++) {
             T reorthog_dot_product = dot(lanczos_vecs[i], lanczos_vecs[k]);
+			//cout << "iter " << iter << " gramSchmidt global dot product " << reorthog_dot_product << endl;
             for (int j = 0; j < size; j++) {
                 lanczos_vecs[k][j] -= reorthog_dot_product * lanczos_vecs[i][j];
             }
         }
-        //T normalise = norm(lanczos_vecs[k]);
-        //for (int j = 0; j < size; j++) lanczos_vecs[k][j] /= normalise;
         normalise(lanczos_vecs[k]);
-        //cout << "norm of lanczos_vecs["<<iter<<"] = " << norm(lanczos_vecs[iter]) << endl;
+        //cout << "norm of lanczos_vecs["<<k<<"] = " << dot(lanczos_vecs[k], lanczos_vecs[k]) << endl;
     }
 }
 
@@ -291,7 +290,7 @@ inline void Lanczos<Vector, T>::gramSchmidt(int& iter, int& size) {
 template<typename Vector, typename T>
 inline T Lanczos<Vector, T>::dot(const Vector& v1, const Vector& v2) {
     if (v1.size() != v2.size())	
-        throw std::length_error("The vector sizes don't match.");
+        throw std::length_error("Lanczos - dot: The vector sizes don't match.");
     int size = v1.size();
     T dotprod = 0.0;
     for (int index = 0; index < size; index++) {
