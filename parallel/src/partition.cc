@@ -73,6 +73,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
 
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
     tqli(laplacian_eigenvalues_, beta, size, tri_eigen_vecs); 
+
 #ifdef Debug
 	cout << "Eigenvalues after TQLI: ";
 	for (auto x:laplacian_eigenvalues_) {
@@ -218,6 +219,7 @@ void Partition::printLapEigenMat() {
 }
 
 void Partition::printLapEigenvalues() {
+    cout << "Laplacian Eigenvalues: ";
     for (const double& x:laplacian_eigenvalues_) {
         cout << x <<  " ";
     }
@@ -225,13 +227,11 @@ void Partition::printLapEigenvalues() {
 }
 
 void Partition::outputLapEigenvalues() {
-
     string filename("eigenvalues_");
     filename += to_string(laplacian_eigenvalues_.size());
     filename += ".dat";
 
     ofstream Output(filename);
-
     for (unsigned int i = 0; i < laplacian_eigenvalues_.size(); i++)	{
         Output << i << " " << laplacian_eigenvalues_[i] << endl;
     }
@@ -258,7 +258,6 @@ Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_
             }
         }
     }
-
     // Calculate the corresponding Laplacian vector by Lanczos vectors(each row represents a vector, need transposing)
     Vector laplacian_vector(size, 0);
     for (int i = 0; i < size; i++) {

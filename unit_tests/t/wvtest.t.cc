@@ -8,19 +8,26 @@
 #include "../../include/test.h"
 #include "../../include/analysis.h"
 
-WVTEST_MAIN("tqli algorithm tests - eigenvalues")
-{
+WVTEST_MAIN("Graph properties - read dot format") {
+    WVPASS(Tests::testReadGraph());
+}
+
+WVTEST_MAIN("Graph properties - read dot format with colour") {
+    WVPASS(Tests::testReadGraphWithColour());
+}
+
+WVTEST_MAIN("Partition - TQLI") {
     WVPASS(Tests::testTqli());
 }
 
-WVTEST_MAIN("lanczos algorithm tests - eigenvalues") 
-{
-	WVPASS(Tests::testLanczos());
+WVTEST_MAIN("Partition - Lanczos & TQLI") {
+    WVPASS(Tests::testLanczos());
 }
 
-WVTEST_MAIN("analysis - percentage of cut edges") 
-{
-	WVPASS(Tests::testCutEdgePercent());
+WVTEST_MAIN("Partition - partition & cut edge percentage") {
+    WVPASS(Tests::testPartition());
 }
 
-
+WVTEST_MAIN("Analysis - manually partition & cut edge percentage") {
+    WVPASS(Tests::testManuallyPartition());
+}

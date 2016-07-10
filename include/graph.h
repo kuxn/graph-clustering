@@ -47,8 +47,8 @@ class Graph {
         void printLaplacianMat() const;
         void setColour(int vertex, int colour) const;
         const int getColour(int vertex) const;
-        void readDotFormat(std::ifstream& In);
-        void readDotFormatWithColour(std::ifstream& In);
+        void readDotFormat(const std::string& filename);
+        void readDotFormatWithColour(const std::string& filename);
         const std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
 };
 

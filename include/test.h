@@ -15,15 +15,16 @@
 #define TEST_H_
 
 class Tests {
+    private:
+        bool testReothogonalisation();
+        bool testCutEdgeVertexTable();
+
     public:
         static bool testTqli();
         static bool testLanczos();
         static bool testPartition();
-        static bool testReothogonalisation();
         static bool testReadGraph();
         static bool testReadGraphWithColour();
-        static bool testCutEdgePercent();
-        static bool testCutEdgeVertexTable();
         static bool testManuallyPartition();
 };
 

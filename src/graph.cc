@@ -240,11 +240,14 @@ const int Graph::getColour(int vertex) const {
  * =====================================================================================
  */
 
-void Graph::readDotFormat(ifstream& In) {
+void Graph::readDotFormat(const string& filename) {
+
+	ifstream In(filename);
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);
 	}
+
 	In.ignore(INT_MAX, '-');
 	In.ignore(1); // Skip the second '-'
 	int from = 0, to = 0;
@@ -268,7 +271,9 @@ void Graph::readDotFormat(ifstream& In) {
  * =====================================================================================
  */
 
-void Graph::readDotFormatWithColour(ifstream& In) {
+void Graph::readDotFormatWithColour(const string& filename) {
+
+	ifstream In(filename);
 	if (!In.is_open()) {
 		std::cerr << "ERROR: Can't open the file" << endl;
 		exit(-1);

@@ -194,6 +194,7 @@ void Partition::printLapEigenMat() {
 }
 
 void Partition::printLapEigenvalues() {
+    cout << "Laplacian Eigenvalues: ";
     for (const double& x:laplacian_eigenvalues_) {
         cout << x <<  " ";
     }
