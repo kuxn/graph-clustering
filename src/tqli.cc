@@ -124,6 +124,7 @@ void tqli (vector<double>& d, vector<double>& e, int n, unordered_map<int, vecto
                     //	z[k][i] = c * z[k][i] - s * f;
                     //}
                     for (k = 0; k < n; k++) { 
+						//VT_TRACER("TQLI - Form eigenvectors");
                         f = z[k][i+1];
                         z[k][i+1] = s * z[k][i] + c * f;
                         z[k][i] = c * z[k][i] - s * f;
