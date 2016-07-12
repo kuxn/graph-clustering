@@ -42,7 +42,7 @@ bool Tests::testPartition() {
         std::cerr << "ERROR: Can't open the file" << endl;
         exit(-1);
     }
-    Partition partition(world, g, 4, true);
+    Partition partition(g, 4, true);
     if (world.rank() == 0) {
         partition.printLapEigenvalues();
         partition.printLapEigenMat();
@@ -67,15 +67,10 @@ bool Tests::testReadGraph() {
     mpi::communicator world;
 
     Graph g;
-    //ifstream In("par_test_8.dot");
-    ifstream In("par_test_500.dot");
-    if (!In.is_open()) {
-        std::cerr << "ERROR: Can't open the file" << endl;
-        exit(-1);
-    }
+    int num = 500;
 
     g.init(world.rank(), num, num/world.size());
-    g.readDotFormat(In);
+    g.readDotFormat("par_test_500.dot");
 
     int rank = 0;
     if (world.rank() == rank) {

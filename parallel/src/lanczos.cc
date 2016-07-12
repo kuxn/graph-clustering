@@ -23,6 +23,7 @@
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/unordered_map.hpp>
+#include <boost/mpi/timer.hpp>
 
 #include "lanczos.h"
 #include "vt_user.h"
@@ -51,11 +52,11 @@ using std::endl;
  *-----------------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------------
- *  Modified Lanczos algorithm with reorthogonalisation by Gram–Schmidt
+ *  Modified Lanczos algorithm with GramSchmidt by Gram–Schmidt
  *-----------------------------------------------------------------------------*/
 
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool reorthogonalisation) {
+Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
 
 	VT_TRACER("LANCZOS");
 	int local_size = g_local.localSize();
@@ -141,7 +142,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool reorthogonalisation) {
 			cout << "beta[" << iter-1 << "]: " << beta_val_global << endl;
 		}
 
-		if (!reorthogonalisation) {
+		if (!GramSchmidt) {
 			v0_local = v1_local;
 		}
 		for (int i = 0; i < local_size; i++) {
@@ -150,7 +151,8 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool reorthogonalisation) {
 
 		lanczos_vecs_local[iter] = v1_local;
 
-		if (reorthogonalisation) {
+		if (GramSchmidt) {
+			boost::mpi::timer timer_gram_schmidt;
 			gramSchmidt(iter, g_local);
 			v0_local = lanczos_vecs_local[iter-1];
 			v1_local = lanczos_vecs_local[iter];
@@ -175,10 +177,10 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool reorthogonalisation) {
 	alpha_global.push_back(alpha_val_global);
 
 	transform(g_local);	
-	if (reorthogonalisation) {
-		cout << "Lanczos algorithm WITH reorthogonalisation is done." << endl;
-	} else {
-		cout << "Lanczos algorithm WITHOUT reorthogonalisation is done." << endl; 
+	if (GramSchmidt && g_local.rank() == 0) {
+		cout << "Lanczos algorithm WITH GramSchmidt is done." << endl;
+	} else if (g_local.rank() == 0){
+		cout << "Lanczos algorithm WITHOUT GramSchmidt is done." << endl; 
 	}
 }
 
@@ -190,7 +192,6 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool reorthogonalisation) {
  */
 
 template<typename Vector, typename T>
-//void Lanczos<Vector, T>::haloInit(boost::mpi::communicator& world, const Graph& g) { 
 void Lanczos<Vector, T>::haloInit(const Graph& g) { 
 	// Find out which rank and the corresponding data need to receive
 	int size = g.localSize();
@@ -272,14 +273,12 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 	}
 	std::vector<std::unordered_map<int, T>> buf_recv(world.size()); // <global_index, value>;
 	//std::unordered_map<int, std::unordered_map<int, T>> buf_recv; // <global_index, value>;
-	//cout << "world rank = " << world.rank() << " local rank = " << g.rank() << endl;
 	i = 0;
 	for (int rank = 0; rank < world.size(); rank++) {
 		if (rank != g.rank()) {
 			auto it = halo_recv.find(rank);
 			if (it != halo_recv.end()) {
 				reqs[i] = world.irecv(rank, 0, buf_recv[i]); //(src, tag, store to value)
-				//cout << "world rank = " << world.rank() << " local rank = " << g.rank() << endl;
 				//cout << "in rank " << g.rank() << " buf["<< rank << "] received from rank " << rank << endl; 
 				i++;
 			}
@@ -294,7 +293,6 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 	i = 0;
 	// Unpack the buffer to fill in to v_halo
 	for (int rank = 0; rank < world.size(); rank++) {
-		//cout << "@@world rank = " << world.rank() << " local rank = " << g.rank() << endl;
 		if (rank != g.rank()) {
 			//cout << "in rank " << g.rank() << " buf["<< rank << "] unpaking data from rank " << rank << endl; 
 			buf_recv_one_pack = buf_recv[i];
@@ -319,11 +317,10 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 template<typename Vector, typename T>
 Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 	Vector prod;
-	//if (g.size() != (int)vec.size())
-	//throw std::length_error("The sizes don't match.");
+	if (g.globalSize() != (int)vec.size())
+	throw std::length_error("Lanczos - multGraphVec: The sizes don't match.");
 
 	// Calcualte a partial result in each process, the index starts from zero in vector "prod"
-
 	int size = g.localSize();
 	for (int vertex = 0; vertex < size; vertex++) {
 		auto it = g.find(g.globalIndex(vertex));
@@ -331,12 +328,8 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 		if (!it->second.empty()) {
 			for (const int& neighbour:it->second) {
 				temp += vec[neighbour];
-				//if (g.rank() == 3)
-				//cout << "rank " << g.rank() << " vec[" << neighbour << "] = " << vec[neighbour] << endl;
 			}
 		}
-		//if (g.rank() == 3)
-		//cout << "push_back " << it->second.size() << " * " << vec[g.globalIndex(vertex)] << endl;
 		prod.push_back(it->second.size() * vec[g.globalIndex(vertex)] - temp);
 	}
 	return prod;
@@ -345,7 +338,7 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  gramSchmidt
- *  Description:  Reorthogonalisation
+ *  Description:  GramSchmidt
  * =====================================================================================
  */
 
@@ -382,8 +375,8 @@ inline void Lanczos<Vector, T>::gramSchmidt(int& iter, const Graph& g) {
 
 template<typename Vector, typename T>
 inline T Lanczos<Vector, T>::dot(const Vector& v1, const Vector& v2) {
-	//if (v1.size() != v2.size())	
-	//throw std::length_error("The vector sizes don't match.");
+	if (v1.size() != v2.size())	
+	throw std::length_error("Lanczos - dot: The vector sizes don't match.");
 
 	int local_size = v1.size();
 	T dot_local = 0.0, dot_global;
@@ -397,8 +390,8 @@ inline T Lanczos<Vector, T>::dot(const Vector& v1, const Vector& v2) {
 
 template<typename Vector, typename T>
 inline T Lanczos<Vector, T>::dot_local(const Vector& v1, const Vector& v2) {
-	//if (v1.size() != v2.size())	
-	//throw std::length_error("The vector sizes don't match.");
+	if (v1.size() != v2.size())	
+	throw std::length_error("Lanczos - dot_local: The vector sizes don't match.");
 
 	int local_size = v1.size();
 	T dot_local = 0.0;
@@ -433,8 +426,8 @@ Vector& Lanczos<Vector, T>::init(Vector& vec, const Graph& g) {
 	std::default_random_engine generator(seed);
 	std::uniform_real_distribution<double> gen(0.0,1.0);
 	for (int i = 0; i < local_size; i++) {
-		//vec[i] = gen(generator);
-		vec[i] = i;
+		vec[i] = gen(generator);
+		//vec[i] = i;
 	}
 	T norm_local = norm(vec);
 	for (int i = 0; i < local_size; i++) {

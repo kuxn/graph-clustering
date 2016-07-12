@@ -17,12 +17,12 @@
 #include "graph.h"
 
 class Analysis {
-
-    public:
+    
+    private:
         static double cutEdgePercent(const Graph& g);
+    public:
         static void cutEdgeVertexTable(const Graph& g);
         static void manuallyPartition(const Graph& g);
-
 };
 
 #endif   

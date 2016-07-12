@@ -13,8 +13,10 @@
 
 #include <iostream>
 #include <sstream>
+
 #include <boost/mpi.hpp>
 #include <boost/program_options.hpp>
+#include <boost/mpi/timer.hpp>
 
 #include "graph.h"
 #include "lanczos.h"
@@ -90,8 +92,12 @@ int main(int argc, char* argv[]) {
     }
 
     world.barrier();
+    boost::mpi::timer timer_lanczos;
     Partition partition(*g, subgraphs, gram_schmidt);
     world.barrier();
+    if (world.rank() == 0) {
+        cout << "In P0, Partition takes " << timer_lanczos.elapsed() << "s" << endl;
+    }
 
     if (output) {
         string filename("./output/parallel_");

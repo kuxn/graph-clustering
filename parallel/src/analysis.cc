@@ -158,3 +158,4 @@ void Analysis::manuallyPartition(const Graph& g) {
         }
     }
 }
+

@@ -330,10 +330,10 @@ void Graph::readDotFormatWithColour(const string& filename) {
 	int vertex = 0, colour = 0;
 	In >> vertex;
 	int first_vertex = vertex;
-	cout << "vertex = " << vertex << endl;
+	//cout << "vertex = " << vertex << endl;
 	In.ignore(INT_MAX, '='); // Ignore the chars before the value of colour
 	In >> colour;
-	cout << "colour = " << colour << endl;
+	//cout << "colour = " << colour << endl;
 	In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 
 	local_size_ = G.size();
@@ -348,7 +348,7 @@ void Graph::readDotFormatWithColour(const string& filename) {
 	}
 
 	int from = first_vertex, to = 0;
-	cout << "first vertex = " << first_vertex << endl;
+	//cout << "first vertex = " << first_vertex << endl;
 	In.ignore(2); // Ignore "--"
 	In >> to;
 	In.ignore(INT_MAX, '\n'); 

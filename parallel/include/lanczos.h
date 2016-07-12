@@ -39,7 +39,7 @@ class Lanczos {
         std::unordered_map<int, Vector> lanczos_vecs_local;
 
     public:
-        Lanczos(const Graph& g, bool reorthogonalisation);
+        Lanczos(const Graph& g, bool GramSchmidt);
 
         Vector alpha_global;
         Vector beta_global;
