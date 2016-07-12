@@ -255,40 +255,56 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
 
 template<typename Vector, typename T>
 void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_halo) {
+	mpi::request reqs[world.size()-1];
+	int i = 0;
 	for (int rank = 0; rank < world.size(); rank++) {
 		if (rank != g.rank()) {
-			mpi::request reqs[g.globalSize()];
-			int i = 0;
 			auto it = halo_send.find(rank);
 			if (it != halo_send.end()) {
+				std::unordered_map<int, T> buf_send(it->second.size()); // <global_index, value>;
 				for (const int& halo_neighbour:it->second) {
-					reqs[i] = world.isend(rank, halo_neighbour, v_local[g.localIndex(halo_neighbour)]); //(dest, tag, value to send)
-					i++;
-					//cout << "IN rank" << g.rank() << " - v_local[" << g.localIndex(halo_neighbour) << "] is sent to " << "rank " << rank << endl;
+					buf_send.insert({halo_neighbour, v_local[g.localIndex(halo_neighbour)]}); // global index, locale value
 				}
+				reqs[i] = world.isend(rank, 0, buf_send); //(dest, tag, value to send)
+				i++;
 			}
-			mpi::wait_all(reqs, reqs + i);
 		} 
 	}
+	std::vector<std::unordered_map<int, T>> buf_recv(world.size()); // <global_index, value>;
+	//std::unordered_map<int, std::unordered_map<int, T>> buf_recv; // <global_index, value>;
+	//cout << "world rank = " << world.rank() << " local rank = " << g.rank() << endl;
+	i = 0;
 	for (int rank = 0; rank < world.size(); rank++) {
 		if (rank != g.rank()) {
-			mpi::request reqs[g.globalSize()];
-			int i = 0;
+			auto it = halo_recv.find(rank);
+			if (it != halo_recv.end()) {
+				reqs[i] = world.irecv(rank, 0, buf_recv[i]); //(src, tag, store to value)
+				//cout << "world rank = " << world.rank() << " local rank = " << g.rank() << endl;
+				//cout << "in rank " << g.rank() << " buf["<< rank << "] received from rank " << rank << endl; 
+				i++;
+			}
+		} else {
+			for (int j = 0; j < g.localSize(); j++) {
+				v_halo[g.globalIndex(j)] = v_local[j];	
+			}
+		}
+	}
+	mpi::wait_all(reqs, reqs+world.size()-1);
+	std::unordered_map<int, T> buf_recv_one_pack; // <global_index, value>;
+	i = 0;
+	// Unpack the buffer to fill in to v_halo
+	for (int rank = 0; rank < world.size(); rank++) {
+		//cout << "@@world rank = " << world.rank() << " local rank = " << g.rank() << endl;
+		if (rank != g.rank()) {
+			//cout << "in rank " << g.rank() << " buf["<< rank << "] unpaking data from rank " << rank << endl; 
+			buf_recv_one_pack = buf_recv[i];
 			auto it = halo_recv.find(rank);
 			if (it != halo_recv.end()) {
 				for (const int& halo_neighbour:it->second) {
-					reqs[i] = world.irecv(rank, halo_neighbour, v_halo[halo_neighbour]); //(src, tag, store to value)
-					i++;
-					//cout << "IN rank" << g.rank() << " - v_halo[" << halo_neighbour << "] is received from " << "rank " << rank << endl;
+					v_halo[halo_neighbour] = buf_recv_one_pack[halo_neighbour]; //(src, tag, store to value)
 				}
+			i++;
 			}
-			mpi::wait_all(reqs, reqs + i);
-		}
-		else {
-			for (int i = 0; i < g.localSize(); i++) {
-				v_halo[g.globalIndex(i)] = v_local[i];	
-			}
-
 		}
 	}
 }
