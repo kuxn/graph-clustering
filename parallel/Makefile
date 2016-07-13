@@ -1,5 +1,5 @@
-CXX 		= mpic++
-#CXX 		= vtcxx -vt:c++ mpic++ -DVTRACE
+#CXX 		= mpic++
+CXX 		= vtcxx -vt:c++ mpic++ -DVTRACE
 CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 INCPATH		= include
 VTINC		= /usr/local/include/vampirtrace

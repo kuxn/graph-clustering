@@ -343,27 +343,20 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
  */
 
 template<typename Vector, typename T>
-inline void Lanczos<Vector, T>::gramSchmidt(int& iter, const Graph& g) {
-    //VT_TRACER("GramSchmidt");
-    for (int k = 1; k <= iter; k++) {
-        //cout << "i - norm of lanczos_vecs_local["<<k<<"] = " << norm(lanczos_vecs_local[k]) << endl;
-        for (int i = 0; i < k; i++) {
-            T dot_global = dot(lanczos_vecs_local[i], lanczos_vecs_local[k]);
-            //if (world.rank() == 0) {
-            //	cout << "iter " << iter << " gramSchmidt global dot product " << dot_global << endl;
-            //}
-            for (int j = 0; j < g.localSize(); j++) {
-                lanczos_vecs_local[k][j] -= dot_global * lanczos_vecs_local[i][j];
-            }
-        }
-        T norm_global = std::sqrt(dot(lanczos_vecs_local[k], lanczos_vecs_local[k]));
-        //if (g.rank() == 0 && (norm_global - 1) > 1e-2) {
-        //    cout << "global dot of lanczos_vecs_local[k] = " << norm_global<< endl;
-        //}
-        normalise(lanczos_vecs_local[k], g, norm_global);
-        //cout << "local dot of lanczos_vecs_local[k] = " << dot_local(lanczos_vecs_local[k], lanczos_vecs_local[k]) << endl;
-        //cout << "global dot of lanczos_vecs_local[k] = " << dot(world, lanczos_vecs_local[k], lanczos_vecs_local[k]) << endl;
-    }
+inline void Lanczos<Vector, T>::gramSchmidt(int& k, const Graph& g) {
+    VT_TRACER("GramSchmidt");
+    for (int i = 0; i < k; i++) {
+		T dot_global = dot(lanczos_vecs_local[i], lanczos_vecs_local[k]);
+		for (int j = 0; j < g.localSize(); j++) {
+			lanczos_vecs_local[k][j] -= dot_global * lanczos_vecs_local[i][j];
+		}
+	}
+	T norm_global = std::sqrt(dot(lanczos_vecs_local[k], lanczos_vecs_local[k]));
+	//if (g.rank() == 0 && (norm_global - 1) > 1e-2) {
+	//    cout << "global dot of lanczos_vecs_local[k] = " << norm_global<< endl;
+	//}
+	normalise(lanczos_vecs_local[k], g, norm_global);
+	//cout << "global dot of lanczos_vecs_local[k] = " << dot(world, lanczos_vecs_local[k], lanczos_vecs_local[k]) << endl;
 }
 
 /* 
