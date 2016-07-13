@@ -54,7 +54,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 
     laplacian_eigenvalues_ = lanczos.alpha_global;
     Vector beta = lanczos.beta_global;
-    beta.push_back(0);
+    beta.push_back(0.0);
 
 #ifdef Debug
 	cout << endl;

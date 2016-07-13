@@ -268,7 +268,7 @@ inline void Lanczos<Vector, T>::gramSchmidt(int& k, int& size) {
 	VT_TRACER("GramSchmidt");
 	for (int i = 0; i < k; i++) {
 		T reorthog_dot_product = dot(lanczos_vecs[i], lanczos_vecs[k]);
-		cout << "iter " << i << " gramSchmidt global dot product " << reorthog_dot_product << endl;
+		//cout << "iter " << i << " gramSchmidt global dot product " << reorthog_dot_product << endl;
 		for (int j = 0; j < size; j++) {
 			lanczos_vecs[k][j] -= reorthog_dot_product * lanczos_vecs[i][j];
 		}
@@ -276,7 +276,7 @@ inline void Lanczos<Vector, T>::gramSchmidt(int& k, int& size) {
 	int dot_temp = dot(lanczos_vecs[k], lanczos_vecs[k]);
 	if (dot_temp != 1) {
 		normalise(lanczos_vecs[k]);
-	cout << "norm of lanczos_vecs["<<k<<"] = " << dot(lanczos_vecs[k], lanczos_vecs[k]) << endl;
+	//cout << "norm of lanczos_vecs["<<k<<"] = " << dot(lanczos_vecs[k], lanczos_vecs[k]) << endl;
 	}
 }
 

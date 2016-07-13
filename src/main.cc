@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
 		//g->printDotFormat();
 		//g->printLaplacianMat();
 		partition.printLapEigenvalues();
-		partition.printLapEigenMat();
+		//partition.printLapEigenMat();
 		Analysis::cutEdgeVertexTable(*g);
 	}
 

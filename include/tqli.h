@@ -17,7 +17,7 @@
 #include <vector>
 #include <unordered_map>
 
-void tqli (std::vector<double>& d, std::vector<double>& e, int n, std::unordered_map<int, std::vector<double>>& z);
+void tqli (std::vector<double>& d, std::vector<double>& e, int& n, std::unordered_map<int, std::vector<double>>& z);
 
 #endif
 

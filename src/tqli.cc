@@ -15,6 +15,7 @@
 #include <iostream>
 #include <cmath>
 #include <utility>
+#include <limits>
 #include "tqli.h"
 #include "vt_user.h"
 
@@ -65,11 +66,12 @@ double pythag(double a, double b) {
  *		z[0..n-1][0..n-1] the kth column of z returns the normalized eigenvector corresponding to d[k].
  *-----------------------------------------------------------------------------*/
 
-void tqli (vector<double>& d, vector<double>& e, int n, unordered_map<int, vector<double>>& z) {
+void tqli (vector<double>& d, vector<double>& e, int& n, unordered_map<int, vector<double>>& z) {
 
     VT_TRACER("TQLI");
     int m,l,iter,i,k;
     double s,r,p,g,f,dd,c,b;
+    const double EPS = numeric_limits<double>::epsilon();
 
     // Convenient to renumber the elements of e.
     //for (i = 2; i <= n; i++) 
@@ -84,10 +86,11 @@ void tqli (vector<double>& d, vector<double>& e, int n, unordered_map<int, vecto
         iter = 0;
         do {
             // Look for a single small subdiagonal element to split the matrix.
-            for (m = l; m <= n-1; m++) 
+            for (m = l; m < n-1; m++) 
             { 
-                dd = fabs(d[m])+fabs(d[m+1]);
-                if ((double)(fabs(e[m]) + dd) == dd) break;
+                dd = std::abs(d[m])+std::abs(d[m+1]);
+                //if ((double)(std::abs(e[m]) + dd) == dd) break;
+                if (std::abs(e[m]) <= EPS * dd) break;
             }
             if (m != l) {
                 if (iter++ == 30) throw std::runtime_error("Too many iterations in tqli.");
@@ -124,7 +127,7 @@ void tqli (vector<double>& d, vector<double>& e, int n, unordered_map<int, vecto
                     //	z[k][i] = c * z[k][i] - s * f;
                     //}
                     for (k = 0; k < n; k++) { 
-						//VT_TRACER("TQLI - Form eigenvectors");
+                        //VT_TRACER("TQLI - Form eigenvectors");
                         f = z[k][i+1];
                         z[k][i+1] = s * z[k][i] + c * f;
                         z[k][i] = c * z[k][i] - s * f;
