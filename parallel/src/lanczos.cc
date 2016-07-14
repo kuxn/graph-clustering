@@ -160,17 +160,17 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
 		}
 
 		//Verify the dot product of v0 and v1 which is supposed to be 0
-		T dot_global = dot(v0_local, v1_local);
 #ifdef Debug
+		T dot_global = dot(v0_local, v1_local);
 		cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_global << endl;
 		cout << endl;
-#endif
 		if (std::abs(dot_global) > 1e-5) 
 			try { throw std::runtime_error("Need reorthogonalise: "); }
 		catch (std::runtime_error& e) { 
 			std::cerr << "ERROR: " << e.what(); 
 			cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_global << endl;
 		}
+#endif
 	}
 	haloUpdate(g_local, v1_local, v1_halo);
 	w_local = multGraphVec(g_local, v1_halo);
@@ -260,12 +260,11 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 	std::vector<mpi::request> reqs;
 	std::unordered_map<int, std::unordered_map<int, T>> buf_send; // <global_index, value>;
 	std::unordered_map<int, std::unordered_map<int, T>> buf_recv;
-	//std::vector<std::unordered_map<int, T>> buf_recv(world.size());
-	std::unordered_map<int, T> buf_temp;
 	for (int rank = 0; rank < world.size(); rank++) {
 		if (rank != g.rank()) {
 			auto it = halo_send.find(rank);
 			if (it != halo_send.end()) {
+				std::unordered_map<int, T> buf_temp;
 				for (const int& halo_neighbour:it->second) {
 					buf_temp.insert({halo_neighbour, v_local[g.localIndex(halo_neighbour)]}); // global index, locale value
 				}
@@ -280,7 +279,6 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 			auto it = halo_recv.find(rank);
 			if (it != halo_recv.end()) {
 				reqs.push_back(world.irecv(rank, 0, buf_recv[rank])); //(src, tag, store to value)
-				//reqs[i] = world.irecv(rank, 0, buf_recv[i]); //(src, tag, store to value)
 				//cout << "in rank " << g.rank() << " buf["<< rank << "] received from rank " << rank << endl; 
 			}
 		} else {
@@ -294,6 +292,7 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 	for (int rank = 0; rank < world.size(); rank++) {
 		if (rank != g.rank()) {
 			//cout << "in rank " << g.rank() << " buf["<< rank << "] unpaking data from rank " << rank << endl; 
+			std::unordered_map<int, T> buf_temp;
 			buf_temp = buf_recv[rank];
 			auto it = halo_recv.find(rank);
 			if (it != halo_recv.end()) {

@@ -68,7 +68,7 @@ double pythag(double a, double b) {
 
 void tqli (vector<double>& d, vector<double>& e, int& n, unordered_map<int, vector<double>>& z) {
 
-    VT_TRACER("TQLI");
+    //VT_TRACER("TQLI");
     int m,l,iter,i,k;
     double s,r,p,g,f,dd,c,b;
     const double EPS = numeric_limits<double>::epsilon();
