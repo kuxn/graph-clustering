@@ -23,7 +23,7 @@
 #include "tqli.h"
 #include "partition.h"
 #include "analysis.h"
-#include "vt_user.h"
+//#include "vt_user.h"
 
 namespace mpi = boost::mpi;
 namespace po = boost::program_options;
@@ -31,7 +31,7 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
-    VT_TRACER("MAIN");
+    //VT_TRACER("MAIN");
     mpi::environment env;
     mpi::communicator world;
 

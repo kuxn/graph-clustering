@@ -17,7 +17,7 @@
 #include <utility>
 #include <limits>
 #include "tqli.h"
-#include "vt_user.h"
+//#include "vt_user.h"
 
 #define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a)) // Magnitude of a times sign of b
 

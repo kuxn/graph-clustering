@@ -26,7 +26,7 @@
 #include <boost/mpi/timer.hpp>
 
 #include "lanczos.h"
-#include "vt_user.h"
+//#include "vt_user.h"
 
 namespace mpi = boost::mpi;
 using std::cout;
@@ -58,7 +58,7 @@ using std::endl;
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
 
-	VT_TRACER("LANCZOS");
+	//VT_TRACER("LANCZOS");
 	int local_size = g_local.localSize();
 	Vector v0_local(local_size);
 	Vector v1_halo(g_local.globalSize());
@@ -99,6 +99,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
 
 	for (int iter = 1; iter < g_local.globalSize(); iter++) {
 		haloUpdate(g_local, v1_local, v1_halo);
+		//cout << "g.localSize = " << g_local.localSize() << "g.globalSize = " << g_local.globalSize() << endl;
 
 #ifdef Debug
 		if (g_local.rank() == 0) {
@@ -256,31 +257,31 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
 
 template<typename Vector, typename T>
 void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_halo) {
-	mpi::request reqs[world.size()-1];
-	int i = 0;
+	std::vector<mpi::request> reqs;
+	std::unordered_map<int, std::unordered_map<int, T>> buf_send; // <global_index, value>;
+	std::unordered_map<int, std::unordered_map<int, T>> buf_recv;
+	//std::vector<std::unordered_map<int, T>> buf_recv(world.size());
+	std::unordered_map<int, T> buf_temp;
 	for (int rank = 0; rank < world.size(); rank++) {
 		if (rank != g.rank()) {
 			auto it = halo_send.find(rank);
 			if (it != halo_send.end()) {
-				std::unordered_map<int, T> buf_send(it->second.size()); // <global_index, value>;
 				for (const int& halo_neighbour:it->second) {
-					buf_send.insert({halo_neighbour, v_local[g.localIndex(halo_neighbour)]}); // global index, locale value
+					buf_temp.insert({halo_neighbour, v_local[g.localIndex(halo_neighbour)]}); // global index, locale value
 				}
-				reqs[i] = world.isend(rank, 0, buf_send); //(dest, tag, value to send)
-				i++;
+				buf_send[rank] = buf_temp;
+				reqs.push_back(world.isend(rank, 0, buf_send[rank])); //(dest, tag, value to send)
+				//world.send(rank, 0, buf_send[rank]); //(dest, tag, value to send)
 			}
 		} 
 	}
-	std::vector<std::unordered_map<int, T>> buf_recv(world.size()); // <global_index, value>;
-	//std::unordered_map<int, std::unordered_map<int, T>> buf_recv; // <global_index, value>;
-	i = 0;
 	for (int rank = 0; rank < world.size(); rank++) {
 		if (rank != g.rank()) {
 			auto it = halo_recv.find(rank);
 			if (it != halo_recv.end()) {
-				reqs[i] = world.irecv(rank, 0, buf_recv[i]); //(src, tag, store to value)
+				reqs.push_back(world.irecv(rank, 0, buf_recv[rank])); //(src, tag, store to value)
+				//reqs[i] = world.irecv(rank, 0, buf_recv[i]); //(src, tag, store to value)
 				//cout << "in rank " << g.rank() << " buf["<< rank << "] received from rank " << rank << endl; 
-				i++;
 			}
 		} else {
 			for (int j = 0; j < g.localSize(); j++) {
@@ -288,20 +289,17 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 			}
 		}
 	}
-	mpi::wait_all(reqs, reqs+world.size()-1);
-	std::unordered_map<int, T> buf_recv_one_pack; // <global_index, value>;
-	i = 0;
+	mpi::wait_all(reqs.begin(), reqs.end());
 	// Unpack the buffer to fill in to v_halo
 	for (int rank = 0; rank < world.size(); rank++) {
 		if (rank != g.rank()) {
 			//cout << "in rank " << g.rank() << " buf["<< rank << "] unpaking data from rank " << rank << endl; 
-			buf_recv_one_pack = buf_recv[i];
+			buf_temp = buf_recv[rank];
 			auto it = halo_recv.find(rank);
 			if (it != halo_recv.end()) {
 				for (const int& halo_neighbour:it->second) {
-					v_halo[halo_neighbour] = buf_recv_one_pack[halo_neighbour]; //(src, tag, store to value)
+					v_halo[halo_neighbour] = buf_temp[halo_neighbour]; //(src, tag, store to value)
 				}
-			i++;
 			}
 		}
 	}
@@ -344,7 +342,7 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 
 template<typename Vector, typename T>
 inline void Lanczos<Vector, T>::gramSchmidt(int& k, const Graph& g) {
-    VT_TRACER("GramSchmidt");
+    //VT_TRACER("GramSchmidt");
     for (int i = 0; i < k; i++) {
 		T dot_global = dot(lanczos_vecs_local[i], lanczos_vecs_local[k]);
 		for (int j = 0; j < g.localSize(); j++) {
