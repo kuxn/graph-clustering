@@ -97,7 +97,10 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
 	cout << endl;
 #endif
 
-	for (int iter = 1; iter < g_local.globalSize(); iter++) {
+	//int m = g_local.globalSize();	
+	int m = 2 * std::sqrt(g_local.globalSize());	
+
+	for (int iter = 1; iter < m; iter++) {
 		haloUpdate(g_local, v1_local, v1_halo);
 		//cout << "g.localSize = " << g_local.localSize() << "g.globalSize = " << g_local.globalSize() << endl;
 
@@ -177,7 +180,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
 	alpha_val_global = dot(v1_local, w_local);
 	alpha_global.push_back(alpha_val_global);
 
-	transform(g_local);	
+	transform(g_local, m);	
 	if (GramSchmidt && g_local.rank() == 0) {
 		cout << "Lanczos algorithm WITH GramSchmidt is done." << endl;
 	} else if (g_local.rank() == 0){
@@ -428,7 +431,7 @@ Vector& Lanczos<Vector, T>::init(Vector& vec, const Graph& g) {
 }
 
 template<typename Vector, typename T>
-void Lanczos<Vector, T>::transform(const Graph& g) {
+void Lanczos<Vector, T>::transform(const Graph& g, const int& m) {
 #ifdef Debug
 	for (unsigned int i = 0; i < lanczos_vecs_local.size(); i++) {
 		auto it = lanczos_vecs_local.find(i);
@@ -444,9 +447,9 @@ void Lanczos<Vector, T>::transform(const Graph& g) {
 	//cout << "size of all_gather = " << gather.size() << endl;
 
 	Vector vinitial(g.globalSize(), 0);
-	for(int i = 0; i < g.globalSize(); i++)	lanczos_vecs_global[i] = vinitial;
+	for(int i = 0; i < m; i++)	lanczos_vecs_global[i] = vinitial;
 
-	for (int row = 0; row < g.globalSize(); row ++) {
+	for (int row = 0; row < m; row ++) {
 		for (int i = 0; i < world.size(); i++) {
 			for (int j = 0; j < g.localSize(); j++) {
 #ifdef Debug

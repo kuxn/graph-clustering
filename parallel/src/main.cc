@@ -93,7 +93,9 @@ int main(int argc, char* argv[]) {
 
     world.barrier();
     boost::mpi::timer timer_partition;
-    Partition partition(*g, subgraphs, gram_schmidt);
+	Partition partition(*g, subgraphs, gram_schmidt);
+	//Partition partition;
+	//partition.usingFullMat(*g, subgraphs, gram_schmidt);
     world.barrier();
     if (world.rank() == 0) {
         cout << "In P0, Partition takes " << timer_partition.elapsed() << "s" << endl;
@@ -119,7 +121,7 @@ int main(int argc, char* argv[]) {
             filename += "r.dot";
             g->readDotFormatWithColour(filename);
         }
-        g->printDotFormat();
+        //g->printDotFormat();
         partition.printLapEigenvalues();
         //partition.printLapEigenMat();
         Analysis::cutEdgeVertexTable(*g);

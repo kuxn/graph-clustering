@@ -66,12 +66,19 @@ double pythag(double a, double b) {
  *		z[0..n-1][0..n-1] the kth column of z returns the normalized eigenvector corresponding to d[k].
  *-----------------------------------------------------------------------------*/
 
-void tqli (vector<double>& d, vector<double>& e, int& n, unordered_map<int, vector<double>>& z) {
+void tqli (vector<double>& d, vector<double>& e, unordered_map<int, vector<double>>& z) {
 
     VT_TRACER("TQLI");
     int m,l,iter,i,k;
     double s,r,p,g,f,dd,c,b;
     const double EPS = numeric_limits<double>::epsilon();
+
+    int n = d.size();
+
+    vector<double> vinitial(n, 0);
+    for(int i = 0; i < n; i++)	z[i] = vinitial;
+    for(int i = 0; i < n; i++)	z[i][i] = 1;
+    e.push_back(0.0);
 
     // Convenient to renumber the elements of e.
     //for (i = 2; i <= n; i++) 

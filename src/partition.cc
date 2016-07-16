@@ -47,8 +47,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
 
-    beta.push_back(0);
-
 #ifdef Debug
     cout << endl;
     cout << "triangular matrix: " << endl;
@@ -57,23 +55,22 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
 
     // Define an identity matrix as the input for TQLI algorithm
     DenseMatrix tri_eigen_vecs;
-    Vector vinitial(size,0);
-    for(int i = 0; i < size; i++)	tri_eigen_vecs[i] = vinitial;
-    for(int i = 0; i < size; i++)	tri_eigen_vecs[i][i] = 1;
 
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
-    tqli(laplacian_eigenvalues_, beta, size, tri_eigen_vecs);
+    tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
 
     // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha" 
     int vector_index = 0;
 
+    int m = laplacian_eigenvalues_.size();
     unordered_multimap<double, int> hashmap;
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < m; i++)
         hashmap.insert({laplacian_eigenvalues_[i], i});
 
     Vector auxiliary_vec = laplacian_eigenvalues_;
     sort(auxiliary_vec.begin(), auxiliary_vec.end());
     int fiedler_index = 1;
+    //int fiedler_index = laplacian_eigenvalues_.size() - 1;
     for (int i = 0; i < num_of_eigenvec; i++) {
         auto it = hashmap.find(auxiliary_vec[fiedler_index]);
         while (abs(it->first) < 1e-2) {
@@ -81,6 +78,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
             it = hashmap.find(auxiliary_vec[fiedler_index]);
         }
         fiedler_index++;
+        //fiedler_index--;
         vector_index = it->second;
         cout << "eigenvalue used: " << it->first << ", Vector_Index: " << vector_index <<endl;
         hashmap.erase(it); // Deal with identical eigenvalues
@@ -235,15 +233,16 @@ Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_
             }
         }
     }
-
     // Calculate the corresponding Laplacian vector by Lanczos vectors(each row represents a vector, need transposing)
-    Vector laplacian_vector(size, 0);
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            laplacian_vector[i] += lanczos_vecs[j][i] * tri_eigen_vec[j];
+    // lanczos vector - m * n, tri_eigen_vecs - m * m, Ritz - m * n, Ritz_vector - n
+    int col_size = lanczos_vecs[0].size();
+    int row_size = lanczos_vecs.size();
+    Vector laplacian_vector(col_size, 0);
+    for (int col = 0; col < col_size; col++) {
+        for (int row = 0; row < row_size; row++) {
+            laplacian_vector[col] += lanczos_vecs[row][col] * tri_eigen_vec[row];
         }
     }
-
     return laplacian_vector;
 } 
 
@@ -269,22 +268,11 @@ void Partition::getLapEigenMat(const Graph& g, bool reorthogonalisation) {
     lanczos.print_tri_mat();
 #endif
 
-    beta.push_back(0);
-
     // Define an identity matrix as the input for TQLI algorithm
     DenseMatrix tri_eigen_vecs;
 
-    Vector vinitial(size,0);
-    for(int i = 0; i < size; i++) {
-        tri_eigen_vecs[i] = vinitial;	
-        laplacian_eigen_mat_[i] = vinitial;
-    }
-    for(int i = 0; i < size; i++) {
-        tri_eigen_vecs[i][i] = 1;
-    }
-
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
-    tqli(laplacian_eigenvalues_, beta, size, tri_eigen_vecs);
+    tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
 
     // Calculate all the eigenvectors of original Laplacian matrix using 
     // the eigenvectors of the tridiagonal matrix computed by TQLI 
@@ -296,4 +284,3 @@ void Partition::getLapEigenMat(const Graph& g, bool reorthogonalisation) {
         }	
     }
 }
-

@@ -35,7 +35,7 @@ class Lanczos {
         std::unordered_map<int, std::unordered_set<int>> halo_send; // <rank, halo_neighbours to send>
         void haloInit(const Graph& g);
         void haloUpdate(const Graph& g, Vector& v_local, Vector& v_halo);
-        void transform(const Graph& g);
+        void transform(const Graph& g, const int& m);
         std::unordered_map<int, Vector> lanczos_vecs_local;
 
     public:

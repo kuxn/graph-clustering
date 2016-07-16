@@ -52,7 +52,6 @@ double Analysis::cutEdgePercent(const Graph& g) {
 
 void Analysis::cutEdgeVertexTable(const Graph& g) {
     int size = g.size();
-	cout << "size of the graph = " << size << endl;
     int subgraphs = g.subgraphsNum();
 
     //cout << "subgraphs = " << subgraphs << endl;

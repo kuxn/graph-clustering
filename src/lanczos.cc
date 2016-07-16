@@ -62,7 +62,10 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool reorthogonalisation) {
 
     lanczos_vecs[0] = v0;
 
-    for (int iter = 1; iter < size; iter++) {
+	int m = 2 * std::sqrt(size);
+	//int m = size;
+
+    for (int iter = 1; iter < m; iter++) {
         w = multGraphVec(g, v1);
 
         T alpha_val = dot(v1, w);
