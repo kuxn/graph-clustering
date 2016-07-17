@@ -17,7 +17,7 @@
 
 using namespace std;
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  cutEdgePercent
  *  Description:  The percentage of edges have been cut by partitioning
@@ -41,9 +41,9 @@ double Analysis::cutEdgePercent(const Graph& g) {
             if (neighbour_colour != vertex_colour) {
                 cut_edge_num++;
             }
-        }	
+        }
     }
-    return (double)cut_edge_num/(double)g.edgesNum()/2.0; 
+    return (double)cut_edge_num/(double)g.edgesNum()/2.0;
 }
 
 /*-----------------------------------------------------------------------------
@@ -56,24 +56,24 @@ void Analysis::cutEdgeVertexTable(const Graph& g) {
 
     //cout << "subgraphs = " << subgraphs << endl;
 
-	std::unordered_map<int, std::vector<int>> cut_edge_table;
-	std::vector<int> cut_vertex_table(subgraphs, 0);
-	std::vector<int> isolated_vertex;
+    std::unordered_map<int, std::vector<int>> cut_edge_table;
+    std::vector<int> cut_vertex_table(subgraphs, 0);
+    std::vector<int> isolated_vertex;
 
-	std::vector<int> vinitial(subgraphs, 0);
-	for (int i = 0; i < subgraphs; i++) {
-		cut_edge_table[i] = vinitial;
-	}
+    std::vector<int> vinitial(subgraphs, 0);
+    for (int i = 0; i < subgraphs; i++) {
+        cut_edge_table[i] = vinitial;
+    }
 
-	for (int vertex = 0; vertex < size; vertex++) {
-		int temp = 0;
-		int vertex_subgraph = g.getColour(vertex);
-		if (vertex_subgraph >= subgraphs)
-			vertex_subgraph = (vertex_subgraph/subgraphs)%subgraphs;
-		auto it = g.find(vertex);
-		for (const int& neighbour:it->second) {
-			int neighbour_subgraph = g.getColour(neighbour);
-			if (neighbour_subgraph >= subgraphs)
+    for (int vertex = 0; vertex < size; vertex++) {
+        int temp = 0;
+        int vertex_subgraph = g.getColour(vertex);
+        if (vertex_subgraph >= subgraphs)
+            vertex_subgraph = (vertex_subgraph/subgraphs)%subgraphs;
+        auto it = g.find(vertex);
+        for (const int& neighbour:it->second) {
+            int neighbour_subgraph = g.getColour(neighbour);
+            if (neighbour_subgraph >= subgraphs)
                 neighbour_subgraph = (neighbour_subgraph/subgraphs)%subgraphs;
             cut_edge_table[vertex_subgraph][neighbour_subgraph]++;
             if (vertex_subgraph == neighbour_subgraph) {
@@ -84,7 +84,7 @@ void Analysis::cutEdgeVertexTable(const Graph& g) {
             isolated_vertex.push_back(vertex);
         }
         cut_vertex_table[vertex_subgraph]++;
-    }	
+    }
 
     cout << "/*-----------------------------------------------------------------------------" << endl;
     cout << " * Basic info of the graph" << endl;
@@ -102,7 +102,7 @@ void Analysis::cutEdgeVertexTable(const Graph& g) {
     }
     cout << endl;
     cout << "vertices:  " << "\t";
-    for (const int& num:cut_vertex_table) {	
+    for (const int& num:cut_vertex_table) {
         cout << num << "\t";
     }
     cout << endl;
@@ -136,7 +136,7 @@ void Analysis::cutEdgeVertexTable(const Graph& g) {
     }
 }
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  manuallyPartition
  *  Description:  Manually set equal number of vertices a colour and then compare the cutEdgePercent with Partitioning algorithm

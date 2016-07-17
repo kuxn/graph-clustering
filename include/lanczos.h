@@ -26,7 +26,7 @@ class Lanczos {
         inline T dot(const Vector& v1, const Vector& v2);
         inline T norm(const Vector& vec);
         inline Vector& normalise(Vector& vec);
-        inline void gramSchmidt(int& iter, int& size);
+        inline void gramSchmidt(const int& iter, Vector& w);
         inline T l2norm(const Vector& alpha, const Vector& beta);
 
     public:

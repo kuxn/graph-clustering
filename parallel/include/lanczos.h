@@ -28,8 +28,8 @@ class Lanczos {
         inline T dot(const Vector& v1, const Vector& v2);
         inline T dot_local(const Vector& v1, const Vector& v2);
         inline T norm(const Vector& vec);
-        inline void normalise(Vector& vec, const Graph& g, const T& norm_global);
-        inline void gramSchmidt(int& iter, const Graph& g);
+        inline void normalise(Vector& vec, const T& norm_global);
+        inline void gramSchmidt(const int& iter, Vector& v);
         
         std::unordered_map<int, std::unordered_set<int>> halo_recv; // <rank, halo_neighbours to receive>
         std::unordered_map<int, std::unordered_set<int>> halo_send; // <rank, halo_neighbours to send>
