@@ -30,7 +30,7 @@ class Lanczos {
         inline T l2norm(const Vector& alpha, const Vector& beta);
 
     public:
-        Lanczos(const Graph& g, bool reorthogonalisation);
+        Lanczos(const Graph& g, bool GramSchmidt);
 
         Vector alpha;
         Vector beta;
