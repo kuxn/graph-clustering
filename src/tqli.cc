@@ -147,5 +147,5 @@ void tqli (vector<double>& d, vector<double>& e, unordered_map<int, vector<doubl
             }
         } while (m != l);
     }
-    cout << "TQLI is done." << endl;
+    //cout << "TQLI is done." << endl;
 }

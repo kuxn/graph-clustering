@@ -40,8 +40,7 @@ using std::endl;
  *
  *	output:
  *		alpha[0..n-1] returns all the diagonal elements of the tridiagonal matrix (diagonalised)
- *		beta[0..n-1] returns all the subdiagonal elements of the tridiagonal matrix
- *		tri_mat[0..n-1][0..n-1] returns the tridiagonal matrix
+ *		beta[0..n-2] returns all the subdiagonal elements of the tridiagonal matrix
  *		lanczos_vecs[0..n-1][0..n-1] the kth row returns the kth Lanczos vector
  *-----------------------------------------------------------------------------*/
 
@@ -51,47 +50,38 @@ using std::endl;
 #ifndef SO
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g, bool GramSchmidt) {
-
     VT_TRACER("LANCZOS");
     int size = g.size();
+    int m = 2 * std::sqrt(size);
+    //int m = size;
+
     Vector v0(size);
     v0 = initialise(v0);
-
-    //int m = 2 * std::sqrt(size);
-    int m = size;
-
     Vector v1 = v0, w;
+
     T beta_val = 0.0;
-	alpha.resize(m);
-	beta.resize(m - 1);
-	beta[0] = 0.0;
+    alpha.resize(m);
+    beta.resize(m - 1);
     lanczos_vecs[0] = v0;
 
     for (int iter = 1; iter < m; iter++) {
         w = multGraphVec(g, v1);
-
-        //alpha_val = dot(v1, w);
-        //alpha.push_back(alpha_val);
-		alpha[iter - 1] = dot(v1, w);
-
-		cout << "beta_val = " << beta_val << endl;
+        alpha[iter - 1] = dot(v1, w);
         for (int i = 0; i < size; i++) {
             w[i] = w[i] - alpha[iter - 1] * v1[i] - beta_val * v0[i];
         }
 
         beta_val = norm(w);
-        //beta.push_back(beta_val);
-		beta[iter - 1] = beta_val;
-		cout << "beta[iter - 1] = " << beta[iter - 1] << endl;
-
-        if (std::abs(beta[iter - 1]) < 1e-5)
+        beta[iter - 1] = beta_val;
+        if (std::abs(beta[iter - 1]) < 1e-5) {
             try {
                 throw std::runtime_error("Value of beta is close to 0: ");
             }
             catch (std::runtime_error& e) {
                 std::cerr << "ERROR: " << e.what();
-                cout << "beta[" << iter-1 << "]: " << beta[iter - 1] << endl;
+                cout << "beta[" << iter - 1 << "]: " << beta[iter - 1] << endl;
             }
+        }
 
         for (int index = 0; index < size; index++) {
             v1[index] = w[index]/beta[iter - 1];
@@ -100,34 +90,23 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool GramSchmidt) {
         if (GramSchmidt) {
             gramSchmidt(iter, v1);
         }
-
         lanczos_vecs[iter] = v1;
-        v0 = lanczos_vecs[iter-1];
+        v0 = lanczos_vecs[iter - 1];
 
         //Verify the dot product of v0 and v1 which is supposed to be 0
         T dot_product = dot(v0, v1);
-        if (std::abs(dot_product) > 1e-5)
+        if (std::abs(dot_product) > 1e-5) {
             try {
                 throw std::runtime_error("Need reorthogonalise: ");
             }
             catch (std::runtime_error& e) {
                 std::cerr << "ERROR: " << e.what();
-                cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_product << endl;
+                cout << "v"<< iter - 1 <<"*v" << iter << " = " << dot_product << endl;
             }
+        }
     }
     w = multGraphVec(g, v1);
-	alpha[m - 1] = dot(v1, w);
-	for (auto x:alpha) { 
-		cout << x << " " << endl;
-	}
-
-	cout << "beta: " << endl;
-	for (auto x:beta) { 
-		cout << x << " " << endl;
-	}
-
-    //alpha_val = dot(v1, w);
-    //alpha.push_back(alpha_val);
+    alpha[m - 1] = dot(v1, w);
 
     if (GramSchmidt) {
         cout << "Lanczos algorithm WITH GramSchmidt is done." << endl;
@@ -141,91 +120,79 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool GramSchmidt) {
  *-----------------------------------------------------------------------------*/
 #ifdef SO
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g, bool so) {
-
-    T tol = 1e-6;
+Lanczos<Vector, T>::Lanczos(const Graph& g, bool So) {
+    VT_TRACER("LANCZOS");
     int size = g.size();
+    //int m = 2 * std::sqrt(size);
+    int m = size;
+
     Vector v0(size);
     v0 = initialise(v0);
+    Vector v1 = v0, w;
 
-    Vector t = v0, v1 = v0, w;
-    T alpha_val = 0.0, beta_val = 0.0;
-
+    T beta_val = 0.0, tol = 1e-6;
+    alpha.resize(m);
+    beta.resize(m - 1);
     lanczos_vecs[0] = v0;
 
-    for (int iter = 1; iter < size; iter++) {
+    int t = 0;
+
+    for (int iter = 1; iter < m; iter++) {
         w = multGraphVec(g, v1);
-
-        T alpha_val = dot(v1, w);
-        alpha.push_back(alpha_val);
-
-        for (int index = 0; index < size; index++) {
-            t[index] = w[index] - alpha_val * v1[index] - beta_val * v0[index];
+        alpha[iter - 1] = dot(v1, w);
+        for (int i = 0; i < size; i++) {
+            w[i] = w[i] - alpha[iter - 1] * v1[i] - beta_val * v0[i];
         }
 
-        beta_val = norm(t);
-        beta.push_back(beta_val);
-        if (std::abs(beta_val) < 1e-5)
+        beta_val = norm(w);
+        beta[iter - 1] = beta_val;
+        if (std::abs(beta[iter - 1]) < 1e-5) {
             try {
                 throw std::runtime_error("Value of beta is close to 0: ");
             }
             catch (std::runtime_error& e) {
                 std::cerr << "ERROR: " << e.what();
-                cout << "beta[" << iter-1 << "]: " << beta_val << endl;
+                cout << "beta[" << iter - 1 << "]: " << beta[iter - 1] << endl;
             }
-
-        if (!so) {
-            v0 = v1;
         }
 
         for (int index = 0; index < size; index++) {
-            v1[index] = t[index]/beta_val;
+            v1[index] = w[index]/beta[iter - 1];
         }
 
-        lanczos_vecs[iter] = v1;
-
-        if (so) {
+        if (So) {
             std::unordered_map<int, Vector> q;
             Vector d = alpha;
             Vector e = beta;
             tqli(d, e, q);
-            for (int k = 1; k <= iter; k++) {
-                if (beta_val * std::abs(q[iter][k]) <= tol) {
-                    //Vector r = dot(v0, q); // r = Viter * Q[:,j]
-					T reorthog_dot_product = dot(lanczos_vecs[i], lanczos_vecs[k]);
-					for (int j = 0; j < size; j++) {
-                            lanczos_vecs[k][j] -= reorthog_dot_product * lanczos_vecs[i][j];
-                        }
-                    }
-                    normalise(lanczos_vecs[k]);
-                    v0 = lanczos_vecs[iter-1];
-                    v1 = lanczos_vecs[iter];
-                }
+            if (beta_val * std::abs(q[iter][iter - 1]) <= tol) {
+                gramSchmidt(iter, v1);
+                t++;
             }
         }
+        lanczos_vecs[iter] = v1;
+        v0 = lanczos_vecs[iter - 1];
 
         //Verify the dot product of v0 and v1 which is supposed to be 0
         T dot_product = dot(v0, v1);
-#ifdef Debug
-        cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_product << endl;
-        cout << endl;
-#endif
-        if (std::abs(dot_product) > 1e-5)
+        if (std::abs(dot_product) > 1e-5) {
             try {
                 throw std::runtime_error("Need reorthogonalise: ");
             }
             catch (std::runtime_error& e) {
                 std::cerr << "ERROR: " << e.what();
-                cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_product << endl;
+                cout << "v"<< iter - 1 <<"*v" << iter << " = " << dot_product << endl;
             }
+        }
     }
     w = multGraphVec(g, v1);
-    alpha_val = dot(v1, w);
-    alpha.push_back(alpha_val);
-    if (so) {
-        cout << "Lanczos algorithm WITH SO is done." << endl;
+    alpha[m - 1] = dot(v1, w);
+
+    //cout << "t = " << t << endl;
+    if (So) {
+        cout << "Lanczos algorithm WITH Selective Reorthogonalisation is done." << endl;
     } else {
-        cout << "Lanczos algorithm WITHOUT SO is done." << endl;
+        cout << "Lanczos algorithm WITHOUT Selective Reorthogonalisation is done." << endl;
     }
 }
 #endif // endif - SO
