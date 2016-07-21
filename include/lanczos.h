@@ -21,7 +21,7 @@
 template<typename Vector, typename T>
 class Lanczos {
     private:
-        Vector& initialise(Vector& vec);
+        Vector init(const int& size);
         Vector multGraphVec(const Graph& g, const Vector& vec);
         inline T dot(const Vector& v1, const Vector& v2);
         inline T norm(const Vector& vec);
@@ -30,7 +30,7 @@ class Lanczos {
         inline T l2norm(const Vector& alpha, const Vector& beta);
 
     public:
-        Lanczos(const Graph& g, bool GramSchmidt);
+        Lanczos(const Graph& g, const int& subgraphs, bool GramSchmidt);
 
         Vector alpha;
         Vector beta;

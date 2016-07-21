@@ -23,7 +23,7 @@ template<typename Vector, typename T>
 class Lanczos {
     private:
 	    boost::mpi::communicator world;
-        Vector& init(Vector& v_local, const Graph& g);
+        Vector init(const Graph& g);
         Vector multGraphVec(const Graph& g, const Vector& vec);
         inline T dot(const Vector& v1, const Vector& v2);
         inline T dot_local(const Vector& v1, const Vector& v2);

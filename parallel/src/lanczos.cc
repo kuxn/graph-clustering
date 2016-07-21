@@ -60,10 +60,9 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
 
     //VT_TRACER("LANCZOS");
     int local_size = g_local.localSize();
-    Vector v0_local(local_size);
     Vector v1_halo(g_local.globalSize());
 
-    v0_local = init(v0_local, g_local);
+    Vector v0_local = init(g_local);
 
     Vector v1_local = v0_local, w_local;
     T alpha_val_global = 0.0, beta_val_global = 0.0;
@@ -319,34 +318,35 @@ inline T Lanczos<Vector, T>::dot_local(const Vector& v1, const Vector& v2) {
 template<typename Vector, typename T>
 inline T Lanczos<Vector, T>::norm(const Vector& vec) {
     T norm_local = 0.0;
-    for (const T& value:vec) {
-        norm_local += value * value;
+    for (const auto& x:vec) {
+        norm_local += x * x;
     }
     return sqrt(norm_local);
 }
 
 template<typename Vector, typename T>
 inline void Lanczos<Vector, T>::normalise(Vector& vec, const T& norm_global) {
-    int local_size = vec.size();
-    for (int i = 0; i < local_size; i++) {
-        vec[i] /= norm_global;
+    for (auto x:vec) {
+        x /= norm_global;
     }
 }
 
 template<typename Vector, typename T>
-Vector& Lanczos<Vector, T>::init(Vector& vec, const Graph& g) {
-    int local_size = vec.size();
+Vector Lanczos<Vector, T>::init(const Graph& g) {
+    int local_size = g.size();
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine generator(seed);
     std::uniform_real_distribution<double> gen(0.0,1.0);
-    for (int i = 0; i < local_size; i++) {
-        vec[i] = gen(generator);
-        //vec[i] = i;
+
+    Vector vec(local_size);
+    for (auto& x:vec) {
+        x = gen(generator);
+        //x = i;
     }
     T norm_local = norm(vec);
-    for (int i = 0; i < local_size; i++) {
-        vec[i] /= norm_local;
-        vec[i] /= sqrt(g.globalSize()/local_size); // vec[i]/=sqrt(procs), to make sure the global vector is normalised
+    for (auto& x:vec) {
+        x /= norm_local;
+        x /= sqrt(g.globalSize()/local_size); // vec[i]/=sqrt(procs), to make sure the global vector is normalised
     }
     return vec;
 }

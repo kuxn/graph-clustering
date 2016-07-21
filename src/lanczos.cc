@@ -49,14 +49,13 @@ using std::endl;
  *-----------------------------------------------------------------------------*/
 #ifdef GS_
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g, bool GramSchmidt) {
+Lanczos<Vector, T>::Lanczos(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     VT_TRACER("LANCZOS");
     int size = g.size();
     //int m = 6 * std::sqrt(size);
     int m = size;
 
-    Vector v0(size);
-    v0 = initialise(v0);
+    Vector v0 = init(size);
     Vector v1 = v0, w;
 
     T beta_val = 0.0;
@@ -120,15 +119,14 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool GramSchmidt) {
  *-----------------------------------------------------------------------------*/
 #ifdef SO_
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g, bool SO) {
+Lanczos<Vector, T>::Lanczos(const Graph& g, const int& subgraphs, bool SO) {
     VT_TRACER("LANCZOS_SO");
     int size = g.size();
-    int m = std::sqrt(size);
-    //int m = size;
+    //int m = 4 * std::sqrt(size);
+    int m = size;
 
-    Vector v0(size);
-    v0 = initialise(v0);
-    Vector v1 = v0, w;
+    Vector v0 = init(size);
+    Vector v1 = v0, w, vstart = v0;
 
     T beta_val = 0.0, tol = 1e-6;
     alpha.resize(m);
@@ -146,29 +144,32 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool SO) {
 
         beta_val = norm(w);
         beta[iter - 1] = beta_val;
-        if (std::abs(beta[iter - 1]) < 1e-5) {
-            try {
-                throw std::runtime_error("Value of beta is close to 0: ");
-            }
-            catch (std::runtime_error& e) {
-                std::cerr << "ERROR: " << e.what();
-                cout << "beta[" << iter - 1 << "]: " << beta[iter - 1] << endl;
-            }
-        }
+        //if (std::abs(beta[iter - 1]) < 1e-5) {
+        //    try {
+        //        throw std::runtime_error("Value of beta is close to 0: ");
+        //    }
+        //    catch (std::runtime_error& e) {
+        //        std::cerr << "ERROR: " << e.what();
+        //        cout << "beta[" << iter - 1 << "]: " << beta[iter - 1] << endl;
+        //    }
+        //}
 
         for (int index = 0; index < size; index++) {
             v1[index] = w[index]/beta[iter - 1];
         }
 
         if (SO) {
-            std::unordered_map<int, Vector> q;
-            Vector d = alpha;
-            Vector e = beta;
-            tqli(d, e, q);
-            cout << "beta_val * std::abs(q[iter][iter - 1] = " << beta_val * std::abs(q[iter][iter - 1]) << endl;
-            cout << "beta_val * std::abs(q[iter-1][iter] = " << beta_val * std::abs(q[iter-1][iter]) << endl;
-            cout << "beta_val * std::abs(q[iter][iter] = " << beta_val * std::abs(q[iter][iter]) << endl;
-            if (beta_val * std::abs(q[iter][iter - 1]) <= tol) {
+            //std::unordered_map<int, Vector> q;
+            //Vector d = alpha;
+            //Vector e = beta;
+            //tqli(d, e, q);
+            //cout << "beta_val * std::abs(q[iter][iter - 1] = " << beta_val * std::abs(q[iter][iter - 1]) << endl;
+            //cout << "beta_val * std::abs(q[iter-1][iter] = " << beta_val * std::abs(q[iter-1][iter]) << endl;
+            //cout << "beta_val * std::abs(q[iter][iter] = " << beta_val * std::abs(q[iter][iter]) << endl;
+            ////if (beta_val * std::abs(q[iter][iter - 1]) <= tol) {
+            //cout << "vstart * v1 = " << dot(vstart, v1) << endl;
+            if (std::abs(dot(vstart, v1)) >= tol) {
+                //if (beta_val * std::abs(q[iter][iter - 1]) <= tol) {
                 gramSchmidt(iter, v1);
                 t++;
             }
@@ -177,16 +178,17 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool SO) {
         v0 = lanczos_vecs[iter - 1];
 
         //Verify the dot product of v0 and v1 which is supposed to be 0
-        T dot_product = dot(v0, v1);
-        if (std::abs(dot_product) > 1e-5) {
-            try {
-                throw std::runtime_error("Need reorthogonalise: ");
-            }
-            catch (std::runtime_error& e) {
-                std::cerr << "ERROR: " << e.what();
-                cout << "v"<< iter - 1 <<"*v" << iter << " = " << dot_product << endl;
-            }
-        }
+        //T dot_product = dot(vstart, v1);
+        ////cout << "v0 * v1 = " << dot(v0, v1) << endl;
+        //if (std::abs(dot_product) > 1e-5) {
+        //    try {
+        //        throw std::runtime_error("Need reorthogonalise: ");
+        //    }
+        //    catch (std::runtime_error& e) {
+        //        std::cerr << "ERROR: " << e.what();
+        //        cout << "v"<< iter - 1 <<"*v" << iter << " = " << dot_product << endl;
+        //    }
+        //}
     }
     w = multGraphVec(g, v1);
     alpha[m - 1] = dot(v1, w);
@@ -205,15 +207,12 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool SO) {
  *-----------------------------------------------------------------------------*/
 #ifdef RS_
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g, bool RS) {
+Lanczos<Vector, T>::Lanczos(const Graph& g, const int& subgraphs, bool RS) {
     VT_TRACER("LANCZOS_RS");
-
-
     int size = g.size();
     int m = 2 * std::sqrt(size);
     //int m = size;
-    Vector v0(size);
-    v0 = initialise(v0);
+    Vector v0 = init(size);
 
     const int MAXIT = 5;
     for (int k = 1; k < MAXIT; k++) {
@@ -335,10 +334,11 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
     for (int vertex = 0; vertex < numofvertex; vertex++) {
         auto it = g.find(vertex);
         T temp = 0.0;
-        if (!it->second.empty())
-            for (const int& neighbour:it->second)
+        if (!it->second.empty()) {
+            for (const int& neighbour:it->second) {
                 temp += vec[neighbour];
-
+            }
+        }
         prod.push_back(it->second.size() * vec[vertex] - temp);
     }
     return prod;
@@ -387,8 +387,8 @@ inline T Lanczos<Vector, T>::dot(const Vector& v1, const Vector& v2) {
 template<typename Vector, typename T>
 inline T Lanczos<Vector, T>::norm(const Vector& vec) {
     T normret = 0.0;
-    for (const T& value:vec) {
-        normret += value * value;
+    for (const auto& x:vec) {
+        normret += x * x;
     }
     return sqrt(normret);
 }
@@ -397,11 +397,6 @@ template<typename Vector, typename T>
 inline T Lanczos<Vector, T>::l2norm(const Vector& alpha, const Vector& beta) {
     T normret = 0.0;
     T col_sum = 0.0;
-
-    //cout << "alpha::" << endl;
-    //for (auto x:alpha) cout << x << " ";
-    //cout << "beta::" << endl;
-    //for (auto x:beta) cout << x << " ";
 
     int size = alpha.size();
     for (int col = 0; col < size; col++) {
@@ -422,27 +417,25 @@ inline T Lanczos<Vector, T>::l2norm(const Vector& alpha, const Vector& beta) {
 
 template<typename Vector, typename T>
 inline Vector& Lanczos<Vector, T>::normalise(Vector& vec) {
-    int size = vec.size();
     T normal = norm(vec);
-    for (int i = 0; i < size; i++) {
-        vec[i] /= normal;
+    for (auto& x:vec) {
+        x /= normal;
     }
     return vec;
 }
 
 template<typename Vector, typename T>
-Vector& Lanczos<Vector, T>::initialise(Vector& vec) {
-    int size = vec.size();
-    for (int i = 0; i < size; i++) {
-        vec[i] = drand48();
+Vector Lanczos<Vector, T>::init(const int& size) {
+    Vector vec(size);
+    for (auto& x:vec) {
+        x = drand48();
     }
     T normalise = norm(vec);
-    for (int i = 0; i < size; i++) {
-        vec[i] /= normalise;
+    for (auto& x:vec) {
+        x /= normalise;
     }
 
     //vec = {0, 0.5, 0, 0.5, 0, 0.5, 0, 0.5};
-
     return vec;
 }
 

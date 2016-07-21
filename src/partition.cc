@@ -17,6 +17,8 @@
 #include <fstream>
 #include <unordered_map>
 
+#include <boost/timer.hpp>
+
 #include "partition.h"
 #include "lanczos.h"
 #include "tqli.h"
@@ -43,7 +45,10 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
     int num_of_eigenvec = log2(subgraphs);
 
     // Construct tridiagonal matrix using Lanczos algorithm
-    Lanczos<Vector, double> lanczos(g, reorthogonalisation);
+
+    boost::timer timer_lanczos;
+    Lanczos<Vector, double> lanczos(g, subgraphs, reorthogonalisation);
+    cout << "Lanczos takes " << timer_lanczos.elapsed() << "s" << endl;
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
 
@@ -57,7 +62,9 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
     DenseMatrix tri_eigen_vecs;
 
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
+    boost::timer timer_tqli;
     tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
+    cout << "TQLI takes " << timer_tqli.elapsed() << "s" << endl;
 
     // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha"
     int vector_index = 0;
@@ -107,7 +114,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
 void Partition::usingFullMat(const Graph& g, const int& subgraphs, bool reorthogonalisation) {
 
     int size = g.size();
-    getLapEigenMat(g, reorthogonalisation);
+    getLapEigenMat(g, subgraphs, reorthogonalisation);
 
 #ifdef Debug
     // Print all the eigenvalues of the tridiagonal/laplacian matrix
@@ -141,7 +148,7 @@ void Partition::usingFullMat(const Graph& g, const int& subgraphs, bool reorthog
     cout << endl;
 
     cout << "eigenvalues in sorted order: " << endl;
-    for (const int& x:eigenvalues_index_sort)
+    for (cont int& x:eigenvalues_index_sort)
         cout <<	laplacian_eigenvalues_[x] << " ";
     cout << endl;
 
@@ -253,14 +260,14 @@ Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_
  * =====================================================================================
  */
 
-void Partition::getLapEigenMat(const Graph& g, bool reorthogonalisation) {
+void Partition::getLapEigenMat(const Graph& g, const int& subgraphs, bool reorthogonalisation) {
 
     int size = g.size();
     Vector vinit(size, 0);
     for(int i = 0; i < size; i++)  laplacian_eigen_mat_[i] = vinit;
 
     // Construct tridiagonal matrix using Lanczos algorithm
-    Lanczos<Vector, double> lanczos(g, reorthogonalisation);
+    Lanczos<Vector, double> lanczos(g, subgraphs, reorthogonalisation);
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
 

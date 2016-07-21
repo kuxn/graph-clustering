@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <boost/program_options.hpp>
+#include <boost/timer.hpp>
 
 #include "graph.h"
 #include "partition.h"
@@ -83,7 +84,9 @@ int main(int argc, char* argv[]) {
         cout << "default argument: subgraphs = " << subgraphs << "." << endl;
     }
 
+	boost::timer timer_partition;
     Partition partition(*g, subgraphs, gram_schmidt);
+	cout << "Partition takes " << timer_partition.elapsed() << "s" << endl;
 
     if (output) {
         string filename("./output/serial_");
