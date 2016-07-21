@@ -29,7 +29,7 @@ using namespace std;
 typedef std::vector<double> Vector;
 typedef std::unordered_map<int, Vector> DenseMatrix;
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  Constructor
  *  Description:  Partition the graph into multiple subgraphs by only calculating the corresponding laplacian eigenvectors
@@ -59,7 +59,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
     tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
 
-    // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha" 
+    // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha"
     int vector_index = 0;
 
     int m = laplacian_eigenvalues_.size();
@@ -119,7 +119,7 @@ void Partition::usingFullMat(const Graph& g, const int& subgraphs, bool reorthog
     printLapEigenMat();
 #endif
 
-    // eigenvalues_index_sort stores the original index of the sorted eigenvalues 
+    // eigenvalues_index_sort stores the original index of the sorted eigenvalues
     vector<int> eigenvalues_index_sort;
     unordered_multimap<double, int> hashmap;
     for (int i = 0; i < size; i++)
@@ -135,14 +135,14 @@ void Partition::usingFullMat(const Graph& g, const int& subgraphs, bool reorthog
 
 #ifdef Debug
     cout << endl;
-    cout << "Original index of eigenvalues in sorted order: "; 
+    cout << "Original index of eigenvalues in sorted order: ";
     for (const int& x:eigenvalues_index_sort)
-        cout <<	x << " "; 
+        cout <<	x << " ";
     cout << endl;
 
-    cout << "eigenvalues in sorted order: " << endl; 
+    cout << "eigenvalues in sorted order: " << endl;
     for (const int& x:eigenvalues_index_sort)
-        cout <<	laplacian_eigenvalues_[x] << " "; 
+        cout <<	laplacian_eigenvalues_[x] << " ";
     cout << endl;
 
     cout << "Laplacian eigenvectors in sorted order: " << endl;
@@ -173,7 +173,7 @@ void Partition::usingFullMat(const Graph& g, const int& subgraphs, bool reorthog
     }
 }
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  utilities
  *  Description:  Print vector, matrix for debug
@@ -214,7 +214,7 @@ void Partition::outputLapEigenvalues() {
     Output.close();
 }
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  getOneLapEigenVec
  *  Description:  Return the fiedler vector using lanczos and tqli functions
@@ -244,9 +244,9 @@ Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_
         }
     }
     return laplacian_vector;
-} 
+}
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  getLapEigenMat
  *  Description:  Get all the eigenvectors of the original matrix.
@@ -256,6 +256,8 @@ Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_
 void Partition::getLapEigenMat(const Graph& g, bool reorthogonalisation) {
 
     int size = g.size();
+    Vector vinit(size, 0);
+    for(int i = 0; i < size; i++)  laplacian_eigen_mat_[i] = vinit;
 
     // Construct tridiagonal matrix using Lanczos algorithm
     Lanczos<Vector, double> lanczos(g, reorthogonalisation);
@@ -274,13 +276,13 @@ void Partition::getLapEigenMat(const Graph& g, bool reorthogonalisation) {
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
     tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
 
-    // Calculate all the eigenvectors of original Laplacian matrix using 
-    // the eigenvectors of the tridiagonal matrix computed by TQLI 
+    // Calculate all the eigenvectors of original Laplacian matrix using
+    // the eigenvectors of the tridiagonal matrix computed by TQLI
     for (int k = 0; k < size; k++) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 laplacian_eigen_mat_[k][i] += lanczos.lanczos_vecs[j][i] * tri_eigen_vecs[j][k];
             }
-        }	
+        }
     }
 }

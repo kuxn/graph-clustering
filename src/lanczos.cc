@@ -47,13 +47,13 @@ using std::endl;
 /*-----------------------------------------------------------------------------
  *  Modified Lanczos algorithm with GramSchmidt by Gram–Schmidt
  *-----------------------------------------------------------------------------*/
-#ifndef SO
+#ifdef GS_
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g, bool GramSchmidt) {
     VT_TRACER("LANCZOS");
     int size = g.size();
-    int m = 2 * std::sqrt(size);
-    //int m = size;
+    //int m = 6 * std::sqrt(size);
+    int m = size;
 
     Vector v0(size);
     v0 = initialise(v0);
@@ -114,17 +114,17 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool GramSchmidt) {
         cout << "Lanczos algorithm WITHOUT GramSchmidt is done." << endl;
     }
 }
-#endif // endif - non-SO
+#endif // endif - GS_
 /*-----------------------------------------------------------------------------
  *  Modified Lanczos algorithm with selective orthogonalisation
  *-----------------------------------------------------------------------------*/
-#ifdef SO
+#ifdef SO_
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g, bool So) {
-    VT_TRACER("LANCZOS");
+Lanczos<Vector, T>::Lanczos(const Graph& g, bool SO) {
+    VT_TRACER("LANCZOS_SO");
     int size = g.size();
-    //int m = 2 * std::sqrt(size);
-    int m = size;
+    int m = std::sqrt(size);
+    //int m = size;
 
     Vector v0(size);
     v0 = initialise(v0);
@@ -160,11 +160,14 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool So) {
             v1[index] = w[index]/beta[iter - 1];
         }
 
-        if (So) {
+        if (SO) {
             std::unordered_map<int, Vector> q;
             Vector d = alpha;
             Vector e = beta;
             tqli(d, e, q);
+            cout << "beta_val * std::abs(q[iter][iter - 1] = " << beta_val * std::abs(q[iter][iter - 1]) << endl;
+            cout << "beta_val * std::abs(q[iter-1][iter] = " << beta_val * std::abs(q[iter-1][iter]) << endl;
+            cout << "beta_val * std::abs(q[iter][iter] = " << beta_val * std::abs(q[iter][iter]) << endl;
             if (beta_val * std::abs(q[iter][iter - 1]) <= tol) {
                 gramSchmidt(iter, v1);
                 t++;
@@ -188,14 +191,132 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, bool So) {
     w = multGraphVec(g, v1);
     alpha[m - 1] = dot(v1, w);
 
-    //cout << "t = " << t << endl;
-    if (So) {
+    cout << "t = " << t << endl;
+    if (SO) {
         cout << "Lanczos algorithm WITH Selective Reorthogonalisation is done." << endl;
     } else {
         cout << "Lanczos algorithm WITHOUT Selective Reorthogonalisation is done." << endl;
     }
 }
 #endif // endif - SO
+
+/*-----------------------------------------------------------------------------
+ *  Modified Lanczos algorithm with restart
+ *-----------------------------------------------------------------------------*/
+#ifdef RS_
+template<typename Vector, typename T>
+Lanczos<Vector, T>::Lanczos(const Graph& g, bool RS) {
+    VT_TRACER("LANCZOS_RS");
+
+
+    int size = g.size();
+    int m = 2 * std::sqrt(size);
+    //int m = size;
+    Vector v0(size);
+    v0 = initialise(v0);
+
+    const int MAXIT = 5;
+    for (int k = 1; k < MAXIT; k++) {
+
+        Vector v1 = v0, w;
+        T beta_val = 0.0, tol = 1e-6;
+        alpha.resize(m);
+        beta.resize(m - 1);
+        lanczos_vecs[0] = v0;
+
+        for (int iter = k; iter < m; iter++) {
+            w = multGraphVec(g, v1);
+            alpha[iter - 1] = dot(v1, w);
+            for (int i = 0; i < size; i++) {
+                w[i] = w[i] - alpha[iter - 1] * v1[i] - beta_val * v0[i];
+            }
+            beta_val = norm(w);
+            beta[iter - 1] = beta_val;
+            if (std::abs(beta[iter - 1]) < 1e-5) {
+                try {
+                    throw std::runtime_error("Value of beta is close to 0: ");
+                }
+                catch (std::runtime_error& e) {
+                    std::cerr << "ERROR: " << e.what();
+                    cout << "beta[" << iter - 1 << "]: " << beta[iter - 1] << endl;
+                }
+            }
+            for (int index = 0; index < size; index++) {
+                v1[index] = w[index]/beta[iter - 1];
+            }
+            lanczos_vecs[iter] = v1;
+            v0 = lanczos_vecs[iter - 1];
+
+            //Verify the dot product of v0 and v1 which is supposed to be 0
+            T dot_product = dot(v0, v1);
+            if (std::abs(dot_product) > 1e-5) {
+                try {
+                    throw std::runtime_error("Need reorthogonalise: ");
+                }
+                catch (std::runtime_error& e) {
+                    std::cerr << "ERROR: " << e.what();
+                    cout << "v"<< iter - 1 <<"*v" << iter << " = " << dot_product << endl;
+                }
+            }
+        }
+        w = multGraphVec(g, v1);
+        alpha[m - 1] = dot(v1, w);
+        std::unordered_map<int, Vector> q;
+        Vector d = alpha;
+        Vector e = beta;
+        tqli(d, e, q);
+        // Calculate eigenvectors
+        cout << endl;
+        std::unordered_map<int, Vector> ritz_vector;
+        Vector vinit(size, 0);
+        for(int i = 0; i < m; i++)	ritz_vector[i] = vinit;
+        for (int row = 0; row < m; row++) {
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < m; j++) {
+                    ritz_vector[row][i] += lanczos_vecs[j][i] * q[j][row];
+                }
+            }
+        }
+
+        cout << "Ritz values: " << endl;
+        for (auto& x:d) {
+            cout << x << " ";
+        }
+        cout << endl;
+        cout << "Ritz vectors: " << endl;
+        int row_size = ritz_vector.size();
+        for (int row = 0; row < row_size; row++) {
+            int col_size = ritz_vector[row].size();
+            for (int col = 0; col < col_size; col++) {
+                cout << ritz_vector[row][col] << " ";
+            }
+            cout << endl;
+        }
+        // new v0 for restart
+        T temp = 0.0;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < m; j++) {
+                temp += ritz_vector[j][i];
+            }
+            v0[i] = temp;
+        }
+        normalise(v0);
+        cout << "norm of v0 = " << norm(v0) << endl;
+
+        //if (beta_val * std::abs(q[iter][iter - 1]) <= tol) {
+        //	gramSchmidt(iter, v1);
+        //	t++;
+        //}
+    }
+
+    //cout << "t = " << t << endl;
+    if (RS) {
+        cout << "Lanczos algorithm WITH Restart is done." << endl;
+    } else {
+        cout << "Lanczos algorithm WITHOUT Restart is done." << endl;
+    }
+}
+#endif // endif - RS
 
 /*
  * ===  FUNCTION  ======================================================================
