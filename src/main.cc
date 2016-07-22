@@ -98,9 +98,10 @@ int main(int argc, char* argv[]) {
     } else {
         //g->printDotFormat();
         //g->printLaplacianMat();
-        partition.printLapEigenvalues();
+        //partition.printLapEigenvalues();
         //partition.printLapEigenMat();
-        Analysis::cutEdgeVertexTable(*g);
+        //Analysis::cutEdgeVertexTable(*g);
+        cout << "cut edge precent = " << Analysis::cutEdgePercent(*g) << endl;
     }
 
     delete g;

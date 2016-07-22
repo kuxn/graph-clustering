@@ -122,7 +122,7 @@ int main(int argc, char* argv[]) {
             g->readDotFormatWithColour(filename);
         }
         //g->printDotFormat();
-        partition.printLapEigenvalues();
+        //partition.printLapEigenvalues();
         //partition.printLapEigenMat();
         Analysis::cutEdgeVertexTable(*g);
     }

@@ -47,7 +47,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
     // Construct tridiagonal matrix using Lanczos algorithm
 
     boost::timer timer_lanczos;
-    Lanczos<Vector, double> lanczos(g, subgraphs, reorthogonalisation);
+    Lanczos<Vector, double> lanczos(g, num_of_eigenvec, reorthogonalisation);
     cout << "Lanczos takes " << timer_lanczos.elapsed() << "s" << endl;
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
@@ -98,12 +98,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
             colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][vertex]);
         }
         g.setColour(vertex, colour);
-    }
-
-    if (reorthogonalisation) {
-        cout << "Partitioning WITH reorthogonalisation is done." << endl;
-    } else {
-        cout << "Partitioning WITHOUT reorthogonalisation is done." << endl;
     }
 }
 

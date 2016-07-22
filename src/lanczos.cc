@@ -49,11 +49,11 @@ using std::endl;
  *-----------------------------------------------------------------------------*/
 #ifdef GS_
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g, const int& subgraphs, bool GramSchmidt) {
+Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool GramSchmidt) {
     VT_TRACER("LANCZOS");
-    int size = g.size();
-    //int m = 6 * std::sqrt(size);
-    int m = size;
+    const int size = g.size();
+    //const int m = 6 * std::sqrt(size);
+    const int m = size;
 
     Vector v0 = init(size);
     Vector v1 = v0, w;
@@ -118,12 +118,29 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& subgraphs, bool GramSchmi
  *  Modified Lanczos algorithm with selective orthogonalisation
  *-----------------------------------------------------------------------------*/
 #ifdef SO_
+#include <cmath>
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g, const int& subgraphs, bool SO) {
+Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO) {
     VT_TRACER("LANCZOS_SO");
-    int size = g.size();
-    //int m = 4 * std::sqrt(size);
-    int m = size;
+    //const int size = g.size();
+    const int size = 1e9;
+	int m, scale;
+	if (num_of_eigenvec == 1) {
+		SO = false;
+		scale = 4 * num_of_eigenvec;
+	} else if (num_of_eigenvec == 2){
+		scale = 4 * (num_of_eigenvec - 1);
+	} else {
+		scale = num_of_eigenvec + 3;
+	}
+	cout << "scale = " << scale << endl;
+	if (log10(size) > 3) {
+		scale -= log10(std::sqrt(size));
+		scale = scale <= 0 ? 1:scale;
+	}
+	cout << "scale = " << scale << endl;
+	m = scale * std::sqrt(size) < size ? scale *  std::sqrt(size):size;
+	cout << "m = " << m << endl;
 
     Vector v0 = init(size);
     Vector v1 = v0, w, vstart = v0;
@@ -134,7 +151,6 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& subgraphs, bool SO) {
     lanczos_vecs[0] = v0;
 
     int t = 0;
-
     for (int iter = 1; iter < m; iter++) {
         w = multGraphVec(g, v1);
         alpha[iter - 1] = dot(v1, w);
@@ -164,12 +180,8 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& subgraphs, bool SO) {
             //Vector e = beta;
             //tqli(d, e, q);
             //cout << "beta_val * std::abs(q[iter][iter - 1] = " << beta_val * std::abs(q[iter][iter - 1]) << endl;
-            //cout << "beta_val * std::abs(q[iter-1][iter] = " << beta_val * std::abs(q[iter-1][iter]) << endl;
-            //cout << "beta_val * std::abs(q[iter][iter] = " << beta_val * std::abs(q[iter][iter]) << endl;
-            ////if (beta_val * std::abs(q[iter][iter - 1]) <= tol) {
-            //cout << "vstart * v1 = " << dot(vstart, v1) << endl;
             if (std::abs(dot(vstart, v1)) >= tol) {
-                //if (beta_val * std::abs(q[iter][iter - 1]) <= tol) {
+            //if (beta_val * std::abs(q[iter][iter - 1]) <= tol) {
                 gramSchmidt(iter, v1);
                 t++;
             }
@@ -207,10 +219,10 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& subgraphs, bool SO) {
  *-----------------------------------------------------------------------------*/
 #ifdef RS_
 template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g, const int& subgraphs, bool RS) {
+Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool RS) {
     VT_TRACER("LANCZOS_RS");
-    int size = g.size();
-    int m = 2 * std::sqrt(size);
+    const int size = g.size();
+    const int m = 2 * std::sqrt(size);
     //int m = size;
     Vector v0 = init(size);
 
