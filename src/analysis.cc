@@ -17,7 +17,7 @@
 
 using namespace std;
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  cutEdgePercent
  *  Description:  The percentage of edges have been cut by partitioning
@@ -41,9 +41,9 @@ double Analysis::cutEdgePercent(const Graph& g) {
             if (neighbour_colour != vertex_colour) {
                 cut_edge_num++;
             }
-        }	
+        }
     }
-    return (double)cut_edge_num/(double)g.edgesNum()/2.0; 
+    return (double)cut_edge_num/(double)g.edgesNum()/2.0;
 }
 
 /*-----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ void Analysis::cutEdgeVertexTable(const Graph& g) {
             isolated_vertex.push_back(vertex);
         }
         cut_vertex_table[vertex_subgraph]++;
-    }	
+    }
 
     cout << "/*-----------------------------------------------------------------------------" << endl;
     cout << " * Basic info of the graph" << endl;
@@ -102,7 +102,7 @@ void Analysis::cutEdgeVertexTable(const Graph& g) {
     }
     cout << endl;
     cout << "vertices:  " << "\t";
-    for (const int& num:cut_vertex_table) {	
+    for (const int& num:cut_vertex_table) {
         cout << num << "\t";
     }
     cout << endl;
@@ -136,7 +136,7 @@ void Analysis::cutEdgeVertexTable(const Graph& g) {
     }
 }
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  manuallyPartition
  *  Description:  Manually set equal number of vertices a colour and then compare the cutEdgePercent with Partitioning algorithm
@@ -157,3 +157,56 @@ void Analysis::manuallyPartition(const Graph& g) {
         }
     }
 }
+
+/*
+ * ===  FUNCTION  ======================================================================
+ *         Name:  outputTime
+ *  Description:  output time data
+ * =====================================================================================
+ */
+
+void Analysis::outputTime() {
+    vector<std::string> filenames = {"./test/par_test_100.dot",
+                                     "./test/par_test_200.dot",
+                                     "./test/par_test_500.dot",
+                                     "./test/par_test_1k.dot",
+                                     "./test/par_test_5k.dot",
+                                     "./test/par_test_10k.dot",
+                                     //"./test/par_test_102k.dot",
+                                    };
+    vector<int> subgraphs = {2, 4, 8, 16, 32, 64};
+    vector<std::vector<std::vector<double>>> output_times(filenames.size());
+
+    /*-----------------------------------------------------------------------------
+     *  Output_times[filename][subgraphs][times]
+     *-----------------------------------------------------------------------------*/
+    for (unsigned int i = 0; i < filenames.size(); i++) {
+        Graph g;
+        bool gram_schmidt = true;
+        g.readDotFormat(filenames[i]);
+        for (unsigned int j = 0; j < subgraphs.size(); j++) {
+            Partition partition(*g, subgraphs[j], gram_schmidt);
+            output_times[i][j] = partition.times;
+        }
+    }
+
+    /*-----------------------------------------------------------------------------
+     *  Output times: Lanczos - 0; TQLI - 1; Partition - 2;
+     *-----------------------------------------------------------------------------*/
+    for (int i = 0; i < 3; i++) {
+        string filename("./graphs/serial_");
+        filename += to_string(i);
+        filename += ".dat";
+        ofstream Output(filename);
+        Output << "subgraphs\t100\t200\t500\t1k\t5k\t10k" << endl;
+        for (unsigned int row = 0; row < subgraphs.size(); row++) {
+            Output << subgraphs[row] << "\t";
+            for (unsigned int col = 0; col < filenames.size(); col++) {
+                Output << output_times[col][row][i] << "\t";
+            }
+            Output << endl;
+        }
+        Output.close();
+    }
+}
+

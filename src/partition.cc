@@ -50,6 +50,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     boost::timer timer_lanczos;
     Lanczos<Vector, double> lanczos(g, num_of_eigenvec, GramSchmidt);
     cout << "Lanczos timer - Lanczos takes " << timer_lanczos.elapsed() << "s" << endl;
+	times.push_back(timer_lanczos.elapsed());
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
 
@@ -66,6 +67,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     boost::timer timer_tqli;
     tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
     cout << "TQLI timer - TQLI takes " << timer_tqli.elapsed() << "s" << endl;
+	times.push_back(timer_tqli.elapsed());
 
     // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha"
     int vector_index = 0;
@@ -102,6 +104,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         g.setColour(vertex, colour);
     }
     cout << "Partition timer - partition takes " << timer_partition.elapsed() << "s" << endl;
+	times.push_back(timer_partition.elapsed());
 }
 
 /*
