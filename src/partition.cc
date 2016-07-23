@@ -38,17 +38,18 @@ typedef std::unordered_map<int, Vector> DenseMatrix;
  * =====================================================================================
  */
 
-Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisation) {
+Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 
     VT_TRACER("PARTITION");
+    boost::timer timer_partition;
     int size = g.size();
     int num_of_eigenvec = log2(subgraphs);
 
     // Construct tridiagonal matrix using Lanczos algorithm
 
     boost::timer timer_lanczos;
-    Lanczos<Vector, double> lanczos(g, num_of_eigenvec, reorthogonalisation);
-    cout << "Lanczos takes " << timer_lanczos.elapsed() << "s" << endl;
+    Lanczos<Vector, double> lanczos(g, num_of_eigenvec, GramSchmidt);
+    cout << "Lanczos timer - Lanczos takes " << timer_lanczos.elapsed() << "s" << endl;
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
 
@@ -64,15 +65,16 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
     boost::timer timer_tqli;
     tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
-    cout << "TQLI takes " << timer_tqli.elapsed() << "s" << endl;
+    cout << "TQLI timer - TQLI takes " << timer_tqli.elapsed() << "s" << endl;
 
     // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha"
     int vector_index = 0;
 
     int m = laplacian_eigenvalues_.size();
     unordered_multimap<double, int> hashmap;
-    for (int i = 0; i < m; i++)
-        hashmap.insert({laplacian_eigenvalues_[i], i});
+	for (int i = 0; i < m; i++) {
+		hashmap.insert({laplacian_eigenvalues_[i], i});
+	}
 
     Vector auxiliary_vec = laplacian_eigenvalues_;
     sort(auxiliary_vec.begin(), auxiliary_vec.end());
@@ -99,79 +101,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool reorthogonalisat
         }
         g.setColour(vertex, colour);
     }
-}
-
-/*-----------------------------------------------------------------------------
- *  Modified partition function to for multiple partitioning by calculating all laplacian eigenvectors
- *-----------------------------------------------------------------------------*/
-
-void Partition::usingFullMat(const Graph& g, const int& subgraphs, bool reorthogonalisation) {
-
-    int size = g.size();
-    getLapEigenMat(g, subgraphs, reorthogonalisation);
-
-#ifdef Debug
-    // Print all the eigenvalues of the tridiagonal/laplacian matrix
-    cout << "laplacian eigenvalues: " << endl;
-    printLapEigenvalues();
-
-    // Print all the eigenvectors in row
-    cout << "laplacian_eigen_mat_: " << endl;
-    printLapEigenMat();
-#endif
-
-    // eigenvalues_index_sort stores the original index of the sorted eigenvalues
-    vector<int> eigenvalues_index_sort;
-    unordered_multimap<double, int> hashmap;
-    for (int i = 0; i < size; i++)
-        hashmap.insert({laplacian_eigenvalues_[i], i});
-
-    Vector auxiliary_vec = laplacian_eigenvalues_;
-    sort(auxiliary_vec.begin(), auxiliary_vec.end());
-    for (int i = 0; i < size; i++) {
-        auto it = hashmap.find(auxiliary_vec[i]);
-        eigenvalues_index_sort.push_back(it->second);
-        hashmap.erase(it);
-    }
-
-#ifdef Debug
-    cout << endl;
-    cout << "Original index of eigenvalues in sorted order: ";
-    for (const int& x:eigenvalues_index_sort)
-        cout <<	x << " ";
-    cout << endl;
-
-    cout << "eigenvalues in sorted order: " << endl;
-    for (cont int& x:eigenvalues_index_sort)
-        cout <<	laplacian_eigenvalues_[x] << " ";
-    cout << endl;
-
-    cout << "Laplacian eigenvectors in sorted order: " << endl;
-    for (const int& row:eigenvalues_index_sort) {
-        for (int col = 0; col < size; col++) {
-            cout << laplacian_eigen_mat_[row][col] << " ";
-        }
-        cout << endl;
-    }
-
-    cout << "Laplacian eigenvectors in sorted order: " << endl;
-    for (const int& row:eigenvalues_index_sort) {
-        for (int col = 0; col < size; col++) {
-            cout << Sign(laplacian_eigen_mat_[row][col])<< " ";
-        }
-        cout << endl;
-    }
-#endif
-
-    int num = log2(subgraphs); // number of eigenvectors to partition the graph, start from the second smallest.
-    for (int vertex = 0; vertex < size; vertex++) {
-        int colour = 0;
-        for (int eigenvec_index = 1; eigenvec_index <= num; eigenvec_index++) {
-            int row = eigenvalues_index_sort[eigenvec_index];
-            colour += pow(2, eigenvec_index - 1) * Sign(laplacian_eigen_mat_[row][vertex]);
-        }
-        g.setColour(vertex, colour);
-    }
+    cout << "Partition timer - partition takes " << timer_partition.elapsed() << "s" << endl;
 }
 
 /*
@@ -254,14 +184,14 @@ Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_
  * =====================================================================================
  */
 
-void Partition::getLapEigenMat(const Graph& g, const int& subgraphs, bool reorthogonalisation) {
+void Partition::getLapEigenMat(const Graph& g, bool GramSchmidt) {
 
     int size = g.size();
     Vector vinit(size, 0);
     for(int i = 0; i < size; i++)  laplacian_eigen_mat_[i] = vinit;
 
     // Construct tridiagonal matrix using Lanczos algorithm
-    Lanczos<Vector, double> lanczos(g, subgraphs, reorthogonalisation);
+    Lanczos<Vector, double> lanczos(g, size, GramSchmidt);
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
 

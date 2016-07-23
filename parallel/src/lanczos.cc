@@ -55,6 +55,7 @@ using std::endl;
  *  Modified Lanczos algorithm with GramSchmidt by Gram–Schmidt
  *-----------------------------------------------------------------------------*/
 
+#ifdef GS_
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
 
@@ -135,6 +136,100 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
         cout << "Lanczos algorithm WITHOUT GramSchmidt is done." << endl;
     }
 }
+#endif /* end-if Gram-Schmidt */
+
+/*-----------------------------------------------------------------------------
+ *  Selective Orthogonalisation
+ *-----------------------------------------------------------------------------*/
+#ifdef SO_
+template<typename Vector, typename T>
+Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bool SO) {
+    //VT_TRACER("LANCZOS");
+    int local_size = g_local.localSize(), t = 0;
+    int global_size = g_local.globalSize();
+    int m, scale;
+    double tol = 1e-6;
+
+    if (num_of_eigenvec == 1) {
+        //SO = false;
+        scale = 4 * num_of_eigenvec;
+    } else if (num_of_eigenvec == 2) {
+        scale = 4 * (num_of_eigenvec - 1);
+    } else {
+        scale = num_of_eigenvec + 2;
+    }
+	cout << "scale = " << scale << endl;
+    if (round(log10(global_size)) > 3) {
+        scale -= round(log10(std::sqrt(global_size)));
+        scale = scale <= 0 ? 1:scale;
+    }
+    m = scale * std::sqrt(global_size) < global_size ? scale * std::sqrt(global_size):global_size;
+	int size = global_size;
+	cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
+ 
+	cout << "scale = " << scale << endl;
+	cout << "m = " << m << endl;
+
+    Vector v1_halo(global_size);
+    Vector v0_local = init(g_local);
+    Vector v1_local = v0_local, w_local, v0_start = v0_local;
+    T alpha_val_global = 0.0, beta_val_global = 0.0;
+
+    lanczos_vecs_local[0] = v1_local;
+    haloInit(g_local);
+
+    for (int iter = 1; iter < m; iter++) {
+        haloUpdate(g_local, v1_local, v1_halo);
+        w_local = multGraphVec(g_local, v1_halo);
+
+        alpha_val_global = dot(v1_local, w_local);
+        alpha_global.push_back(alpha_val_global);
+
+        for (int i = 0; i < local_size; i++) {
+            w_local[i] = w_local[i] - alpha_val_global * v1_local[i] - beta_val_global * v0_local[i];
+        }
+
+        beta_val_global = sqrt(dot(w_local, w_local));
+        beta_global.push_back(beta_val_global);
+
+        if (std::abs(beta_val_global) < 1e-5) {
+            try {
+                throw std::runtime_error("Value of beta is close to 0: ");
+            }
+            catch (std::runtime_error& e) {
+                std::cerr << "ERROR: " << e.what();
+                cout << "beta[" << iter-1 << "]: " << beta_val_global << endl;
+            }
+        }
+
+        for (int i = 0; i < local_size; i++) {
+            v1_local[i] = w_local[i]/beta_val_global;
+        }
+
+        if (std::abs(dot(v0_start, v1_local)) >= tol) {
+            gramSchmidt(iter, v1_local);
+            t++;
+        }
+        lanczos_vecs_local[iter] = v1_local;
+        v0_local = lanczos_vecs_local[iter-1];
+    }
+    haloUpdate(g_local, v1_local, v1_halo);
+    w_local = multGraphVec(g_local, v1_halo);
+    alpha_val_global = dot(v1_local, w_local);
+    alpha_global.push_back(alpha_val_global);
+
+    transform(g_local, m);
+    if (SO && g_local.rank() == 0) {
+        cout << "m = " << m << endl;
+        cout << "t = " << t << endl;
+        cout << "Lanczos algorithm WITH Selective Orthogonalisation is done." << endl;
+    } else if (g_local.rank() == 0) {
+        cout << "m = " << m << endl;
+        cout << "t = " << t << endl;
+        cout << "Lanczos algorithm WITHOUT Selective Orthogonalisation is done." << endl;
+    }
+}
+#endif /* end-if SO */
 
 /*
  * ===  FUNCTION  ======================================================================

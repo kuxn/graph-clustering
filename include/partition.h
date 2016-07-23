@@ -28,12 +28,11 @@ class Partition {
         DenseMatrix laplacian_eigen_mat_;
 
         Vector getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index);
-        void getLapEigenMat(const Graph& g, const int& subgraphs, bool reorthogonalisation);
+        void getLapEigenMat(const Graph& g, bool GramSchmidt);
 
     public:
         Partition() {}
-        Partition(const Graph& g, const int& subgraphs, bool reorthogonalisation);
-        void usingFullMat(const Graph& g, const int& subgraphs, bool reorthogonalisation);
+        Partition(const Graph& g, const int& subgraphs, bool GramSchmidt);
 
         void printLapEigenMat();
         void printLapEigenvalues();

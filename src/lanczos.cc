@@ -122,22 +122,26 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool Gra
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO) {
     VT_TRACER("LANCZOS_SO");
-    //const int size = g.size();
-    const int size = 1e9;
+    const int size = g.size();
+    //const int size = 1e9;
 	int m, scale;
 	if (num_of_eigenvec == 1) {
-		SO = false;
+		//SO = false;
 		scale = 4 * num_of_eigenvec;
 	} else if (num_of_eigenvec == 2){
 		scale = 4 * (num_of_eigenvec - 1);
 	} else {
-		scale = num_of_eigenvec + 3;
+		scale = num_of_eigenvec + 2;
 	}
+
 	cout << "scale = " << scale << endl;
-	if (log10(size) > 3) {
-		scale -= log10(std::sqrt(size));
+	cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
+
+	if (round(log10(size)) > 3) {
+		scale -= round(log10(std::sqrt(size)));
 		scale = scale <= 0 ? 1:scale;
 	}
+
 	cout << "scale = " << scale << endl;
 	m = scale * std::sqrt(size) < size ? scale *  std::sqrt(size):size;
 	cout << "m = " << m << endl;
@@ -207,9 +211,9 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
 
     cout << "t = " << t << endl;
     if (SO) {
-        cout << "Lanczos algorithm WITH Selective Reorthogonalisation is done." << endl;
+        cout << "Lanczos algorithm WITH Selective Orthogonalisation is done." << endl;
     } else {
-        cout << "Lanczos algorithm WITHOUT Selective Reorthogonalisation is done." << endl;
+        cout << "Lanczos algorithm WITHOUT Selective Orthogonalisation is done." << endl;
     }
 }
 #endif // endif - SO

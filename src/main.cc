@@ -84,12 +84,10 @@ int main(int argc, char* argv[]) {
         cout << "default argument: subgraphs = " << subgraphs << "." << endl;
     }
 
-	boost::timer timer_partition;
-    Partition partition(*g, subgraphs, gram_schmidt);
-	cout << "Partition takes " << timer_partition.elapsed() << "s" << endl;
+	Partition partition(*g, subgraphs, gram_schmidt);
 
-    if (output) {
-        string filename("./output/serial_");
+	if (output) {
+		string filename("./output/serial_");
         filename += to_string(g->size());
         filename += "v_";
         filename += to_string(g->subgraphsNum());
@@ -98,10 +96,10 @@ int main(int argc, char* argv[]) {
     } else {
         //g->printDotFormat();
         //g->printLaplacianMat();
-        //partition.printLapEigenvalues();
+        partition.printLapEigenvalues();
         //partition.printLapEigenMat();
-        //Analysis::cutEdgeVertexTable(*g);
-        cout << "cut edge precent = " << Analysis::cutEdgePercent(*g) << endl;
+        Analysis::cutEdgeVertexTable(*g);
+        //cout << "cut edge precent = " << Analysis::cutEdgePercent(*g) << endl;
     }
 
     delete g;
