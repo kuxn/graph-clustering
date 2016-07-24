@@ -12,6 +12,7 @@
  */
 
 #include <iostream>
+#include <fstream>
 #include "analysis.h"
 #include "partition.h"
 
@@ -160,12 +161,12 @@ void Analysis::manuallyPartition(const Graph& g) {
 
 /*
  * ===  FUNCTION  ======================================================================
- *         Name:  outputTime
- *  Description:  output time data
+ *         Name:  benchmarks
+ *  Description:  output time data for different number of vertices/colours
  * =====================================================================================
  */
 
-void Analysis::outputTime() {
+void Analysis::benchmarks(bool GramSchmidt) {
     vector<std::string> filenames = {"./test/par_test_100.dot",
                                      "./test/par_test_200.dot",
                                      "./test/par_test_500.dot",
@@ -175,20 +176,24 @@ void Analysis::outputTime() {
                                      //"./test/par_test_102k.dot",
                                     };
     vector<int> subgraphs = {2, 4, 8, 16, 32, 64};
-    vector<std::vector<std::vector<double>>> output_times(filenames.size());
+    vector<std::vector<std::vector<double>>> output_times;
+    cout << "filenames.size() = " << filenames.size() << endl;
 
     /*-----------------------------------------------------------------------------
-     *  Output_times[filename][subgraphs][times]
+     *  output_times[filename][subgraphs][times]
      *-----------------------------------------------------------------------------*/
     for (unsigned int i = 0; i < filenames.size(); i++) {
         Graph g;
-        bool gram_schmidt = true;
         g.readDotFormat(filenames[i]);
+        vector<std::vector<double>> subgraph_times;
         for (unsigned int j = 0; j < subgraphs.size(); j++) {
-            Partition partition(*g, subgraphs[j], gram_schmidt);
-            output_times[i][j] = partition.times;
+            Partition partition(g, subgraphs[j], GramSchmidt);
+            subgraph_times.push_back(partition.times);
         }
+        output_times.push_back(subgraph_times);
     }
+
+    //cout << "output_times.size() = " << output_times.size() << ", output_times[0].size()" << output_times[0].size() << ", output_times[0][0].size() = " << output_times[0][0].size() << endl;
 
     /*-----------------------------------------------------------------------------
      *  Output times: Lanczos - 0; TQLI - 1; Partition - 2;
@@ -197,7 +202,7 @@ void Analysis::outputTime() {
         string filename("./graphs/serial_");
         filename += to_string(i);
         filename += ".dat";
-        ofstream Output(filename);
+        ofstream Output(filename, ios::out | ios::binary | ios::trunc);
         Output << "subgraphs\t100\t200\t500\t1k\t5k\t10k" << endl;
         for (unsigned int row = 0; row < subgraphs.size(); row++) {
             Output << subgraphs[row] << "\t";

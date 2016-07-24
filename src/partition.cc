@@ -49,8 +49,9 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 
     boost::timer timer_lanczos;
     Lanczos<Vector, double> lanczos(g, num_of_eigenvec, GramSchmidt);
-    cout << "Lanczos timer - Lanczos takes " << timer_lanczos.elapsed() << "s" << endl;
-	times.push_back(timer_lanczos.elapsed());
+    double t_lan = timer_lanczos.elapsed();
+    cout << "Lanczos timer - Lanczos takes " << t_lan << "s" << endl;
+    times.push_back(t_lan);
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
 
@@ -66,17 +67,18 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
     boost::timer timer_tqli;
     tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
-    cout << "TQLI timer - TQLI takes " << timer_tqli.elapsed() << "s" << endl;
-	times.push_back(timer_tqli.elapsed());
+    double t_tqli = timer_tqli.elapsed();
+    cout << "TQLI timer - TQLI takes " << t_tqli << "s" << endl;
+    times.push_back(t_tqli);
 
     // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha"
     int vector_index = 0;
 
     int m = laplacian_eigenvalues_.size();
     unordered_multimap<double, int> hashmap;
-	for (int i = 0; i < m; i++) {
-		hashmap.insert({laplacian_eigenvalues_[i], i});
-	}
+    for (int i = 0; i < m; i++) {
+        hashmap.insert({laplacian_eigenvalues_[i], i});
+    }
 
     Vector auxiliary_vec = laplacian_eigenvalues_;
     sort(auxiliary_vec.begin(), auxiliary_vec.end());
@@ -103,8 +105,9 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         }
         g.setColour(vertex, colour);
     }
-    cout << "Partition timer - partition takes " << timer_partition.elapsed() << "s" << endl;
-	times.push_back(timer_partition.elapsed());
+    double t_par = timer_partition.elapsed();
+    cout << "Partition timer - partition takes " << t_par << "s" << endl;
+    times.push_back(t_par);
 }
 
 /*

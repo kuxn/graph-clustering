@@ -37,7 +37,7 @@ class Partition {
         void printLapEigenMat();
         void printLapEigenvalues();
         void outputLapEigenvalues();
-        void vector<double> times;
+        std::vector<double> times;
 };
 
 #endif
