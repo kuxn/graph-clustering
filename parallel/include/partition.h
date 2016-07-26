@@ -39,6 +39,7 @@ class Partition {
         void printLapEigenMat();
         void printLapEigenvalues();
         void outputLapEigenvalues();
+        std::vector<double> ritz_values;
         std::vector<double> times;
 };
 

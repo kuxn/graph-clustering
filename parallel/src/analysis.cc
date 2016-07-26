@@ -54,7 +54,7 @@ double Analysis::cutEdgePercent(const Graph& g) {
  *  Modified cutEdgePercent function calculating percentage of cut edges between different subgraphs
  *-----------------------------------------------------------------------------*/
 
-void Analysis::cutEdgeVertexTable(const Graph& g) {
+void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_values) {
     int size = g.size();
     int subgraphs = g.subgraphsNum();
 
@@ -89,14 +89,17 @@ void Analysis::cutEdgeVertexTable(const Graph& g) {
         }
         cut_vertex_table[vertex_subgraph]++;
     }
+    std::ostream_iterator<double> it_double(std::cout, "\t");
+    std::ostream_iterator<int> it_int(std::cout, "\t");
 
     cout << "/*-----------------------------------------------------------------------------" << endl;
     cout << " * Basic info of the graph" << endl;
     cout << "/*-----------------------------------------------------------------------------" << endl;
     cout << "Vertices:  " << g.size() << endl;
     cout << "Edges:     " << g.edgesNum() << endl;
-    cout << "Subgraphs: " << subgraphs << endl;
-    cout << "Cut Edge Percent: " << cutEdgePercent(g) << endl;
+    cout << "Colours:   " << subgraphs << endl;
+    cout << "Used Ritz values: "; copy(ritz_values.cbegin(), ritz_values.cend(), it_double);
+    cout << endl << "Cut Edge Percent: " << cutEdgePercent(g) * 100 << "%" << endl;
     cout << "/*-----------------------------------------------------------------------------" << endl;
     cout << " * Number of vertices in each subgraph" << endl;
     cout << "/*-----------------------------------------------------------------------------" << endl;
@@ -105,10 +108,8 @@ void Analysis::cutEdgeVertexTable(const Graph& g) {
         cout << col << "\t";
     }
     cout << endl;
-    cout << "vertices:  " << "\t";
-    for (const int& num:cut_vertex_table) {
-        cout << num << "\t";
-    }
+    cout << "Vertices:  " << "\t";
+	copy(cut_vertex_table.cbegin(), cut_vertex_table.cend(), it_int);
     cout << endl;
     cout << "/*-----------------------------------------------------------------------------" << endl;
     cout << " * Edges table after partitioning" << endl;
@@ -177,7 +178,7 @@ void Analysis::outputTimes(const int& procs, const vector<double>& vec) {
     Output << "procs\tLanczos\tTqli\tpartition\t" << endl;
     Output << procs << "\t";
     std::ostream_iterator<double> outIter(Output, "\t");
-    std::copy(vec.begin(), vec.end(), outIter);
+    std::copy(vec.cbegin(), vec.cend(), outIter);
     Output.close();
 }
 

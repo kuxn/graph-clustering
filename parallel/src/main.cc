@@ -83,11 +83,13 @@ int main(int argc, char* argv[]) {
         subgraphs = vm["subgraphs"].as<int>();
         if (world.rank() == 0 && read_graph) {
             cout << "argument: subgraphs = " << subgraphs << "." << endl;
+            cout << "number of processes = " << world.size() << "." << endl;
         }
     } else {
         subgraphs = 2;
         if (world.rank() == 0 && read_graph) {
             cout << "default argument: subgraphs = " << subgraphs << "." << endl;
+            cout << "number of processes = " << world.size() << "." << endl;
         }
     }
 
@@ -119,7 +121,7 @@ int main(int argc, char* argv[]) {
         //partition.printLapEigenvalues();
         //partition.printLapEigenMat();
         Analysis::outputTimes(world.size(), partition.times);
-        Analysis::cutEdgeVertexTable(*g);
+        Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
     //fstream Output;
     //for (int proc = 0; proc < world.size(); proc++) {

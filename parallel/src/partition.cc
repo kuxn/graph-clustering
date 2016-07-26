@@ -119,9 +119,10 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         fiedler_index++;
         //fiedler_index--;
         vector_index = it->second;
-        if (g.rank() == 0) {
-            cout << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
-        }
+		ritz_values.push_back(it->first);
+        //if (g.rank() == 0) {
+        //    cout << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
+        //}
         hashmap.erase(it);
         laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs_global, tri_eigen_vecs, vector_index);
     }

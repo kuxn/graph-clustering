@@ -144,7 +144,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
 
 	cout << "scale = " << scale << endl;
 	m = scale * std::sqrt(size) < size ? scale *  std::sqrt(size):size;
-	//m = size;
+	m = size;
 	cout << "m = " << m << endl;
 
     Vector v0 = init(size);

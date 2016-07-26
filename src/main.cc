@@ -100,9 +100,9 @@ int main(int argc, char* argv[]) {
         } else {
             //g->printDotFormat();
             //g->printLaplacianMat();
-            //partition.printLapEigenvalues();
+            partition.printLapEigenvalues();
             //partition.printLapEigenMat();
-            Analysis::cutEdgeVertexTable(*g);
+            Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
             //cout << "cut edge precent = " << Analysis::cutEdgePercent(*g) << endl;
         }
     }

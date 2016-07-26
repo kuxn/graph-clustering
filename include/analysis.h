@@ -15,12 +15,13 @@
 #define ANALYSIS_H_
 
 #include "graph.h"
+#include <vector>
 
 class Analysis {
 
     public:
         static double cutEdgePercent(const Graph& g);
-        static void cutEdgeVertexTable(const Graph& g);
+        static void cutEdgeVertexTable(const Graph& g, const std::vector<double>& ritz_values);
         static void manuallyPartition(const Graph& g);
         static void benchmarks(bool GramSchmidt);
 };

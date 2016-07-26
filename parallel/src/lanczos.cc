@@ -168,7 +168,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
 	//cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
  
 	//cout << "scale = " << scale << endl;
-	cout << "m = " << m << endl;
+	//cout << "m = " << m << endl;
 
     Vector v1_halo(global_size);
     Vector v0_local = init(g_local);
