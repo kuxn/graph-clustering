@@ -47,10 +47,11 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     // Construct tridiagonal matrix using Lanczos algorithm
     boost::mpi::timer timer_lanczos;
     Lanczos<Vector, double> lanczos(g, num_of_eigenvec, GramSchmidt);
+	double t_lan = timer_lanczos.elapsed();
     if (g.rank() == 0) {
-        cout << "In P0, Lanczos takes " << timer_lanczos.elapsed() << "s" << endl;
+        cout << "In P0, Lanczos takes " << t_lan << "s" << endl;
     }
-
+	times.push_back(t_lan);
     laplacian_eigenvalues_ = lanczos.alpha_global;
     Vector beta = lanczos.beta_global;
 
@@ -76,9 +77,11 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
     boost::mpi::timer timer_tqli;
     tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
+    double t_tqli = timer_tqli.elapsed();
     if (g.rank() == 0) {
-        cout << "In P0, TQLI takes " << timer_tqli.elapsed() << "s" << endl;
+        cout << "In P0, TQLI takes " << t_tqli << "s" << endl;
     }
+    times.push_back(t_tqli);
 
 #ifdef Debug
     cout << "Eigenvalues after TQLI: ";
@@ -130,9 +133,11 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         }
         g.setColour(g.globalIndex(vertex), colour);
     }
+    double t_par = timer_partition.elapsed();
     if (g.rank() == 0) {
         cout << "In P0, Partition takes " << timer_partition.elapsed() << "s" << endl;
     }
+    times.push_back(t_par);
 }
 
 /*

@@ -158,16 +158,16 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
     } else {
         scale = num_of_eigenvec + 2;
     }
-	cout << "scale = " << scale << endl;
+	//cout << "scale = " << scale << endl;
     if (round(log10(global_size)) > 3) {
         scale -= round(log10(std::sqrt(global_size)));
         scale = scale <= 0 ? 1:scale;
     }
     m = scale * std::sqrt(global_size) < global_size ? scale * std::sqrt(global_size):global_size;
-	int size = global_size;
-	cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
+	//int size = global_size;
+	//cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
  
-	cout << "scale = " << scale << endl;
+	//cout << "scale = " << scale << endl;
 	cout << "m = " << m << endl;
 
     Vector v1_halo(global_size);
@@ -220,12 +220,12 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
 
     transform(g_local, m);
     if (SO && g_local.rank() == 0) {
-        cout << "m = " << m << endl;
-        cout << "t = " << t << endl;
+        //cout << "m = " << m << endl;
+        //cout << "t = " << t << endl;
         cout << "Lanczos algorithm WITH Selective Orthogonalisation is done." << endl;
     } else if (g_local.rank() == 0) {
-        cout << "m = " << m << endl;
-        cout << "t = " << t << endl;
+        //cout << "m = " << m << endl;
+        //cout << "t = " << t << endl;
         cout << "Lanczos algorithm WITHOUT Selective Orthogonalisation is done." << endl;
     }
 }

@@ -15,6 +15,7 @@
 #define ANALYSIS_H_
 
 #include "graph.h"
+#include <vector>
 
 class Analysis {
     
@@ -23,6 +24,7 @@ class Analysis {
     public:
         static void cutEdgeVertexTable(const Graph& g);
         static void manuallyPartition(const Graph& g);
+        static void outputTimes(const int& procs, const std::vector<double>& vec);
 };
 
 #endif   

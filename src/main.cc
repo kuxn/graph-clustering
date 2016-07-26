@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
             //g->printLaplacianMat();
             //partition.printLapEigenvalues();
             //partition.printLapEigenMat();
-            //Analysis::cutEdgeVertexTable(*g);
+            Analysis::cutEdgeVertexTable(*g);
             //cout << "cut edge precent = " << Analysis::cutEdgePercent(*g) << endl;
         }
     }

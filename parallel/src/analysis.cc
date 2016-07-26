@@ -12,6 +12,10 @@
  */
 
 #include <iostream>
+#include <string>
+#include <vector>
+#include <iterator>
+#include <algorithm>
 #include "analysis.h"
 #include "partition.h"
 
@@ -157,4 +161,24 @@ void Analysis::manuallyPartition(const Graph& g) {
         }
     }
 }
+
+/*
+ * ===  FUNCTION  ======================================================================
+ *         Name:  outputTimes
+ *  Description:  output the times into a file
+ * =====================================================================================
+ */
+
+void Analysis::outputTimes(const int& procs, const vector<double>& vec) {
+    string filename("./times/parallel_");
+    filename += to_string(procs);
+    filename += ".dat";
+    ofstream Output(filename, ios::out | ios::binary | ios::trunc);
+    Output << "procs\tLanczos\tTqli\tpartition\t" << endl;
+    Output << procs << "\t";
+    std::ostream_iterator<double> outIter(Output, "\t");
+    std::copy(vec.begin(), vec.end(), outIter);
+    Output.close();
+}
+
 

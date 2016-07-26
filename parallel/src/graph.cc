@@ -190,7 +190,7 @@ void Graph::printDotFormat() const {
 
 void Graph::outputDotFormat(const string& filename) const {
     int num_of_vertex = G.size();
-    ofstream Output(filename);
+    ofstream Output(filename, ios::out | ios::binary | ios::trunc);
 
     Output << "Undirected Graph {" << endl;
     if (Colour.size() == 0)
