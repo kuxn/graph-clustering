@@ -171,7 +171,7 @@ void Analysis::manuallyPartition(const Graph& g) {
  */
 
 void Analysis::outputTimes(const int& procs, const int& size, const vector<double>& vec) {
-    string filename("./benchmarks/times/t_");
+    string filename("./times/t_");
     filename += to_string(procs);
     filename += ".dat";
     ofstream Output(filename, ios::out | ios::binary | ios::app);

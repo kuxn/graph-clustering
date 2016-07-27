@@ -98,11 +98,13 @@ int main(int argc, char* argv[]) {
     world.barrier();
 
     if (output && world.rank() != 0) {
-        filename = "./output/parallel_";
-        filename += to_string(g->localSize());
-        filename += "v_";
-        filename += to_string(g->rank());
-        filename += "r.dot";
+		filename = "./output/temp_";
+		filename += to_string(vertices);
+		filename += "v_";
+		filename += to_string(g->localSize());
+		filename += "lv_";
+		filename += to_string(g->rank());
+		filename += "r.dot";
         g->outputDotFormat(filename);
     }
     world.barrier();
@@ -110,9 +112,11 @@ int main(int argc, char* argv[]) {
     if (world.rank() == 0) {
         if (output) {
             for (int rank = 1; rank < world.size(); rank++) {
-                filename = "./output/parallel_";
-                filename += to_string(vertices/world.size());
+                filename = "./output/temp_";
+                filename += to_string(vertices);
                 filename += "v_";
+                filename += to_string(vertices/world.size());
+                filename += "lv_";
                 filename += to_string(rank);
                 filename += "r.dot";
                 g->readDotFormatWithColour(filename);
