@@ -170,15 +170,16 @@ void Analysis::manuallyPartition(const Graph& g) {
  * =====================================================================================
  */
 
-void Analysis::outputTimes(const int& procs, const vector<double>& vec) {
-    string filename("./times/parallel_");
+void Analysis::outputTimes(const int& procs, const int& size, const vector<double>& vec) {
+    string filename("./benchmarks/times/t_");
     filename += to_string(procs);
     filename += ".dat";
-    ofstream Output(filename, ios::out | ios::binary | ios::trunc);
-    Output << "procs\tLanczos\tTqli\tpartition\t" << endl;
-    Output << procs << "\t";
+    ofstream Output(filename, ios::out | ios::binary | ios::app);
+    //Output << "procs\tlanczos\ttqli\tpartition\t" << endl;
+    Output << procs << "\t" << size << "\t";
     std::ostream_iterator<double> outIter(Output, "\t");
     std::copy(vec.cbegin(), vec.cend(), outIter);
+	Output << endl;
     Output.close();
 }
 

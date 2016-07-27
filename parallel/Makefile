@@ -42,6 +42,10 @@ tester: $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBDIR) $(LDLIBS)
 	time ./tester
 
+plot:
+	chmod +x ./benchmarks/plot.sh
+	./benchmarks/plot.sh
+	
 output: main
 	time ./main > graph.dot
 

@@ -97,32 +97,40 @@ int main(int argc, char* argv[]) {
     Partition partition(*g, subgraphs, gram_schmidt);
     world.barrier();
 
-    if (output) {
-        string filename("./output/parallel_");
+    if (output && world.rank() != 0) {
+        filename = "./output/parallel_";
         filename += to_string(g->localSize());
         filename += "v_";
         filename += to_string(g->rank());
         filename += "r.dot";
         g->outputDotFormat(filename);
     }
-
     world.barrier();
     // Read all the vertices to rank 0
-    if (output && world.rank() == 0) {
-        for (int rank = 1; rank < world.size(); rank++) {
-            filename = "./output/parallel_";
-            filename += to_string(vertices/world.size());
+    if (world.rank() == 0) {
+        if (output) {
+            for (int rank = 1; rank < world.size(); rank++) {
+                filename = "./output/parallel_";
+                filename += to_string(vertices/world.size());
+                filename += "v_";
+                filename += to_string(rank);
+                filename += "r.dot";
+                g->readDotFormatWithColour(filename);
+            }
+            filename = "./output/result_";
+            filename += to_string(g->globalSize());
             filename += "v_";
-            filename += to_string(rank);
-            filename += "r.dot";
-            g->readDotFormatWithColour(filename);
+            filename += to_string(subgraphs);
+            filename += "s.dot";
+            g->outputDotFormat(filename);
         }
         //g->printDotFormat();
         //partition.printLapEigenvalues();
         //partition.printLapEigenMat();
-        Analysis::outputTimes(world.size(), partition.times);
+        Analysis::outputTimes(world.size(), vertices, partition.times);
         Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
+
     //fstream Output;
     //for (int proc = 0; proc < world.size(); proc++) {
     //	if (world.rank() == proc) {

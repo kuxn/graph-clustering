@@ -24,7 +24,7 @@ class Analysis {
     public:
         static void cutEdgeVertexTable(const Graph& g, const std::vector<double>& ritz_values);
         static void manuallyPartition(const Graph& g);
-        static void outputTimes(const int& procs, const std::vector<double>& vec);
+        static void outputTimes(const int& procs, const int& size, const std::vector<double>& vec);
 };
 
 #endif   

@@ -220,12 +220,12 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
 
     transform(g_local, m);
     if (SO && g_local.rank() == 0) {
-        //cout << "m = " << m << endl;
-        //cout << "t = " << t << endl;
+        cout << "m = " << m << endl;
+        cout << "t = " << t << endl;
         cout << "Lanczos algorithm WITH Selective Orthogonalisation is done." << endl;
     } else if (g_local.rank() == 0) {
-        //cout << "m = " << m << endl;
-        //cout << "t = " << t << endl;
+        cout << "m = " << m << endl;
+        cout << "t = " << t << endl;
         cout << "Lanczos algorithm WITHOUT Selective Orthogonalisation is done." << endl;
     }
 }
