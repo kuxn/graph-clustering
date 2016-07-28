@@ -98,7 +98,8 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
     cout << "Vertices:  " << g.size() << endl;
     cout << "Edges:     " << g.edgesNum() << endl;
     cout << "Colours:   " << subgraphs << endl;
-    cout << "Used Ritz values: "; copy(ritz_values.cbegin(), ritz_values.cend(), it_double);
+    cout << "Used Ritz values: ";
+    copy(ritz_values.cbegin(), ritz_values.cend(), it_double);
     cout << endl << "Cut Edge Percent: " << cutEdgePercent(g) * 100 << "%" << endl;
     cout << "/*-----------------------------------------------------------------------------" << endl;
     cout << " * Number of vertices in each subgraph" << endl;
@@ -109,7 +110,7 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
     }
     cout << endl;
     cout << "Vertices:  " << "\t";
-	copy(cut_vertex_table.cbegin(), cut_vertex_table.cend(), it_int);
+    copy(cut_vertex_table.cbegin(), cut_vertex_table.cend(), it_int);
     cout << endl;
     cout << "/*-----------------------------------------------------------------------------" << endl;
     cout << " * Edges table after partitioning" << endl;
@@ -171,7 +172,7 @@ void Analysis::manuallyPartition(const Graph& g) {
  */
 
 void Analysis::outputTimes(const int& procs, const int& size, const vector<double>& vec) {
-    string filename("./times/t_");
+    string filename("./times/");
     filename += to_string(procs);
     filename += ".dat";
     ofstream Output(filename, ios::out | ios::binary | ios::app);
@@ -179,8 +180,6 @@ void Analysis::outputTimes(const int& procs, const int& size, const vector<doubl
     Output << procs << "\t" << size << "\t";
     std::ostream_iterator<double> outIter(Output, "\t");
     std::copy(vec.cbegin(), vec.cend(), outIter);
-	Output << endl;
+    Output << endl;
     Output.close();
 }
-
-

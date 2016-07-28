@@ -164,6 +164,24 @@ void Analysis::manuallyPartition(const Graph& g) {
     }
 }
 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  outputTimes
+ *  Description:  outputTimes for the times vectors from partition function
+ * =====================================================================================
+ */
+
+void Analysis::outputTimes(const int& size, const vector<double>& vec) {
+    string filename("./times/1.dat");
+    ofstream Output(filename, ios::out | ios::binary | ios::app);
+    //Output << "procs\tlanczos\ttqli\tpartition\t" << endl;
+    Output << 1 << "\t" << size << "\t";
+    std::ostream_iterator<double> outIter(Output, "\t");
+    std::copy(vec.cbegin(), vec.cend(), outIter);
+	Output << endl;
+    Output.close();
+}
+
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  benchmarks
@@ -172,15 +190,14 @@ void Analysis::manuallyPartition(const Graph& g) {
  */
 
 void Analysis::benchmarks(bool GramSchmidt) {
-    vector<std::string> filenames = {"./test/par_test_100.dot",
-                                     "./test/par_test_200.dot",
-                                     "./test/par_test_500.dot",
-                                     "./test/par_test_1k.dot",
-                                     "./test/par_test_5k.dot",
-                                     "./test/par_test_10k.dot",
-                                     //"./test/par_test_102k.dot",
+    vector<std::string> filenames = {"./test/par_test_1024.dot",
+                                     "./test/par_test_2048.dot",
+                                     "./test/par_test_5120.dot",
+                                     "./test/par_test_10240.dot",
+                                     "./test/par_test_102400.dot",
                                     };
-    vector<int> subgraphs = {2, 4, 8, 16, 32, 64};
+    //vector<int> subgraphs = {2, 4, 8, 16, 32, 64};
+    vector<int> subgraphs = {8};
     vector<std::vector<std::vector<double>>> output_times;
     cout << "filenames.size() = " << filenames.size() << endl;
 
@@ -193,6 +210,7 @@ void Analysis::benchmarks(bool GramSchmidt) {
         vector<std::vector<double>> subgraph_times;
         for (unsigned int j = 0; j < subgraphs.size(); j++) {
             Partition partition(g, subgraphs[j], GramSchmidt);
+			outputTimes(g.size(), partition.times);
             subgraph_times.push_back(partition.times);
         }
         output_times.push_back(subgraph_times);
@@ -204,7 +222,7 @@ void Analysis::benchmarks(bool GramSchmidt) {
      *  Output times: Lanczos - 0; TQLI - 1; Partition - 2;
      *-----------------------------------------------------------------------------*/
     for (int i = 0; i < 3; i++) {
-        string filename("./graphs/serial_");
+        string filename("./times/serial_");
         filename += to_string(i);
         filename += ".dat";
         ofstream Output(filename, ios::out | ios::binary | ios::trunc);

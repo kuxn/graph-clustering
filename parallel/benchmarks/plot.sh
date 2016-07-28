@@ -3,12 +3,13 @@
 i=3
 for f in lanczos.dat tqli.dat partition.dat
 do
-#paste ./*.dat | awk -F" " '{printf("%s ", $2);for(x=index;x<=NF;x+=5)printf("%s ",$x); printf("\n");}' > $f
-paste ./times/*.dat | awk -F" " -v i=$i 'BEGIN{ORS="";}{print $2," "; for(x=i;x<=NF;x+=5)print $x," "; print "\n";}' > $f
-let i++
-#sed -i '' '1d' $f
-sed -i '' '1i\
-Vertices  "4 procs" "8 procs"  "16 procs"   "32 procs"  "64 procs"
-' $f
+	echo "Procs 1024 2048 5120 10240 102400" > $f
+	#awk -F" " '{print $2; print "\n";}' ./times/t_16.dat | xargs > $f
+	for t in $(ls ./times | sort -n)
+	do
+	echo $t
+	awk -F" " -v i=$i 'FNR == 1 {print $1}{print $i; print "\n";}' ./times/$t | xargs >> $f
+	done
+	let i++
 done
 gnuplot < plot.gp
