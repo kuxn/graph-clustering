@@ -54,14 +54,15 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 	times.push_back(t_lan);
     laplacian_eigenvalues_ = lanczos.alpha_global;
     Vector beta = lanczos.beta_global;
-
+    //int size = g.localSize();
+    
 #ifdef Debug
     cout << endl;
     if (g.rank() == 0) {
         cout << "lanczos matrix: " << endl;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                cout << lanczos.lanczos_vecs_global[i][j] << "\t";
+                cout << lanczos.lanczos_vecs_local[i][j] << "\t";
             }
             cout << endl;
         }
@@ -120,17 +121,17 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         //fiedler_index--;
         vector_index = it->second;
 		ritz_values.push_back(it->first);
-        if (g.rank() == 0) {
-            cout << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
-        }
+        //if (g.rank() == 0) {
+        cout << "in rank " << g.rank() << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
+        //}
         hashmap.erase(it);
-        laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs_global, tri_eigen_vecs, vector_index);
+        laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs_local, tri_eigen_vecs, vector_index);
     }
 
     for (int vertex = 0; vertex < g.localSize(); vertex++) {
         int colour = 0;
         for (int row = 0; row < num_of_eigenvec; row++) {
-            colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][g.globalIndex(vertex)]);
+            colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][vertex]);
         }
         g.setColour(g.globalIndex(vertex), colour);
         //if (g.globalIndex(vertex) < 10) {
@@ -242,7 +243,7 @@ void Partition::getLapEigenMat(const Graph& g, bool GramSchmidt) {
     for (int k = 0; k < size; k++) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                laplacian_eigen_mat_[k][i] += lanczos.lanczos_vecs_global[j][i] * tri_eigen_vecs[j][k];
+                laplacian_eigen_mat_[k][i] += lanczos.lanczos_vecs_local[j][i] * tri_eigen_vecs[j][k];
             }
         }
     }

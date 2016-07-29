@@ -27,12 +27,15 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <boost/mpi.hpp>
 
 class Graph {
     private:
+        boost::mpi::communicator world;
         int local_size_;
         int global_size_;
         int rank_;
+        std::vector<int> global_index_;
         std::unordered_map<int, int> local_index_;
         typedef std::unordered_set<int> SetOfNeighbours;
         std::unordered_map<int, SetOfNeighbours> G;
@@ -64,7 +67,6 @@ class Graph {
         const int rank() const;
         const int globalIndex(int local_index) const;
         const int localIndex(int global_index) const;
-        std::vector<int> global_index;
         std::vector<int> global_rank_map;
 };
 

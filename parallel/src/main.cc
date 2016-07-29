@@ -137,6 +137,7 @@ int main(int argc, char* argv[]) {
         Analysis::outputTimes(world.size(), vertices, partition.times);
         Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
+	//partition.printLapEigenMat();
 
     //fstream Output;
     //for (int proc = 0; proc < world.size(); proc++) {

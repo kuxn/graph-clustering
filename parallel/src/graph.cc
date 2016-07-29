@@ -81,7 +81,7 @@ const int Graph::rank() const {
 }
 
 const int Graph::globalIndex(int local_index) const {
-    return global_index[local_index];
+    return global_index_[local_index];
 }
 
 const int Graph::localIndex(int global_index) const {
@@ -417,7 +417,7 @@ void Graph::readDotFormatByColour(const string& filename) {
     while (In.good()) {
         if (colour == rank_) {
             vertex_set.insert(vertex);
-            global_index.push_back(vertex);
+            global_index_.push_back(vertex);
             local_index_.insert({vertex, local_size_});
             local_size_++;
         }
@@ -445,12 +445,6 @@ void Graph::readDotFormatByColour(const string& filename) {
         In.ignore(INT_MAX, '\n');
     }
     In.close();
-
-    //cout << "global rank map:" << endl;
-    //for (unsigned int i = 0; i < global_rank_map.size(); i++) {
-    //    cout << i << "-> " << global_rank_map[i] << endl;
-    //}
-
     if (local_size_ == 0) {
         std::cerr << "ERROR: Number of processes and colours should match." << endl;
         exit(-1);
