@@ -59,6 +59,7 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
     int subgraphs = g.subgraphsNum();
 
     //cout << "subgraphs = " << subgraphs << endl;
+    cout << "size = " << size << endl;
 
     std::unordered_map<int, std::vector<int>> cut_edge_table;
     std::vector<int> cut_vertex_table(subgraphs, 0);

@@ -81,11 +81,11 @@ const int Graph::rank() const {
 }
 
 const int Graph::globalIndex(int local_index) const {
-    return local_index + rank_ * local_size_;
+    return global_index[local_index];
 }
 
 const int Graph::localIndex(int global_index) const {
-    return global_index - rank_ * local_size_;
+    return local_index_.at(global_index);
 }
 
 /*
@@ -146,11 +146,11 @@ const int Graph::subgraphsNum() const {
         return 1;
     }
 
-    unordered_map<int, int> reverse_colour_map;
+    unordered_map<int, int> reverse_vertex_set;
     for (const auto& it:Colour) {
-        reverse_colour_map.insert({it.second, it.first});
+        reverse_vertex_set.insert({it.second, it.first});
     }
-    return reverse_colour_map.size();
+    return reverse_vertex_set.size();
 }
 
 const unordered_map<int, std::unordered_set<int>>::const_iterator Graph::find(int vertex) const {
@@ -167,15 +167,15 @@ const unordered_map<int, std::unordered_set<int>>::const_iterator Graph::find(in
 void Graph::printDotFormat() const {
     int num_of_vertex = G.size();
     cout << "Undirected Graph {" << endl;
-    if (Colour.size() == 0)
+    if (Colour.size() == 0) {
         for (int vertex = 0; vertex < num_of_vertex; vertex++) {
             cout << globalIndex(vertex) << ";" << endl;
         }
-    else
+    } else {
         for (int vertex = 0; vertex < num_of_vertex; vertex++) {
             cout << globalIndex(vertex) << "[Colour=" << getColour(globalIndex(vertex)) << "];" << endl;
         }
-
+    }
     for (int vertex = 0; vertex < num_of_vertex; vertex++) {
         auto it = G.find(globalIndex(vertex));
         for (const int& neighbour:it->second)
@@ -206,6 +206,32 @@ void Graph::outputDotFormat(const string& filename) const {
         auto it = G.find(globalIndex(vertex));
         for (const int& neighbour:it->second)
             Output << globalIndex(vertex) << "--" << neighbour << " ;" << endl;
+    }
+    Output << "}" << endl;
+}
+
+/*-----------------------------------------------------------------------------
+ *  Modified function to output the graph into dot file for rank0
+ *-----------------------------------------------------------------------------*/
+
+void Graph::outputResult(const string& filename) const {
+    int num_of_vertex = G.size();
+    ofstream Output(filename, ios::out | ios::binary | ios::trunc);
+
+    Output << "Undirected Graph {" << endl;
+    if (Colour.size() == 0)
+        for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+            Output << vertex << ";" << endl;
+        }
+    else
+        for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+            Output << vertex << "[Colour=" << getColour(vertex) << "];" << endl;
+        }
+
+    for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+        auto it = G.find(vertex);
+        for (const int& neighbour:it->second)
+            Output << vertex << "--" << neighbour << " ;" << endl;
     }
     Output << "}" << endl;
 }
@@ -361,3 +387,73 @@ void Graph::readDotFormatWithColour(const string& filename) {
     }
     In.close();
 }
+
+/*
+ * ===  FUNCTION  ======================================================================
+ *         Name:  readDotFormatByColour
+ *  Description:  Each process read the vertices having same colour and the corresponding edges;
+ * =====================================================================================
+ */
+
+void Graph::readDotFormatByColour(const string& filename) {
+
+    ifstream In(filename);
+    if (!In.is_open()) {
+        std::cerr << "ERROR: Can't open the file" << endl;
+        exit(-1);
+    }
+    In.ignore(INT_MAX, '{'); // Ignore the chars before the value of colour
+    int vertex = 0, colour = 0;
+    In >> vertex;
+    int first_vertex = vertex;
+    //cout << "vertex = " << vertex << endl;
+    In.ignore(INT_MAX, '='); // Ignore the chars before the value of colour
+    In >> colour;
+    //cout << "colour = " << colour << endl;
+    In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
+
+    unordered_set<int> vertex_set; // vertices with same colour
+    local_size_ = 0;
+    while (In.good()) {
+        if (colour == rank_) {
+            vertex_set.insert(vertex);
+            global_index.push_back(vertex);
+            local_index_.insert({vertex, local_size_});
+            local_size_++;
+        }
+        global_rank_map.push_back(colour); // Look the rank/colour of any global vertex
+        In >> vertex;
+        if (vertex == first_vertex) break; // Break the loop at the beginning of edge line
+        In.ignore(INT_MAX, '=');
+        In >> colour;
+        In.ignore(INT_MAX, '\n');
+    }
+    
+
+    int from = first_vertex, to = 0;
+    //cout << "first vertex = " << first_vertex << endl;
+    In.ignore(2); // Ignore "--"
+    In >> to;
+    In.ignore(INT_MAX, '\n');
+    while (In.good()) {
+        if (vertex_set.find(from) != vertex_set.end()) {
+            addEdge(from, to);
+        }
+        In >> from;
+        In.ignore(2); // Ignore "--"
+        In >> to;
+        In.ignore(INT_MAX, '\n');
+    }
+    In.close();
+
+    //cout << "global rank map:" << endl;
+    //for (unsigned int i = 0; i < global_rank_map.size(); i++) {
+    //    cout << i << "-> " << global_rank_map[i] << endl;
+    //}
+
+    if (local_size_ == 0) {
+        std::cerr << "ERROR: Number of processes and colours should match." << endl;
+        exit(-1);
+    }
+}
+

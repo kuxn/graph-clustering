@@ -22,8 +22,10 @@ class Tests {
         static bool testReothogonalisation();
         static bool testReadGraph();
         static bool testReadGraphWithColour();
+        static bool testReadByColour();
         static bool testCutEdgePercent();
         static bool testCutEdgeNodeTable();
+        static bool testPartitionWithSubgraphs();
 };
 
 #endif

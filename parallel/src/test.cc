@@ -24,7 +24,7 @@
 
 using namespace std;
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  testPartition
  *  Description:  Partitioning is based on the correctness of the calculation of eigenvalues and corresponding eigenvectors of the Laplacian matrix
@@ -54,7 +54,7 @@ bool Tests::testPartition() {
     return true;
 }
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  testReadGraph
  *  Description:  Test the read function, can not verify the correctness in unit testing, but can test the performance
@@ -62,17 +62,12 @@ bool Tests::testPartition() {
  */
 
 bool Tests::testReadGraph() {
-
     mpi::environment env;
     mpi::communicator world;
-
     Graph g;
-    int num = 500;
-
+    int num = 500, rank = 0;
     g.init(world.rank(), num, num/world.size());
     g.readDotFormat("par_test_500.dot");
-
-    int rank = 0;
     if (world.rank() == rank) {
         g.printDotFormat();
         cout << "rank = " << world.rank() << endl;
@@ -80,14 +75,63 @@ bool Tests::testReadGraph() {
         cout << "num of edges = " << g.edgesNum() << endl;
         g.printLaplacianMat();
     }
+    env.~environment();
+    return true;
+}
 
+/*
+ * ===  FUNCTION  ======================================================================
+ *         Name:  testReadByColour
+ *  Description:  Test reading the vertices with same colours and corresponding edges
+ * =====================================================================================
+ */
+
+bool Tests::testReadByColour() {
+    mpi::environment env;
+    mpi::communicator world;
+    Graph g;
+    int num = 20, rank = 3;
+    g.init(world.rank(), num, num/world.size());
+    g.readDotFormatByColour("./test/par_test_8.dot");
+    if (world.rank() == rank) {
+        g.printDotFormat();
+        cout << "rank = " << world.rank() << endl;
+        cout << "size of graph = " << g.size() << endl;
+        cout << "num of edges = " << g.edgesNum() << endl;
+        //g.printLaplacianMat();
+    }
+    env.~environment();
+    return true;
+}
+
+/*
+ * ===  FUNCTION  ======================================================================
+ *         Name:  testPartitionWithSubgraphs
+ *  Description:  Test the partition with partitioned graph
+ * =====================================================================================
+ */
+
+bool Tests::testPartitionWithSubgraphs() {
+    mpi::environment env;
+    mpi::communicator world;
+    Graph g;
+    int num = 102400, rank = 3, subgraphs = 2;
+    bool gram_schmidt = true;
+    g.init(world.rank(), num, num/world.size());
+    g.readDotFormatByColour("./pfs_test_4s/par_test_102400.dot");
+    if (world.rank() == rank) {
+        g.printDotFormat();
+        cout << "rank = " << world.rank() << ", size of graph = " << g.size() << ", num of edges = " << g.edgesNum() << endl;
+        //g.printLaplacianMat();
+    }
+    Partition partition(g, subgraphs, gram_schmidt);
     env.~environment();
     return true;
 }
 
 int main() {
-
-    Tests::testReadGraph();
+    Tests::testPartitionWithSubgraphs();
+    //Tests::testReadByColour();
     //Tests::testPartition();
 
     return 0;

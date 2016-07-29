@@ -41,7 +41,7 @@ clean:
 
 tester: $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBDIR) $(LDLIBS)
-	time ./tester
+	mpirun -np 2 ./tester
 
 bench:
 	make -C benchmarks bench

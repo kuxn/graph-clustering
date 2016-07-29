@@ -120,9 +120,9 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         //fiedler_index--;
         vector_index = it->second;
 		ritz_values.push_back(it->first);
-        //if (g.rank() == 0) {
-        //    cout << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
-        //}
+        if (g.rank() == 0) {
+            cout << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
+        }
         hashmap.erase(it);
         laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs_global, tri_eigen_vecs, vector_index);
     }
@@ -133,6 +133,9 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
             colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][g.globalIndex(vertex)]);
         }
         g.setColour(g.globalIndex(vertex), colour);
+        //if (g.globalIndex(vertex) < 10) {
+        //    cout << "vertex " << g.globalIndex(vertex) << ", colour = " << colour << endl;
+        //}
     }
     double t_par = timer_partition.elapsed();
     if (g.rank() == 0) {

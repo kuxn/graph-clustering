@@ -26,12 +26,14 @@
 #include <unordered_map>
 #include <fstream>
 #include <string>
+#include <vector>
 
 class Graph {
     private:
         int local_size_;
         int global_size_;
         int rank_;
+        std::unordered_map<int, int> local_index_;
         typedef std::unordered_set<int> SetOfNeighbours;
         std::unordered_map<int, SetOfNeighbours> G;
         mutable std::unordered_map<int, int> Colour;
@@ -47,11 +49,13 @@ class Graph {
 
         void printDotFormat() const;
         void outputDotFormat(const std::string& filename) const;
+        void outputResult(const std::string& filename) const;
         void printLaplacianMat() const;
         void setColour(int vertex, int colour) const;
         const int getColour(int vertex) const;
         void readDotFormat(const std::string& filename);
         void readDotFormatWithColour(const std::string& filename);
+        void readDotFormatByColour(const std::string& filename);
         const std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
 
         void init(int rank, int global_size, int local_size);
@@ -60,6 +64,8 @@ class Graph {
         const int rank() const;
         const int globalIndex(int local_index) const;
         const int localIndex(int global_index) const;
+        std::vector<int> global_index;
+        std::vector<int> global_rank_map;
 };
 
 #endif

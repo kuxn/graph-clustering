@@ -148,7 +148,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
     int local_size = g_local.localSize(), t = 0;
     int global_size = g_local.globalSize();
     int m, scale;
-    double tol = 1e-6;
+    double tol = 1e-7;
 
     if (num_of_eigenvec == 1) {
         //SO = false;
@@ -158,28 +158,40 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
     } else {
         scale = num_of_eigenvec + 2;
     }
-    cout << "scale = " << scale << endl;
+    //cout << "scale = " << scale << endl;
     if (round(log10(global_size)) > 3) {
         scale -= round(log10(std::sqrt(global_size)));
         scale = scale <= 0 ? 1:scale;
     }
     m = scale * std::sqrt(global_size) < global_size ? scale * std::sqrt(global_size):global_size;
     int size = global_size;
-    cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
+    //cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
 
-    cout << "scale = " << scale << endl;
+    //cout << "scale = " << scale << endl;
+	//m = size;
     cout << "m = " << m << endl;
 
     Vector v1_halo(global_size);
     Vector v0_local = init(g_local);
+
+	cout << "global_dot = " << dot(v0_local, v0_local) << endl;
     Vector v1_local = v0_local, w_local, v0_start = v0_local;
     T alpha_val_global = 0.0, beta_val_global = 0.0;
 
     lanczos_vecs_local[0] = v1_local;
     haloInit(g_local);
-
+	
     for (int iter = 1; iter < m; iter++) {
         haloUpdate(g_local, v1_local, v1_halo);
+
+		//if (world.rank() == 0) {
+		//	cout << "v1_halo: ";
+		//	for (const auto& x:v1_halo) {
+		//		cout << x << " ";
+		//	}
+		//}
+		//cout << endl;
+
         w_local = multGraphVec(g_local, v1_halo);
 
         alpha_val_global = dot(v1_local, w_local);
@@ -228,6 +240,18 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
         cout << "t = " << t << endl;
         cout << "Lanczos algorithm WITHOUT Selective Orthogonalisation is done." << endl;
     }
+	//if (world.rank() == 0) {
+	//	cout << "alpha: " << endl;
+	//for (const auto& x:alpha_global) {
+	//	cout << x << endl;
+	//}
+	//
+	//cout << "beta: " << endl;
+	//for (const auto& x:beta_global) {
+	//	cout << x << endl;
+	//}	
+	//}
+
 }
 #endif /* end-if SO */
 
@@ -246,7 +270,7 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
         auto it = g.find(g.globalIndex(vertex));
         if (!it->second.empty()) {
             for (const int& neighbour:it->second) {
-                int rank = neighbour / size;
+                int rank = g.global_rank_map[neighbour];
                 if (rank != g.rank()) {
                     auto it = halo_recv.find(rank);
                     if (it != halo_recv.end()) {
@@ -264,6 +288,7 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
                     } else {
                         std::unordered_set<int> halo_neighbours;
                         halo_neighbours.insert(g.globalIndex(vertex));
+                        //halo_neighbours.insert(vertex);
                         halo_send.insert(make_pair(rank, halo_neighbours));
                     }
                 }
@@ -291,6 +316,8 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
                 std::unordered_map<int, T> buf_temp;
                 for (const int& halo_neighbour:it->second) {
                     buf_temp.insert({halo_neighbour, v_local[g.localIndex(halo_neighbour)]}); // global index, locale value
+                    //buf_temp.insert({halo_neighbour, v_local[halo_neighbour]}); // global index, locale value
+					//cout << "In rank " << g.rank() << ", send buffer " << halo_neighbour << " with local index " << g.localIndex(halo_neighbour) << endl;
                 }
                 buf_send[rank] = buf_temp;
                 reqs.push_back(world.isend(rank, 0, buf_send[rank])); //(dest, tag, value to send)
@@ -306,6 +333,7 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
         } else {
             for (int j = 0; j < g.localSize(); j++) {
                 v_halo[g.globalIndex(j)] = v_local[j];
+				//cout << "In rank " << g.rank() << ", fill in local halo vector " << g.globalIndex(j) << endl;
             }
         }
     }
@@ -319,6 +347,7 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
             if (it != halo_recv.end()) {
                 for (const int& halo_neighbour:it->second) {
                     v_halo[halo_neighbour] = buf_temp[halo_neighbour]; //(src, tag, store to value)
+					//cout << "In rank " << g.rank() << ", recv buffer " << halo_neighbour << " store in halo" << endl;
                 }
             }
         }
@@ -436,12 +465,11 @@ Vector Lanczos<Vector, T>::init(const Graph& g) {
     Vector vec(local_size);
     for (auto& x:vec) {
         x = gen(generator);
-        //x = i;
     }
     T norm_local = norm(vec);
     for (auto& x:vec) {
         x /= norm_local;
-        x /= sqrt(g.globalSize()/local_size); // vec[i]/=sqrt(procs), to make sure the global vector is normalised
+        x /= sqrt(world.size()); // vec[i]/=sqrt(procs), to make sure the global vector is normalised
     }
     return vec;
 }
@@ -450,18 +478,51 @@ template<typename Vector, typename T>
 void Lanczos<Vector, T>::transform(const Graph& g, const int& m) {
 
     std::vector<std::unordered_map<int, Vector>> gather;
+	std::vector<int> local_size_lookup;
+	std::vector<std::vector<int>> global_index_lookup;
     all_gather(world, lanczos_vecs_local, gather);
+    all_gather(world, g.localSize(), local_size_lookup);
+    all_gather(world, g.global_index, global_index_lookup);
+    //for(unsigned int i = 0; i < local_size_lookup.size(); i++) {
+	//	cout << i << "->" << local_size_lookup[i] << endl;	
+	//}
 
     Vector vinitial(g.globalSize(), 0);
     for(int i = 0; i < m; i++)	lanczos_vecs_global[i] = vinitial;
 
+	//if (g.rank() == 0) {
+	//	cout << "Lanczos local vectors:" << endl;
+	//	for (unsigned int i = 0; i < lanczos_vecs_local.size(); i++) {
+	//		auto it = lanczos_vecs_local.find(i);
+	//		cout << "rank " << g.rank() << ": ";
+	//		for (auto x:it->second) {
+	//			cout << x << " ";
+	//		}
+	//		cout << endl;
+	//	}
+	//}
+
     for (int row = 0; row < m; row ++) {
         for (int i = 0; i < world.size(); i++) {
-            for (int j = 0; j < g.localSize(); j++) {
-                lanczos_vecs_global[row][i * g.localSize() + j] = gather[i][row][j];
+            for (int j = 0; j < local_size_lookup[i]; j++) {
+                lanczos_vecs_global[row][global_index_lookup[i][j]] = gather[i][row][j];
             }
         }
     }
+	//cout << "I am here1" << endl;
+	//cout << "rank = " << world.rank() << ", local_size = " << g.localSize() << endl;
+
+	//if (g.rank() == 0) {
+	//	cout << "Lanczos global vectors:" << endl;
+	//	for (unsigned int i = 0; i < lanczos_vecs_global.size(); i++) {
+	//		auto it = lanczos_vecs_global.find(i);
+	//		cout << "rank " << g.rank() << ": ";
+	//		for (auto x:it->second) {
+	//			cout << x << " ";
+	//		}
+	//		cout << endl;
+	//	}
+	//}
 }
 
 template<typename Vector, typename T>

@@ -71,7 +71,8 @@ int main(int argc, char* argv[]) {
         if (world.rank() == 0) {
             cout << "Input file is \"" << filename  << "\""<< endl;
         }
-        g->readDotFormat(filename);
+        //g->readDotFormat(filename);
+        g->readDotFormatByColour(filename);
     } else {
         if (world.rank() == 0) {
             cout << "Please set file name and number of vertices" << endl;
@@ -86,7 +87,7 @@ int main(int argc, char* argv[]) {
             cout << "number of processes = " << world.size() << "." << endl;
         }
     } else {
-        subgraphs = 2;
+        subgraphs = 4;
         if (world.rank() == 0 && read_graph) {
             cout << "default argument: subgraphs = " << subgraphs << "." << endl;
             cout << "number of processes = " << world.size() << "." << endl;
@@ -95,16 +96,18 @@ int main(int argc, char* argv[]) {
 
     world.barrier();
     Partition partition(*g, subgraphs, gram_schmidt);
+    std::vector<int> local_size_lookup;
+    all_gather(world, g->localSize(), local_size_lookup);
     world.barrier();
 
     if (output && world.rank() != 0) {
-		filename = "./output/temp_";
-		filename += to_string(vertices);
-		filename += "v_";
-		filename += to_string(g->localSize());
-		filename += "lv_";
-		filename += to_string(g->rank());
-		filename += "r.dot";
+        filename = "./output/temp_";
+        filename += to_string(vertices);
+        filename += "v_";
+        filename += to_string(g->localSize());
+        filename += "lv_";
+        filename += to_string(g->rank());
+        filename += "r.dot";
         g->outputDotFormat(filename);
     }
     world.barrier();
@@ -115,7 +118,7 @@ int main(int argc, char* argv[]) {
                 filename = "./output/temp_";
                 filename += to_string(vertices);
                 filename += "v_";
-                filename += to_string(vertices/world.size());
+                filename += to_string(local_size_lookup[rank]);
                 filename += "lv_";
                 filename += to_string(rank);
                 filename += "r.dot";
@@ -126,7 +129,7 @@ int main(int argc, char* argv[]) {
             filename += "v_";
             filename += to_string(subgraphs);
             filename += "s.dot";
-            g->outputDotFormat(filename);
+            g->outputResult(filename);
         }
         //g->printDotFormat();
         //partition.printLapEigenvalues();
