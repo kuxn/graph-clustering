@@ -48,20 +48,21 @@ class Graph {
         Graph() {}
         Graph(int n); // Construct a random graph with n vertices
 
+        const std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
         const int edgesNum() const;
         const int subgraphsNum() const;
         const int size() const;
 
+        void setColour(int vertex, int colour) const;
+        const int getColour(int vertex) const;
+
+        void readDotFormat(const std::string& filename, const int& global_size);
+        void readDotFormatWithColour(const std::string& filename);
+        void readDotFormatByColour(const std::string& filename, const int& global_size);
         void printDotFormat() const;
         void outputDotFormat(const std::string& filename) const;
         void outputResult(const std::string& filename) const;
         void printLaplacianMat() const;
-        void setColour(int vertex, int colour) const;
-        const int getColour(int vertex) const;
-        void readDotFormat(const std::string& filename, const int& global_size);
-        void readDotFormatWithColour(const std::string& filename);
-        void readDotFormatByColour(const std::string& filename, const int& global_size);
-        const std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
 
         const int globalSize() const;
         const int localSize() const;

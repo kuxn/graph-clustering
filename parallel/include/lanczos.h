@@ -26,10 +26,9 @@ class Lanczos {
         Vector init(const Graph& g);
         Vector multGraphVec(const Graph& g, const Vector& vec);
         inline T dot(const Vector& v1, const Vector& v2);
-        inline T dot_local(const Vector& v1, const Vector& v2);
         inline T norm(const Vector& vec);
-        inline void normalise(Vector& vec, const T& norm_global);
         inline void gramSchmidt(const int& iter, Vector& v);
+        const int getIteration(const int& num_of_eigenvec, const int & global_size);
         
         std::unordered_map<int, std::unordered_set<int>> halo_recv; // <rank, halo_neighbours to receive>
         std::unordered_map<int, std::unordered_set<int>> halo_send; // <rank, halo_neighbours to send>

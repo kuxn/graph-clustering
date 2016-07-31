@@ -29,14 +29,12 @@ using namespace std;
  */
 
 double Analysis::cutEdgePercent(const Graph& g) {
-
     int size = g.size();
     int cut_edge_num = 0;
 
     if (g.subgraphsNum() == 1) {
         return 0.0;
     }
-
     for (int vertex = 0; vertex < size; vertex++) {
         int vertex_colour = g.getColour(vertex);
         auto it = g.find(vertex);
@@ -57,9 +55,7 @@ double Analysis::cutEdgePercent(const Graph& g) {
 void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_values) {
     int size = g.size();
     int subgraphs = g.subgraphsNum();
-
     //cout << "subgraphs = " << subgraphs << endl;
-    cout << "size = " << size << endl;
 
     std::unordered_map<int, std::vector<int>> cut_edge_table;
     std::vector<int> cut_vertex_table(subgraphs, 0);

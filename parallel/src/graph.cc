@@ -57,33 +57,6 @@ Graph::Graph(int num_of_vertex) {
 
 /*
  * ===  FUNCTION  ======================================================================
- *         Name:  init
- *  Description:  Initilise the subgraph
- * =====================================================================================
- */
-
-const int Graph::globalSize() const {
-    return global_size_;
-}
-
-const int Graph::localSize() const {
-    return local_size_;
-}
-
-const int Graph::rank() const {
-    return rank_;
-}
-
-const int Graph::globalIndex(int local_index) const {
-    return global_index_[local_index];
-}
-
-const int Graph::localIndex(int global_index) const {
-    return local_index_.at(global_index);
-}
-
-/*
- * ===  FUNCTION  ======================================================================
  *         Name:  addEdge
  *  Description:  Add edges into graph
  * =====================================================================================
@@ -100,19 +73,34 @@ void Graph::addEdge(int src, int dest) {
     else {
         unordered_set<int> edges;
         edges.insert(dest);
-        G.insert(make_pair(src, edges));
+        G.insert({src, edges});
     }
-    /*
-    // Since graph is undirected, add edge dest->src
-    it = G.find(dest);
-    if (it != G.end())
-    it->second.insert(src);
-    else {
-    unordered_set<int> edges;
-    edges.insert(src);
-    G.insert(make_pair(dest, edges));
+}
+
+/*
+ * ===  FUNCTION  ======================================================================
+ *         Name:  setColour
+ *  Description:  Map colour for each vertex
+ * =====================================================================================
+ */
+
+void Graph::setColour(int vertex, int colour) const {
+    //Colour.insert({vertex, colour});
+    Colour[vertex] = colour;
+}
+
+/*
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getColour
+ *  Description:  Return the colour of the vertex
+ * =====================================================================================
+ */
+
+const int Graph::getColour(int vertex) const {
+    if (Colour.size() == 0) {
+        return 0;
     }
-    */
+    return Colour.at(vertex);
 }
 
 /*
@@ -139,7 +127,6 @@ const int Graph::subgraphsNum() const {
         cout << "WARNING:The graph hasn't been partitioned." << endl;
         return 1;
     }
-
     unordered_map<int, int> reverse_vertex_set;
     for (const auto& it:Colour) {
         reverse_vertex_set.insert({it.second, it.first});
@@ -149,6 +136,26 @@ const int Graph::subgraphsNum() const {
 
 const unordered_map<int, std::unordered_set<int>>::const_iterator Graph::find(int vertex) const {
     return G.find(vertex);
+}
+
+const int Graph::globalSize() const {
+    return global_size_;
+}
+
+const int Graph::localSize() const {
+    return local_size_;
+}
+
+const int Graph::rank() const {
+    return rank_;
+}
+
+const int Graph::globalIndex(int local_index) const {
+    return global_index_[local_index];
+}
+
+const int Graph::localIndex(int global_index) const {
+    return local_index_.at(global_index);
 }
 
 /*
@@ -187,19 +194,20 @@ void Graph::outputDotFormat(const string& filename) const {
     ofstream Output(filename, ios::out | ios::binary | ios::trunc);
 
     Output << "Undirected Graph {" << endl;
-    if (Colour.size() == 0)
+    if (Colour.size() == 0) {
         for (int vertex = 0; vertex < num_of_vertex; vertex++) {
             Output << globalIndex(vertex) << ";" << endl;
         }
-    else
+    } else {
         for (int vertex = 0; vertex < num_of_vertex; vertex++) {
             Output << globalIndex(vertex) << "[Colour=" << getColour(globalIndex(vertex)) << "];" << endl;
         }
-
+    }
     for (int vertex = 0; vertex < num_of_vertex; vertex++) {
         auto it = G.find(globalIndex(vertex));
-        for (const int& neighbour:it->second)
+        for (const int& neighbour:it->second) {
             Output << globalIndex(vertex) << "--" << neighbour << " ;" << endl;
+        }
     }
     Output << "}" << endl;
 }
@@ -213,19 +221,20 @@ void Graph::outputResult(const string& filename) const {
     ofstream Output(filename, ios::out | ios::binary | ios::trunc);
 
     Output << "Undirected Graph {" << endl;
-    if (Colour.size() == 0)
+    if (Colour.size() == 0) {
         for (int vertex = 0; vertex < num_of_vertex; vertex++) {
             Output << vertex << ";" << endl;
         }
-    else
+    } else {
         for (int vertex = 0; vertex < num_of_vertex; vertex++) {
             Output << vertex << "[Colour=" << getColour(vertex) << "];" << endl;
         }
-
+    }
     for (int vertex = 0; vertex < num_of_vertex; vertex++) {
         auto it = G.find(vertex);
-        for (const int& neighbour:it->second)
+        for (const int& neighbour:it->second) {
             Output << vertex << "--" << neighbour << " ;" << endl;
+        }
     }
     Output << "}" << endl;
 }
@@ -268,39 +277,12 @@ void Graph::printLaplacianMat() const {
 
 /*
  * ===  FUNCTION  ======================================================================
- *         Name:  setColour
- *  Description:  Map colour for each vertex
- * =====================================================================================
- */
-
-void Graph::setColour(int vertex, int colour) const {
-    //Colour.insert({vertex, colour});
-    Colour[vertex] = colour;
-}
-
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  getColour
- *  Description:  Return the colour of the vertex
- * =====================================================================================
- */
-
-const int Graph::getColour(int vertex) const {
-    if (Colour.size() == 0) {
-        return 0;
-    }
-    return Colour.at(vertex);
-}
-
-/*
- * ===  FUNCTION  ======================================================================
  *         Name:  readDotFormat
  *  Description:  Read the graph from Dot file
  * =====================================================================================
  */
 
 void Graph::readDotFormat(const string& filename, const int& global_size) {
-
     ifstream In(filename);
     if (!In.is_open()) {
         std::cerr << "ERROR: Can't open the file" << endl;
@@ -312,21 +294,21 @@ void Graph::readDotFormat(const string& filename, const int& global_size) {
     In >> to;
     In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 
-	global_size_ = global_size;
-	local_size_ = global_size / world.size();
-	rank_ = world.rank();
-	global_index_.resize(local_size_, 0);
+    global_size_ = global_size;
+    local_size_ = global_size / world.size();
+    rank_ = world.rank();
+    global_index_.resize(local_size_, 0);
 
     while (In.good()) {
         if (from >= rank_ * local_size_ && from <= (rank_ + 1) * local_size_ - 1) {
             //cout << "from = " << from << " to = " << to << endl;
             addEdge(from, to);
             global_index_[local_index] = from;
-			local_index_.insert({from, local_index});
-			In >> from;
-			if (from != global_index_[local_index]) {
-				local_index++;
-			}
+            local_index_.insert({from, local_index});
+            In >> from;
+            if (from != global_index_[local_index]) {
+                local_index++;
+            }
             In.ignore(2); // Ignore "--"
             In >> to;
             In.ignore(INT_MAX, '\n');
@@ -339,9 +321,9 @@ void Graph::readDotFormat(const string& filename, const int& global_size) {
             if (from > (rank_ + 1) * local_size_ - 1) break;
         }
     }
-	for (int i = 0; i < global_size; i++) {
-		global_rank_map.push_back(i / local_size_);
-	}
+    for (int i = 0; i < global_size; i++) {
+        global_rank_map.push_back(i / local_size_);
+    }
     In.close();
 }
 
@@ -353,7 +335,6 @@ void Graph::readDotFormat(const string& filename, const int& global_size) {
  */
 
 void Graph::readDotFormatWithColour(const string& filename) {
-
     ifstream In(filename);
     if (!In.is_open()) {
         std::cerr << "ERROR: Can't open the file" << endl;
@@ -419,9 +400,9 @@ void Graph::readDotFormatByColour(const string& filename, const int& global_size
     In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 
     unordered_set<int> vertex_set; // vertices with same colour
-	global_size_ = global_size;
+    global_size_ = global_size;
     local_size_ = 0;
-	rank_ = world.rank();
+    rank_ = world.rank();
 
     while (In.good()) {
         if (colour == rank_) {

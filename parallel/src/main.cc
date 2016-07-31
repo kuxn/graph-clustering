@@ -30,7 +30,6 @@ namespace po = boost::program_options;
 using namespace std;
 
 int main(int argc, char* argv[]) {
-
     //VT_TRACER("MAIN");
     mpi::environment env;
     mpi::communicator world;
@@ -42,7 +41,8 @@ int main(int argc, char* argv[]) {
     desc.add_options()
     ("help,h", ":produce help message")
     ("output,o", ":output the partitioned graph into dot files")
-    ("gram-schmidt,g", ":Gram Schmidt in Lanczos")
+    ("gram-schmidt,g", ":enable Gram Schmidt in Lanczos")
+    ("read-by-colour,r", ":read dot format into different processes by colours")
     ("subgraphs,s", po::value<int>(), ":set number of subgraphs, has to be the power of 2")
     ("input-file,f", po::value<string>(), ":input file name")
     ("vertices,v", po::value<int>(), ":number of vertices of the input file")
@@ -57,6 +57,7 @@ int main(int argc, char* argv[]) {
     }
 
     bool read_graph = vm.count("input-file") && vm.count("vertices"),
+         read_by_colour = vm.count("read-by-colour"),
          sub_graphs = vm.count("subgraphs"),
          output = vm.count("output"),
          gram_schmidt = vm.count("gram-schmidt");
@@ -70,8 +71,17 @@ int main(int argc, char* argv[]) {
         if (world.rank() == 0) {
             cout << "Input file is \"" << filename  << "\""<< endl;
         }
-        g->readDotFormat(filename, vertices);
-        //g->readDotFormatByColour(filename, vertices);
+        if (read_by_colour) {
+            g->readDotFormatByColour(filename, vertices);
+            if (world.rank() == 0) {
+                cout << "read file without colour" << endl;
+            }
+        } else {
+            g->readDotFormat(filename, vertices);
+            if (world.rank() == 0) {
+                cout << "read file without colour" << endl;
+            }
+        }
     } else {
         if (world.rank() == 0) {
             cout << "Please set file name and number of vertices" << endl;
@@ -95,16 +105,14 @@ int main(int argc, char* argv[]) {
 
     world.barrier();
     Partition partition(*g, subgraphs, gram_schmidt);
-    std::vector<int> local_size_lookup;
-    all_gather(world, g->localSize(), local_size_lookup);
     world.barrier();
 
     if (output && world.rank() != 0) {
         filename = "./output/temp_";
         filename += to_string(vertices);
         filename += "v_";
-        filename += to_string(g->localSize());
-        filename += "lv_";
+        filename += to_string(world.size());
+        filename += "wr_";
         filename += to_string(g->rank());
         filename += "r.dot";
         g->outputDotFormat(filename);
@@ -117,8 +125,8 @@ int main(int argc, char* argv[]) {
                 filename = "./output/temp_";
                 filename += to_string(vertices);
                 filename += "v_";
-                filename += to_string(local_size_lookup[rank]);
-                filename += "lv_";
+                filename += to_string(world.size());
+                filename += "wr_";
                 filename += to_string(rank);
                 filename += "r.dot";
                 g->readDotFormatWithColour(filename);
@@ -130,13 +138,11 @@ int main(int argc, char* argv[]) {
             filename += "s.dot";
             g->outputResult(filename);
         }
-        //g->printDotFormat();
-        partition.printLapEigenvalues();
+        //partition.printLapEigenvalues();
         //partition.printLapEigenMat();
         Analysis::outputTimes(world.size(), vertices, partition.times);
         Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
-	//partition.printLapEigenMat();
 
     env.~environment();
 

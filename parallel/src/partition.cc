@@ -47,15 +47,15 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     // Construct tridiagonal matrix using Lanczos algorithm
     boost::mpi::timer timer_lanczos;
     Lanczos<Vector, double> lanczos(g, num_of_eigenvec, GramSchmidt);
-	double t_lan = timer_lanczos.elapsed();
+    double t_lan = timer_lanczos.elapsed();
     if (g.rank() == 0) {
         cout << "In P0, Lanczos takes " << t_lan << "s" << endl;
     }
-	times.push_back(t_lan);
+    times.push_back(t_lan);
     laplacian_eigenvalues_ = lanczos.alpha_global;
     Vector beta = lanczos.beta_global;
     //int size = g.localSize();
-    
+
 #ifdef Debug
     cout << endl;
     if (g.rank() == 0) {
@@ -120,9 +120,9 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         fiedler_index++;
         //fiedler_index--;
         vector_index = it->second;
-		ritz_values.push_back(it->first);
+        ritz_values.push_back(it->first);
         //if (g.rank() == 0) {
-        cout << "in rank " << g.rank() << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
+        //cout << "in rank " << g.rank() << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
         //}
         hashmap.erase(it);
         laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs_local, tri_eigen_vecs, vector_index);
