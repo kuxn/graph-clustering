@@ -40,8 +40,8 @@ class Lanczos {
 
         Vector alpha_global;
         Vector beta_global;
-        std::unordered_map<int, Vector> lanczos_vecs_local;
-        std::unordered_map<int, Vector> lanczos_vecs_global;
+        std::vector<Vector> lanczos_vecs_local;
+        std::vector<Vector> lanczos_vecs_global;
         void print_tri_mat();
 
 };

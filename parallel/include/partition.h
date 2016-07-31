@@ -23,7 +23,7 @@ class Partition {
 
     private:
         typedef std::vector<double> Vector;
-        typedef std::unordered_map<int, Vector> DenseMatrix;
+        typedef std::vector<Vector> DenseMatrix;
 
         Vector laplacian_eigenvalues_;
         DenseMatrix laplacian_eigen_mat_;

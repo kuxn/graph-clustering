@@ -19,14 +19,14 @@
 #include "graph.h"
 #include "partition.h"
 #include "analysis.h"
-#include "vt_user.h"
+//#include "vt_user.h"
 
 using namespace std;
 namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
 
-    VT_TRACER("MAIN");
+    //VT_TRACER("MAIN");
     int vertices, colours;
     string filename;
 
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
         } else {
             //g->printDotFormat();
             //g->printLaplacianMat();
-            partition.printLapEigenvalues();
+            //partition.printLapEigenvalues();
             //partition.printLapEigenMat();
             Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
             //cout << "cut edge precent = " << Analysis::cutEdgePercent(*g) << endl;

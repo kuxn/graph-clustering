@@ -21,7 +21,7 @@
 
 #include "lanczos.h"
 #include "tqli.h"
-#include "vt_user.h"
+//#include "vt_user.h"
 
 using std::cout;
 using std::endl;
@@ -50,7 +50,7 @@ using std::endl;
 #ifdef GS_
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool GramSchmidt) {
-    VT_TRACER("LANCZOS");
+    //VT_TRACER("LANCZOS");
     const int size = g.size();
     //const int m = 6 * std::sqrt(size);
     const int m = size;
@@ -121,7 +121,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool Gra
 #include <cmath>
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO) {
-    VT_TRACER("LANCZOS_SO");
+    //VT_TRACER("LANCZOS_SO");
     const int size = g.size();
     //const int size = 1e9;
     int m, scale;
@@ -154,6 +154,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
     T beta_val = 0.0, tol = 1e-6;
     alpha.resize(m);
     beta.resize(m - 1);
+    lanczos_vecs.resize(m);
     lanczos_vecs[0] = v0;
 
     int t = 0;
@@ -181,7 +182,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
         }
 
         if (SO) {
-            //std::unordered_map<int, Vector> q;
+            //std::vector<int, Vector> q;
             //Vector d = alpha;
             //Vector e = beta;
             //tqli(d, e, q);
@@ -226,7 +227,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
 #ifdef RS_
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool RS) {
-    VT_TRACER("LANCZOS_RS");
+    //VT_TRACER("LANCZOS_RS");
     const int size = g.size();
     const int m = 2 * std::sqrt(size);
     //int m = size;
@@ -278,13 +279,13 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool RS)
         }
         w = multGraphVec(g, v1);
         alpha[m - 1] = dot(v1, w);
-        std::unordered_map<int, Vector> q;
+        std::vector<Vector> q;
         Vector d = alpha;
         Vector e = beta;
         tqli(d, e, q);
         // Calculate eigenvectors
         cout << endl;
-        std::unordered_map<int, Vector> ritz_vector;
+        std::vector<Vector> ritz_vector;
         Vector vinit(size, 0);
         for(int i = 0; i < m; i++)	ritz_vector[i] = vinit;
         for (int row = 0; row < m; row++) {
@@ -371,7 +372,7 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 
 template<typename Vector, typename T>
 inline void Lanczos<Vector, T>::gramSchmidt(const int& k,  Vector& v) {
-    VT_TRACER("GramSchmidt");
+    //VT_TRACER("GramSchmidt");
     int size = v.size();
     for (int i = 0; i < k; i++) {
         T reorthog_dot_product = dot(lanczos_vecs[i], v);

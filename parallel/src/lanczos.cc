@@ -147,6 +147,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
     Vector v1_local = v0_local, w_local, v0_start = v0_local;
     T alpha_val_global = 0.0, beta_val_global = 0.0;
 
+    lanczos_vecs_local.resize(m);
     lanczos_vecs_local[0] = v1_local;
     haloInit(g_local);
 
@@ -206,7 +207,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
 
 template<typename Vector, typename T>
 const int Lanczos<Vector, T>::getIteration(const int& num_of_eigenvec, const int & global_size) {
-	int scale, m;
+    int scale, m;
     if (num_of_eigenvec == 1) {
         scale = 4 * num_of_eigenvec;
     } else if (num_of_eigenvec == 2) {
@@ -224,7 +225,7 @@ const int Lanczos<Vector, T>::getIteration(const int& num_of_eigenvec, const int
     //cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
     //cout << "scale = " << scale << endl;
     //m = global_size;
-	return m;
+    return m;
 }
 
 /*

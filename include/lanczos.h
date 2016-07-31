@@ -34,7 +34,7 @@ class Lanczos {
 
         Vector alpha;
         Vector beta;
-        std::unordered_map<int, Vector> lanczos_vecs;
+        std::vector<Vector> lanczos_vecs;
         void print_tri_mat();
 };
 

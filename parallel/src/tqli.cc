@@ -23,9 +23,9 @@
 
 using namespace std;
 
-double SQR(double a); 
+double SQR(double a);
 double pythag(double a, double b);
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  pythag (P70, Numerical Recipes)
  *  Description:  Computes sqrt(a^2 + b^2) without destructive underflow or overflow.
@@ -46,7 +46,7 @@ double pythag(double a, double b) {
     else return (absb == 0.0 ? 0.0 : absb*sqrt(1.0+SQR(absa/absb)));
 }
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  tqli (P480, Numerical Recipes)
  *  Description:  Calculate the eigenvalues and eigenvectors of a sysmetric triangular matrix
@@ -66,7 +66,7 @@ double pythag(double a, double b) {
  *		z[0..n-1][0..n-1] the kth column of z returns the normalized eigenvector corresponding to d[k].
  *-----------------------------------------------------------------------------*/
 
-void tqli (vector<double>& d, vector<double>& e, unordered_map<int, vector<double>>& z) {
+void tqli (vector<double>& d, vector<double>& e, vector<vector<double>>& z) {
 
     //VT_TRACER("TQLI");
     int m,l,iter,i,k;
@@ -75,15 +75,13 @@ void tqli (vector<double>& d, vector<double>& e, unordered_map<int, vector<doubl
 
     int n = d.size();
 
-    vector<double> vinitial(n, 0);
-    for(int i = 0; i < n; i++)	z[i] = vinitial;
+    z.resize(n, vector<double>(n, 0));
     for(int i = 0; i < n; i++)	z[i][i] = 1;
     e.push_back(0.0);
 
-
     // Convenient to renumber the elements of e.
-    //for (i = 2; i <= n; i++) 
-    //	e[i-1] = e[i]; 
+    //for (i = 2; i <= n; i++)
+    //	e[i-1] = e[i];
     //e[n] = 0.0;
     //
     //for (i = 0; i <= n; i++)
@@ -95,9 +93,9 @@ void tqli (vector<double>& d, vector<double>& e, unordered_map<int, vector<doubl
         iter = 0;
         do {
             // Look for a single small subdiagonal element to split the matrix.
-            //for (m = l; m <= n-1; m++) 
-            for (m = l; m < n-1; m++) 
-            { 
+            //for (m = l; m <= n-1; m++)
+            for (m = l; m < n-1; m++)
+            {
                 dd = std::abs(d[m])+std::abs(d[m+1]);
                 //if ((double)(std::abs(e[m]) + dd) == dd) break;
                 if (std::abs(e[m]) <= EPS * dd) break;
@@ -110,9 +108,9 @@ void tqli (vector<double>& d, vector<double>& e, unordered_map<int, vector<doubl
                 s = c = 1.0;
                 p = 0.0;
 
-                // A plane rotation as in the original QL, 
+                // A plane rotation as in the original QL,
                 // followed by Givens rotations to restore tridiagonal form.
-                for (i = m-1; i >= l; i--) { 
+                for (i = m-1; i >= l; i--) {
                     f = s * e[i];
                     b = c * e[i];
                     e[i+1] = (r = pythag(f,g));
@@ -131,12 +129,12 @@ void tqli (vector<double>& d, vector<double>& e, unordered_map<int, vector<doubl
                     // Next loop can be omitted if eigenvectors not wanted
                     // Form eigenvectors.
 
-                    //for (k = 1; k <= n; k++) { 
+                    //for (k = 1; k <= n; k++) {
                     //	f = z[k][i+1];
                     //	z[k][i+1] = s * z[k][i] + c * f;
                     //	z[k][i] = c * z[k][i] - s * f;
                     //}
-                    for (k = 0; k < n; k++) { 
+                    for (k = 0; k < n; k++) {
                         f = z[k][i+1];
                         z[k][i+1] = s * z[k][i] + c * f;
                         z[k][i] = c * z[k][i] - s * f;

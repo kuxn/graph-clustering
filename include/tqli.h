@@ -15,9 +15,8 @@
 #define TQLI_H_
 
 #include <vector>
-#include <unordered_map>
 
-void tqli (std::vector<double>& d, std::vector<double>& e, std::unordered_map<int, std::vector<double>>& z);
+void tqli (std::vector<double>& d, std::vector<double>& e, std::vector<std::vector<double>>& z);
 
 #endif
 

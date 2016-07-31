@@ -29,7 +29,7 @@
 using namespace std;
 
 typedef std::vector<double> Vector;
-typedef std::unordered_map<int, Vector> DenseMatrix;
+typedef std::vector<Vector> DenseMatrix;
 
 /*
  * ===  FUNCTION  ======================================================================
@@ -125,7 +125,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         //cout << "in rank " << g.rank() << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
         //}
         hashmap.erase(it);
-        laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs_local, tri_eigen_vecs, vector_index);
+        laplacian_eigen_mat_.push_back(getOneLapEigenVec(lanczos.lanczos_vecs_local, tri_eigen_vecs, vector_index));
     }
 
     for (int vertex = 0; vertex < g.localSize(); vertex++) {

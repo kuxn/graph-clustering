@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <vector>
 #include <unordered_map>
 
 #include <boost/timer.hpp>
@@ -22,14 +23,14 @@
 #include "partition.h"
 #include "lanczos.h"
 #include "tqli.h"
-#include "vt_user.h"
+//#include "vt_user.h"
 
 #define Sign(a) (a >= 0.0 ? 1:0)
 
 using namespace std;
 
 typedef std::vector<double> Vector;
-typedef std::unordered_map<int, Vector> DenseMatrix;
+typedef std::vector<Vector> DenseMatrix;
 
 /*
  * ===  FUNCTION  ======================================================================
@@ -40,7 +41,7 @@ typedef std::unordered_map<int, Vector> DenseMatrix;
 
 Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 
-    VT_TRACER("PARTITION");
+    //VT_TRACER("PARTITION");
     boost::timer timer_partition;
     int size = g.size();
     int num_of_eigenvec = log2(subgraphs);
@@ -96,7 +97,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         ritz_values.push_back(it->first);
         //cout << "eigenvalue used: " << it->first << ", Vector_Index: " << vector_index <<endl;
         hashmap.erase(it); // Deal with identical eigenvalues
-        laplacian_eigen_mat_[i] = getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index);
+        laplacian_eigen_mat_.push_back(getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index));
     }
 
     for (int vertex = 0; vertex < size; vertex++) {
@@ -160,7 +161,7 @@ void Partition::outputLapEigenvalues() {
  */
 
 Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index) {
-    VT_TRACER("EigenVec");
+    //VT_TRACER("EigenVec");
     // Find the eigenvector from the vector matrix of the Tridiagonal eigenvector matrix (each column represents a vector)
     int size = tri_eigen_vecs.size(); // Size of vertices/vectors
     Vector tri_eigen_vec(size, 0);

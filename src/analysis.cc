@@ -60,14 +60,9 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
 
     //cout << "subgraphs = " << subgraphs << endl;
 
-    std::unordered_map<int, std::vector<int>> cut_edge_table;
+    std::vector<std::vector<int>> cut_edge_table(subgraphs, std::vector<int>(subgraphs, 0));
     std::vector<int> cut_vertex_table(subgraphs, 0);
     std::vector<int> isolated_vertex;
-
-    std::vector<int> vinitial(subgraphs, 0);
-    for (int i = 0; i < subgraphs; i++) {
-        cut_edge_table[i] = vinitial;
-    }
 
     for (int vertex = 0; vertex < size; vertex++) {
         int temp = 0;
@@ -98,7 +93,8 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
     cout << "Vertices:  " << g.size() << endl;
     cout << "Edges:     " << g.edgesNum() << endl;
     cout << "Colours:   " << subgraphs << endl;
-    cout << "Used Ritz values: "; copy(ritz_values.cbegin(), ritz_values.cend(), it_double);
+    cout << "Used Ritz values: ";
+    copy(ritz_values.cbegin(), ritz_values.cend(), it_double);
     cout << endl << "Cut Edge Percent: " << cutEdgePercent(g) * 100 << "%" << endl;
 
     cout << "/*-----------------------------------------------------------------------------" << endl;
@@ -110,7 +106,7 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
     }
     cout << endl;
     cout << "vertices:  " << "\t";
-	copy(cut_vertex_table.cbegin(), cut_vertex_table.cend(), it_int);
+    copy(cut_vertex_table.cbegin(), cut_vertex_table.cend(), it_int);
     cout << endl;
     cout << "/*-----------------------------------------------------------------------------" << endl;
     cout << " * Edges table after partitioning" << endl;
@@ -164,7 +160,7 @@ void Analysis::manuallyPartition(const Graph& g) {
     }
 }
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  outputTimes
  *  Description:  outputTimes for the times vectors from partition function
@@ -178,7 +174,7 @@ void Analysis::outputTimes(const int& size, const vector<double>& vec) {
     Output << 1 << "\t" << size << "\t";
     std::ostream_iterator<double> outIter(Output, "\t");
     std::copy(vec.cbegin(), vec.cend(), outIter);
-	Output << endl;
+    Output << endl;
     Output.close();
 }
 
@@ -210,7 +206,7 @@ void Analysis::benchmarks(bool GramSchmidt) {
         vector<std::vector<double>> subgraph_times;
         for (unsigned int j = 0; j < subgraphs.size(); j++) {
             Partition partition(g, subgraphs[j], GramSchmidt);
-			outputTimes(g.size(), partition.times);
+            outputTimes(g.size(), partition.times);
             subgraph_times.push_back(partition.times);
         }
         output_times.push_back(subgraph_times);
