@@ -32,20 +32,22 @@
 class Graph {
     private:
         boost::mpi::communicator world;
+        typedef std::unordered_set<int> SetOfNeighbours;
+        std::unordered_map<int, SetOfNeighbours> G;
+
         int local_size_;
         int global_size_;
         int rank_;
         std::vector<int> global_index_;
         std::unordered_map<int, int> local_index_;
-        typedef std::unordered_set<int> SetOfNeighbours;
-        std::unordered_map<int, SetOfNeighbours> G;
+
         mutable std::unordered_map<int, int> Colour;
+        void addEdge(int src, int dest);
 
     public:
         Graph() {}
         Graph(int n); // Construct a random graph with n vertices
 
-        void addEdge(int src, int dest);
         const int edgesNum() const;
         const int subgraphsNum() const;
         const int size() const;
@@ -56,12 +58,11 @@ class Graph {
         void printLaplacianMat() const;
         void setColour(int vertex, int colour) const;
         const int getColour(int vertex) const;
-        void readDotFormat(const std::string& filename);
+        void readDotFormat(const std::string& filename, const int& global_size);
         void readDotFormatWithColour(const std::string& filename);
-        void readDotFormatByColour(const std::string& filename);
+        void readDotFormatByColour(const std::string& filename, const int& global_size);
         const std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
 
-        void init(int rank, int global_size, int local_size);
         const int globalSize() const;
         const int localSize() const;
         const int rank() const;

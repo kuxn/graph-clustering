@@ -167,7 +167,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
     //cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
 
     //cout << "scale = " << scale << endl;
-    //m = size;
+    //m = global_size;
     cout << "m = " << m << endl;
 
     Vector v1_halo(global_size);
@@ -349,8 +349,9 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 template<typename Vector, typename T>
 Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
     Vector prod;
-    if (g.globalSize() != (int)vec.size())
-        throw std::length_error("Lanczos - multGraphVec: The sizes don't match.");
+    //if (g.globalSize() != (int)vec.size()) {
+    //    throw std::length_error("Lanczos - multGraphVec: The sizes don't match.");
+    //}
 
     // Calcualte a partial result in each process, the index starts from zero in vector "prod"
     int size = g.localSize();

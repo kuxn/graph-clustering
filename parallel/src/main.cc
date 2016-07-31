@@ -66,13 +66,12 @@ int main(int argc, char* argv[]) {
     if (read_graph) {
         g = new Graph;
         vertices = vm["vertices"].as<int>();
-        g->init(world.rank(), vertices, vertices/world.size());
         filename = vm["input-file"].as<string>();
         if (world.rank() == 0) {
             cout << "Input file is \"" << filename  << "\""<< endl;
         }
-        //g->readDotFormat(filename);
-        g->readDotFormatByColour(filename);
+        g->readDotFormat(filename, vertices);
+        //g->readDotFormatByColour(filename, vertices);
     } else {
         if (world.rank() == 0) {
             cout << "Please set file name and number of vertices" << endl;
@@ -132,42 +131,14 @@ int main(int argc, char* argv[]) {
             g->outputResult(filename);
         }
         //g->printDotFormat();
-        //partition.printLapEigenvalues();
+        partition.printLapEigenvalues();
         //partition.printLapEigenMat();
         Analysis::outputTimes(world.size(), vertices, partition.times);
         Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
 	//partition.printLapEigenMat();
 
-    //fstream Output;
-    //for (int proc = 0; proc < world.size(); proc++) {
-    //	if (world.rank() == proc) {
-    //		//Output.open("output.dot", std::ofstream::ate);
-    //		Output.open("output.dot", std::fstream::in | std::fstream::out | std::fstream:: ate);
-    //		for (int vertex = 0; vertex < g.localSize(); vertex++) {
-    //			//Output << g.globalIndex(vertex) << "[Colour=" << g.getColour(g.globalIndex(vertex)) << "];" << endl;
-    //			cout << g.globalIndex(vertex) << "[Colour=" << g.getColour(g.globalIndex(vertex)) << "];" << endl;
-    //		}
-    //		Output.close();
-    //	}
-    //}
-    //world.barrier();
-    //for (int proc = 0; proc < world.size(); proc++) {
-    //	if (world.rank() == proc) {
-    //		//Output.open("output.dot", std::ofstream::ate);
-    //		Output.open("output.dot", std::fstream::in | std::fstream::out | std::fstream:: ate);
-    //		for (int vertex = 0; vertex < g.localSize(); vertex++) {
-    //			auto it = g.find(g.globalIndex(vertex));
-    //			for (auto neighbour:it->second)
-    //				//Output << g.globalIndex(vertex) << "--" << neighbour << ";" << endl;
-    //				cout << g.globalIndex(vertex) << "--" << neighbour << ";" << endl;
-    //		}
-    //		Output.close();
-    //	}
-    //}
-
-    //env.~environment();
-    //cout << "finalized = " << env.finalized() << endl;
+    env.~environment();
 
     delete g;
     return 0;

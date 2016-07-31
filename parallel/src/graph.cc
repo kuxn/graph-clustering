@@ -62,12 +62,6 @@ Graph::Graph(int num_of_vertex) {
  * =====================================================================================
  */
 
-void Graph::init(int rank, int global_size, int local_size) {
-    rank_ = rank;
-    global_size_ = global_size;
-    local_size_ = local_size;
-}
-
 const int Graph::globalSize() const {
     return global_size_;
 }
@@ -305,7 +299,7 @@ const int Graph::getColour(int vertex) const {
  * =====================================================================================
  */
 
-void Graph::readDotFormat(const string& filename) {
+void Graph::readDotFormat(const string& filename, const int& global_size) {
 
     ifstream In(filename);
     if (!In.is_open()) {
@@ -314,15 +308,25 @@ void Graph::readDotFormat(const string& filename) {
     }
     In.ignore(INT_MAX, '-');
     In.ignore(1); // Skip the second '-'
-    int from = 0, to = 0;
+    int from = 0, to = 0, local_index = 0;
     In >> to;
     In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
+
+	global_size_ = global_size;
+	local_size_ = global_size / world.size();
+	rank_ = world.rank();
+	global_index_.resize(local_size_, 0);
 
     while (In.good()) {
         if (from >= rank_ * local_size_ && from <= (rank_ + 1) * local_size_ - 1) {
             //cout << "from = " << from << " to = " << to << endl;
             addEdge(from, to);
-            In >> from;
+            global_index_[local_index] = from;
+			local_index_.insert({from, local_index});
+			In >> from;
+			if (from != global_index_[local_index]) {
+				local_index++;
+			}
             In.ignore(2); // Ignore "--"
             In >> to;
             In.ignore(INT_MAX, '\n');
@@ -335,6 +339,9 @@ void Graph::readDotFormat(const string& filename) {
             if (from > (rank_ + 1) * local_size_ - 1) break;
         }
     }
+	for (int i = 0; i < global_size; i++) {
+		global_rank_map.push_back(i / local_size_);
+	}
     In.close();
 }
 
@@ -395,8 +402,7 @@ void Graph::readDotFormatWithColour(const string& filename) {
  * =====================================================================================
  */
 
-void Graph::readDotFormatByColour(const string& filename) {
-
+void Graph::readDotFormatByColour(const string& filename, const int& global_size) {
     ifstream In(filename);
     if (!In.is_open()) {
         std::cerr << "ERROR: Can't open the file" << endl;
@@ -413,7 +419,10 @@ void Graph::readDotFormatByColour(const string& filename) {
     In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 
     unordered_set<int> vertex_set; // vertices with same colour
+	global_size_ = global_size;
     local_size_ = 0;
+	rank_ = world.rank();
+
     while (In.good()) {
         if (colour == rank_) {
             vertex_set.insert(vertex);
@@ -428,8 +437,6 @@ void Graph::readDotFormatByColour(const string& filename) {
         In >> colour;
         In.ignore(INT_MAX, '\n');
     }
-    
-
     int from = first_vertex, to = 0;
     //cout << "first vertex = " << first_vertex << endl;
     In.ignore(2); // Ignore "--"
@@ -450,4 +457,3 @@ void Graph::readDotFormatByColour(const string& filename) {
         exit(-1);
     }
 }
-
