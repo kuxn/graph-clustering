@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
         if (read_by_colour) {
             g->readDotFormatByColour(filename, vertices);
             if (world.rank() == 0) {
-                cout << "read file without colour" << endl;
+                cout << "read file by colour" << endl;
             }
         } else {
             g->readDotFormat(filename, vertices);
