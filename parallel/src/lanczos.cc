@@ -22,7 +22,6 @@
 #include <cmath>
 
 #include <boost/serialization/serialization.hpp>
-#include <boost/serialization/unordered_map.hpp>
 #include <boost/mpi/timer.hpp>
 
 #include "lanczos.h"
@@ -239,35 +238,69 @@ template<typename Vector, typename T>
 void Lanczos<Vector, T>::haloInit(const Graph& g) {
     // Find out which rank and the corresponding data need to receive
     int size = g.localSize();
+    std::unordered_map<int, std::set<int>> halo_recv_temp; // <rank, halo_neighbours to receive>
+    std::unordered_map<int, std::set<int>> halo_send_temp; // <rank, halo_neighbours to send>
     for (int vertex = 0; vertex < size; vertex++) {
         auto it = g.find(g.globalIndex(vertex));
         if (!it->second.empty()) {
             for (const int& neighbour:it->second) {
                 int rank = g.global_rank_map[neighbour];
                 if (rank != g.rank()) {
-                    auto it = halo_recv.find(rank);
-                    if (it != halo_recv.end()) {
+                    auto it = halo_recv_temp.find(rank);
+                    if (it != halo_recv_temp.end()) {
                         it->second.insert(neighbour);
                     } else {
-                        std::unordered_set<int> halo_neighbours;
+                        std::set<int> halo_neighbours;
                         halo_neighbours.insert(neighbour);
-                        halo_recv.insert(make_pair(rank, halo_neighbours));
+                        halo_recv_temp.insert({rank, halo_neighbours});
                     }
                 }
                 if (rank != g.rank()) {
-                    auto it = halo_send.find(rank);
-                    if (it != halo_send.end()) {
+                    auto it = halo_send_temp.find(rank);
+                    if (it != halo_send_temp.end()) {
                         it->second.insert(g.globalIndex(vertex));
                     } else {
-                        std::unordered_set<int> halo_neighbours;
+                        std::set<int> halo_neighbours;
                         halo_neighbours.insert(g.globalIndex(vertex));
-                        //halo_neighbours.insert(vertex);
-                        halo_send.insert(make_pair(rank, halo_neighbours));
+                        halo_send_temp.insert({rank, halo_neighbours});
                     }
                 }
             }
         }
     }
+    // Convert <int, set> to <int, vector> for looking up in halo_update, cheaper than iterating a set.
+    for (auto& it:halo_send_temp) {
+        int rank = it.first;
+        std::vector<int> vector_send;
+        for (auto& x:it.second) {
+            vector_send.push_back(x);
+        }
+        halo_send.insert({rank, vector_send});
+    }
+    for (auto& it:halo_recv_temp) {
+        int rank = it.first;
+        std::vector<int> vector_recv;
+        for (auto& x:it.second) {
+            vector_recv.push_back(x);
+        }
+        halo_recv.insert({rank, vector_recv});
+    }
+    //if (g.rank() == 0) {
+    //	cout << "in rank " << g.rank() << " ";
+    //	for (auto& it:halo_send) {
+    //		cout << "send to rank " << it.first << ": " << endl;
+    //		for (unsigned int i = 0; i < it.second.size(); ++i) {
+    //			cout << "vector_send["<< i << "]" << it.second[i] << endl;
+    //		}
+    //	}
+    //	cout << "in rank " << g.rank() << " ";
+    //	for (auto& it:halo_recv) {
+    //		cout << "recv from rank " << it.first << ": " << endl;
+    //		for (unsigned int i = 0; i < it.second.size(); ++i) {
+    //			cout << "vector_recv["<< i << "]" << it.second[i] << endl;
+    //		}
+    //	}
+    //}
 }
 
 /*
@@ -280,17 +313,18 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
 template<typename Vector, typename T>
 void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_halo) {
     std::vector<mpi::request> reqs;
-    std::unordered_map<int, std::unordered_map<int, T>> buf_send; // <global_index, value>;
-    std::unordered_map<int, std::unordered_map<int, T>> buf_recv;
+    std::unordered_map<int, std::vector<T>> buf_send(world.size()); // <global_index, value>;
+    std::unordered_map<int, std::vector<T>> buf_recv(world.size());
+
     for (int rank = 0; rank < world.size(); rank++) {
         if (rank != g.rank()) {
             auto it = halo_send.find(rank);
             if (it != halo_send.end()) {
-                std::unordered_map<int, T> buf_temp;
+                std::vector<T> buf_temp;
                 for (const int& halo_neighbour:it->second) {
-                    buf_temp.insert({halo_neighbour, v_local[g.localIndex(halo_neighbour)]}); // global index, locale value
+                    buf_temp.push_back(v_local[g.localIndex(halo_neighbour)]);
                 }
-                buf_send[rank] = buf_temp;
+                buf_send.insert({rank, buf_temp});
                 reqs.push_back(world.isend(rank, 0, buf_send[rank])); //(dest, tag, value to send)
             }
         }
@@ -311,12 +345,14 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
     // Unpack the buffer to fill in to v_halo
     for (int rank = 0; rank < world.size(); rank++) {
         if (rank != g.rank()) {
-            std::unordered_map<int, T> buf_temp;
+            std::vector<T> buf_temp;
             buf_temp = buf_recv[rank];
             auto it = halo_recv.find(rank);
             if (it != halo_recv.end()) {
+                int i = 0;
                 for (const int& halo_neighbour:it->second) {
-                    v_halo[halo_neighbour] = buf_temp[halo_neighbour]; //(src, tag, store to value)
+                    v_halo[halo_neighbour] = buf_temp[i]; //(src, tag, store to value)
+                    i++;
                 }
             }
         }
