@@ -21,6 +21,7 @@
 #include "graph.h"
 
 using namespace std;
+typedef std::unordered_map<int, std::unordered_set<int>>::const_iterator const_iterator;
 
 /*
  * ===  FUNCTION  ======================================================================
@@ -65,7 +66,6 @@ Graph::Graph(int num_of_vertex) {
 void Graph::addEdge(int src, int dest) {
     // Avoid the self circle
     if (src == dest) return;
-
     // Add edge src->edge
     auto it = G.find(src);
     if (it != G.end())
@@ -75,7 +75,6 @@ void Graph::addEdge(int src, int dest) {
         edges.insert(dest);
         G.insert(make_pair(src, edges));
     }
-
     // Since graph is undirected, add edge dest->src
     it = G.find(dest);
     if (it != G.end())
@@ -111,7 +110,6 @@ const int Graph::subgraphsNum() const {
         cout << "WARNING:The graph hasn't been partitioned." << endl;
         return 1;
     }
-
     unordered_map<int, int> reverse_colour_map;
     for (const auto& it:Colour) {
         reverse_colour_map.insert({it.second, it.first});
@@ -119,8 +117,16 @@ const int Graph::subgraphsNum() const {
     return reverse_colour_map.size();
 }
 
-const unordered_map<int, std::unordered_set<int>>::const_iterator Graph::find(int vertex) const {
+const const_iterator Graph::find(int vertex) const {
     return G.find(vertex);
+}
+
+const const_iterator Graph::cbegin() const {
+    return G.cbegin();
+}
+
+const const_iterator Graph::cend() const {
+    return G.cend();
 }
 
 /*
@@ -241,13 +247,11 @@ const int Graph::getColour(int vertex) const {
  */
 
 void Graph::readDotFormat(const string& filename) {
-
     ifstream In(filename);
     if (!In.is_open()) {
         std::cerr << "ERROR: Can't open the file" << endl;
         exit(-1);
     }
-
     In.ignore(INT_MAX, '-');
     In.ignore(1); // Skip the second '-'
     int from = 0, to = 0;
@@ -272,14 +276,13 @@ void Graph::readDotFormat(const string& filename) {
  */
 
 void Graph::readDotFormatWithColour(const string& filename) {
-
     ifstream In(filename);
     if (!In.is_open()) {
         std::cerr << "ERROR: Can't open the file" << endl;
         exit(-1);
     }
     In.ignore(INT_MAX, '='); // Ignore the chars before the value of colour
-    int vertex = 0, colour = 0;
+    int vertex = 0, colour = 0, from = 0, to = 0;
     In >> colour;
     In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 
@@ -291,8 +294,6 @@ void Graph::readDotFormatWithColour(const string& filename) {
         In >> colour;
         In.ignore(INT_MAX, '\n');
     }
-
-    int from = 0, to = 0;
     In.ignore(2); // Ignore "--"
     In >> to;
     In.ignore(INT_MAX, '\n');

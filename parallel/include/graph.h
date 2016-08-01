@@ -39,7 +39,7 @@ class Graph {
         int global_size_;
         int rank_;
         std::vector<int> global_index_;
-        std::unordered_map<int, int> local_index_;
+        std::vector<int> local_index_;
 
         mutable std::unordered_map<int, int> Colour;
         void addEdge(int src, int dest);
@@ -47,8 +47,11 @@ class Graph {
     public:
         Graph() {}
         Graph(int n); // Construct a random graph with n vertices
+        typedef std::unordered_map<int, std::unordered_set<int>>::const_iterator const_iterator;
+        const const_iterator find(int vertex) const;
+        const const_iterator cbegin() const;
+        const const_iterator cend() const;
 
-        const std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
         const int edgesNum() const;
         const int subgraphsNum() const;
         const int size() const;
@@ -61,7 +64,6 @@ class Graph {
         void readDotFormatByColour(const std::string& filename, const int& global_size);
         void printDotFormat() const;
         void outputDotFormat(const std::string& filename) const;
-        void outputResult(const std::string& filename) const;
         void printLaplacianMat() const;
 
         const int globalSize() const;

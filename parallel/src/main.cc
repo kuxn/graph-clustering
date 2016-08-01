@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
             filename += "v_";
             filename += to_string(subgraphs);
             filename += "s.dot";
-            g->outputResult(filename);
+            g->outputDotFormat(filename);
         }
         //partition.printLapEigenvalues();
         //partition.printLapEigenMat();

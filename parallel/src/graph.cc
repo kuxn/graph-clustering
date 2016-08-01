@@ -20,6 +20,7 @@
 #include "graph.h"
 
 using namespace std;
+typedef std::unordered_map<int, std::unordered_set<int>>::const_iterator const_iterator;
 
 /*
  * ===  FUNCTION  ======================================================================
@@ -134,8 +135,16 @@ const int Graph::subgraphsNum() const {
     return reverse_vertex_set.size();
 }
 
-const unordered_map<int, std::unordered_set<int>>::const_iterator Graph::find(int vertex) const {
+const const_iterator Graph::find(int vertex) const {
     return G.find(vertex);
+}
+
+const const_iterator Graph::cbegin() const {
+    return G.cbegin();
+}
+
+const const_iterator Graph::cend() const {
+    return G.cend();
 }
 
 const int Graph::globalSize() const {
@@ -190,50 +199,20 @@ void Graph::printDotFormat() const {
  *-----------------------------------------------------------------------------*/
 
 void Graph::outputDotFormat(const string& filename) const {
-    int num_of_vertex = G.size();
     ofstream Output(filename, ios::out | ios::binary | ios::trunc);
-
     Output << "Undirected Graph {" << endl;
     if (Colour.size() == 0) {
-        for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-            Output << globalIndex(vertex) << ";" << endl;
+        for (auto it = G.cbegin(); it != G.cend(); ++it) {
+            Output << it->first << ";" << endl;
         }
     } else {
-        for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-            Output << globalIndex(vertex) << "[Colour=" << getColour(globalIndex(vertex)) << "];" << endl;
+        for (auto it = G.cbegin(); it != G.cend(); ++it) {
+            Output << it->first << "[Colour=" << getColour(it->first) << "];" << endl;
         }
     }
-    for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-        auto it = G.find(globalIndex(vertex));
+    for (auto it = G.cbegin(); it != G.cend(); ++it) {
         for (const int& neighbour:it->second) {
-            Output << globalIndex(vertex) << "--" << neighbour << " ;" << endl;
-        }
-    }
-    Output << "}" << endl;
-}
-
-/*-----------------------------------------------------------------------------
- *  Modified function to output the graph into dot file for rank0
- *-----------------------------------------------------------------------------*/
-
-void Graph::outputResult(const string& filename) const {
-    int num_of_vertex = G.size();
-    ofstream Output(filename, ios::out | ios::binary | ios::trunc);
-
-    Output << "Undirected Graph {" << endl;
-    if (Colour.size() == 0) {
-        for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-            Output << vertex << ";" << endl;
-        }
-    } else {
-        for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-            Output << vertex << "[Colour=" << getColour(vertex) << "];" << endl;
-        }
-    }
-    for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-        auto it = G.find(vertex);
-        for (const int& neighbour:it->second) {
-            Output << vertex << "--" << neighbour << " ;" << endl;
+            Output << it->first << "--" << neighbour << " ;" << endl;
         }
     }
     Output << "}" << endl;
@@ -298,13 +277,14 @@ void Graph::readDotFormat(const string& filename, const int& global_size) {
     local_size_ = global_size / world.size();
     rank_ = world.rank();
     global_index_.resize(local_size_, 0);
+    local_index_.resize(global_size, 0);
 
     while (In.good()) {
         if (from >= rank_ * local_size_ && from <= (rank_ + 1) * local_size_ - 1) {
             //cout << "from = " << from << " to = " << to << endl;
             addEdge(from, to);
             global_index_[local_index] = from;
-            local_index_.insert({from, local_index});
+            local_index_[from] = local_index;
             In >> from;
             if (from != global_index_[local_index]) {
                 local_index++;
@@ -403,12 +383,13 @@ void Graph::readDotFormatByColour(const string& filename, const int& global_size
     global_size_ = global_size;
     local_size_ = 0;
     rank_ = world.rank();
+    local_index_.resize(global_size, 0);
 
     while (In.good()) {
         if (colour == rank_) {
             vertex_set.insert(vertex);
             global_index_.push_back(vertex);
-            local_index_.insert({vertex, local_size_});
+            local_index_[vertex] = local_size_;
             local_size_++;
         }
         global_rank_map.push_back(colour); // Look the rank/colour of any global vertex

@@ -29,15 +29,12 @@ using namespace std;
  */
 
 double Analysis::cutEdgePercent(const Graph& g) {
-    int size = g.size();
     int cut_edge_num = 0;
-
     if (g.subgraphsNum() == 1) {
         return 0.0;
     }
-    for (int vertex = 0; vertex < size; vertex++) {
-        int vertex_colour = g.getColour(vertex);
-        auto it = g.find(vertex);
+    for (auto it = g.cbegin(); it != g.cend(); ++it) {
+        int vertex_colour = g.getColour(it->first);
         for (const int& neighbour:it->second) {
             int neighbour_colour = g.getColour(neighbour);
             if (neighbour_colour != vertex_colour) {
@@ -53,7 +50,6 @@ double Analysis::cutEdgePercent(const Graph& g) {
  *-----------------------------------------------------------------------------*/
 
 void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_values) {
-    int size = g.size();
     int subgraphs = g.subgraphsNum();
     //cout << "subgraphs = " << subgraphs << endl;
 
@@ -61,23 +57,24 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
     std::vector<int> cut_vertex_table(subgraphs, 0);
     std::vector<int> isolated_vertex;
 
-    for (int vertex = 0; vertex < size; vertex++) {
+    for (auto it = g.cbegin(); it != g.cend(); ++it) {
         int temp = 0;
-        int vertex_subgraph = g.getColour(vertex);
-        if (vertex_subgraph >= subgraphs)
+        int vertex_subgraph = g.getColour(it->first);
+        if (vertex_subgraph >= subgraphs) {
             vertex_subgraph = (vertex_subgraph/subgraphs)%subgraphs;
-        auto it = g.find(vertex);
+        }
         for (const int& neighbour:it->second) {
             int neighbour_subgraph = g.getColour(neighbour);
-            if (neighbour_subgraph >= subgraphs)
+            if (neighbour_subgraph >= subgraphs) {
                 neighbour_subgraph = (neighbour_subgraph/subgraphs)%subgraphs;
+            }
             cut_edge_table[vertex_subgraph][neighbour_subgraph]++;
             if (vertex_subgraph == neighbour_subgraph) {
                 temp++;
             }
         }
         if (temp == 0) {
-            isolated_vertex.push_back(vertex);
+            isolated_vertex.push_back(it->first);
         }
         cut_vertex_table[vertex_subgraph]++;
     }
@@ -146,8 +143,8 @@ void Analysis::manuallyPartition(const Graph& g) {
     int subgraph_size = size/g.subgraphsNum();
 
     int num = 0, colour = 0;
-    for (int vertex = 0; vertex < size; vertex++) {
-        g.setColour(vertex, colour);
+    for (auto it = g.cbegin(); it != g.cend(); ++it) {
+        g.setColour(it->first, colour);
         num++;
         if (num == subgraph_size) {
             colour++;

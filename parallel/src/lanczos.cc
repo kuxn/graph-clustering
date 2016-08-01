@@ -20,6 +20,7 @@
 #include <exception>
 #include <utility>
 #include <cmath>
+#include <set>
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/mpi/timer.hpp>
@@ -237,13 +238,13 @@ const int Lanczos<Vector, T>::getIteration(const int& num_of_eigenvec, const int
 template<typename Vector, typename T>
 void Lanczos<Vector, T>::haloInit(const Graph& g) {
     // Find out which rank and the corresponding data need to receive
-    int size = g.localSize();
     std::unordered_map<int, std::set<int>> halo_recv_temp; // <rank, halo_neighbours to receive>
     std::unordered_map<int, std::set<int>> halo_send_temp; // <rank, halo_neighbours to send>
-    for (int vertex = 0; vertex < size; vertex++) {
-        auto it = g.find(g.globalIndex(vertex));
-        if (!it->second.empty()) {
-            for (const int& neighbour:it->second) {
+    //for (int vertex = 0; vertex < size; vertex++) {
+    //    auto iter = g.find(g.globalIndex(vertex));
+    for (auto iter = g.cbegin(); iter != g.cend(); ++iter) {
+        if (!iter->second.empty()) {
+            for (const int& neighbour:iter->second) {
                 int rank = g.global_rank_map[neighbour];
                 if (rank != g.rank()) {
                     auto it = halo_recv_temp.find(rank);
@@ -258,10 +259,12 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
                 if (rank != g.rank()) {
                     auto it = halo_send_temp.find(rank);
                     if (it != halo_send_temp.end()) {
-                        it->second.insert(g.globalIndex(vertex));
+                        it->second.insert(iter->first);
+                        //it->second.insert(g.globalIndex(vertex));
                     } else {
                         std::set<int> halo_neighbours;
-                        halo_neighbours.insert(g.globalIndex(vertex));
+                        halo_neighbours.insert(iter->first);
+                        //halo_neighbours.insert(g.globalIndex(vertex));
                         halo_send_temp.insert({rank, halo_neighbours});
                     }
                 }
@@ -368,22 +371,15 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 
 template<typename Vector, typename T>
 Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
-    Vector prod;
-    //if (g.globalSize() != (int)vec.size()) {
-    //    throw std::length_error("Lanczos - multGraphVec: The sizes don't match.");
-    //}
-
-    // Calcualte a partial result in each process, the index starts from zero in vector "prod"
-    int size = g.localSize();
-    for (int vertex = 0; vertex < size; vertex++) {
-        auto it = g.find(g.globalIndex(vertex));
+    Vector prod(g.localSize());
+    for (auto it = g.cbegin(); it != g.cend(); ++it) {
         T temp = 0.0;
         if (!it->second.empty()) {
             for (const int& neighbour:it->second) {
                 temp += vec[neighbour];
             }
         }
-        prod.push_back(it->second.size() * vec[g.globalIndex(vertex)] - temp);
+        prod[g.localIndex(it->first)] = it->second.size() * vec[it->first] - temp;
     }
     return prod;
 }

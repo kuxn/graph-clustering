@@ -345,20 +345,15 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool RS)
 
 template<typename Vector, typename T>
 Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
-    Vector prod;
-    if (g.size() != (int)vec.size())
-        throw std::length_error("Lanczos - multGraphVec: The sizes don't match.");
-
-    int numofvertex = vec.size();
-    for (int vertex = 0; vertex < numofvertex; vertex++) {
-        auto it = g.find(vertex);
+    Vector prod(g.size());
+    for (auto it = g.cbegin(); it != g.cend(); it++) {
         T temp = 0.0;
         if (!it->second.empty()) {
             for (const int& neighbour:it->second) {
                 temp += vec[neighbour];
             }
         }
-        prod.push_back(it->second.size() * vec[vertex] - temp);
+        prod[it->first] = it->second.size() * vec[it->first] - temp;
     }
     return prod;
 }

@@ -29,17 +29,12 @@ using namespace std;
  */
 
 double Analysis::cutEdgePercent(const Graph& g) {
-
-    int size = g.size();
     int cut_edge_num = 0;
-
     if (g.subgraphsNum() == 1) {
         return 0.0;
     }
-
-    for (int vertex = 0; vertex < size; vertex++) {
-        int vertex_colour = g.getColour(vertex);
-        auto it = g.find(vertex);
+    for (auto it = g.cbegin(); it != g.cend(); ++it) {
+        int vertex_colour = g.getColour(it->first);
         for (const int& neighbour:it->second) {
             int neighbour_colour = g.getColour(neighbour);
             if (neighbour_colour != vertex_colour) {
@@ -150,8 +145,8 @@ void Analysis::manuallyPartition(const Graph& g) {
     int subgraph_size = size/g.subgraphsNum();
 
     int num = 0, colour = 0;
-    for (int vertex = 0; vertex < size; vertex++) {
-        g.setColour(vertex, colour);
+    for (auto it = g.cbegin(); it != g.cend(); ++it) {
+        g.setColour(it->first, colour);
         num++;
         if (num == subgraph_size) {
             colour++;

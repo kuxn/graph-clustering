@@ -1,6 +1,6 @@
 CXX 		= mpic++
 #CXX 		= vtcxx -vt:c++ mpic++ -DVTRACE
-CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -g -DSO_
+CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_
 INCPATH		= include
 VTINC		= /usr/local/include/vampirtrace
 LIBDIR		= -L/usr/local/lib

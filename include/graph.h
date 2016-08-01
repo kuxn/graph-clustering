@@ -49,7 +49,11 @@ class Graph {
         const int getColour(int vertex) const;
         void readDotFormat(const std::string& filename);
         void readDotFormatWithColour(const std::string& filename);
-        const std::unordered_map<int, std::unordered_set<int>>::const_iterator find(int vertex) const;
+
+        typedef std::unordered_map<int, std::unordered_set<int>>::const_iterator const_iterator;
+        const const_iterator find(int vertex) const;
+        const const_iterator cbegin() const;
+        const const_iterator cend() const;
 };
 
 #endif
