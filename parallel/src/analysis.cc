@@ -161,6 +161,10 @@ void Analysis::manuallyPartition(const Graph& g) {
  */
 
 void Analysis::outputTimes(const int& procs, const int& size, const vector<double>& vec) {
+    cout << "In P0, Lanczos takes " << vec[0] << "s" << endl;
+    cout << "In P0, TQLI takes " << vec[1] << "s" << endl;
+    cout << "In P0, Partition takes " << vec[2] << "s" << endl;
+
     string filename("./times/");
     filename += to_string(procs);
     filename += ".dat";

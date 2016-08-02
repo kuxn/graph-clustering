@@ -96,10 +96,6 @@ const int Graph::getColour(int vertex) const {
  * =====================================================================================
  */
 
-const int Graph::size() const {
-    return G.size();
-}
-
 const int Graph::edgesNum() const {
     int edges = 0;
     for (auto& it:G) {
@@ -136,7 +132,7 @@ const int Graph::globalSize() const {
     return global_size_;
 }
 
-const int Graph::localSize() const {
+const int Graph::size() const {
     return local_size_;
 }
 

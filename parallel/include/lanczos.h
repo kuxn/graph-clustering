@@ -38,10 +38,9 @@ class Lanczos {
     public:
         Lanczos(const Graph& g, const int& num_of_eigenvec, bool GramSchmidt);
     
-        Vector alpha_global;
-        Vector beta_global;
-        std::vector<Vector> lanczos_vecs_local;
-        std::vector<Vector> lanczos_vecs_global;
+        Vector alpha;
+        Vector beta;
+        std::vector<Vector> lanczos_vecs;
         void print_tri_mat();
 };
 

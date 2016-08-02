@@ -17,7 +17,7 @@
 #include <fstream>
 #include <unordered_map>
 
-#include <boost/mpi/timer.hpp>
+#include <boost/timer.hpp>
 
 #include "partition.h"
 #include "lanczos.h"
@@ -41,20 +41,16 @@ typedef std::vector<Vector> DenseMatrix;
 Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 
     //VT_TRACER("PARTITION");
-    boost::mpi::timer timer_partition;
+    boost::timer timer_partition;
     int num_of_eigenvec = log2(subgraphs);
 
     // Construct tridiagonal matrix using Lanczos algorithm
-    boost::mpi::timer timer_lanczos;
+    boost::timer timer_lanczos;
     Lanczos<Vector, double> lanczos(g, num_of_eigenvec, GramSchmidt);
     double t_lan = timer_lanczos.elapsed();
-    if (g.rank() == 0) {
-        cout << "In P0, Lanczos takes " << t_lan << "s" << endl;
-    }
     times.push_back(t_lan);
-    laplacian_eigenvalues_ = lanczos.alpha_global;
-    Vector beta = lanczos.beta_global;
-    //int size = g.localSize();
+    laplacian_eigenvalues_ = lanczos.alpha;
+    Vector beta = lanczos.beta;
 
 #ifdef Debug
     cout << endl;
@@ -62,7 +58,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         cout << "lanczos matrix: " << endl;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                cout << lanczos.lanczos_vecs_local[i][j] << "\t";
+                cout << lanczos.lanczos_vecs[i][j] << "\t";
             }
             cout << endl;
         }
@@ -76,12 +72,9 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     DenseMatrix tri_eigen_vecs;
 
     // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
-    boost::mpi::timer timer_tqli;
+    boost::timer timer_tqli;
     tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
     double t_tqli = timer_tqli.elapsed();
-    if (g.rank() == 0) {
-        cout << "In P0, TQLI takes " << t_tqli << "s" << endl;
-    }
     times.push_back(t_tqli);
 
 #ifdef Debug
@@ -125,23 +118,17 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         //cout << "in rank " << g.rank() << "eigenvalue used: " << it->first << ", Vector Index: " << vector_index <<endl;
         //}
         hashmap.erase(it);
-        laplacian_eigen_mat_.push_back(getOneLapEigenVec(lanczos.lanczos_vecs_local, tri_eigen_vecs, vector_index));
+        laplacian_eigen_mat_.push_back(getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index));
     }
 
-    for (int vertex = 0; vertex < g.localSize(); vertex++) {
+    for (int vertex = 0; vertex < g.size(); vertex++) {
         int colour = 0;
         for (int row = 0; row < num_of_eigenvec; row++) {
             colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][vertex]);
         }
         g.setColour(g.globalIndex(vertex), colour);
-        //if (g.globalIndex(vertex) < 10) {
-        //    cout << "vertex " << g.globalIndex(vertex) << ", colour = " << colour << endl;
-        //}
     }
     double t_par = timer_partition.elapsed();
-    if (g.rank() == 0) {
-        cout << "In P0, Partition takes " << timer_partition.elapsed() << "s" << endl;
-    }
     times.push_back(t_par);
 }
 
@@ -229,8 +216,8 @@ void Partition::getLapEigenMat(const Graph& g, bool GramSchmidt) {
 
     // Construct tridiagonal matrix using Lanczos algorithm
     Lanczos<Vector, double> lanczos(g, size, GramSchmidt);
-    laplacian_eigenvalues_ = lanczos.alpha_global;
-    Vector beta = lanczos.beta_global;
+    laplacian_eigenvalues_ = lanczos.alpha;
+    Vector beta = lanczos.beta;
 
     // Define an identity matrix as the input for TQLI algorithm
     DenseMatrix tri_eigen_vecs;
@@ -243,7 +230,7 @@ void Partition::getLapEigenMat(const Graph& g, bool GramSchmidt) {
     for (int k = 0; k < size; k++) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                laplacian_eigen_mat_[k][i] += lanczos.lanczos_vecs_local[j][i] * tri_eigen_vecs[j][k];
+                laplacian_eigen_mat_[k][i] += lanczos.lanczos_vecs[j][i] * tri_eigen_vecs[j][k];
             }
         }
     }

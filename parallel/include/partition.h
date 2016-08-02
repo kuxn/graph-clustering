@@ -16,7 +16,6 @@
 
 #include <vector>
 #include <map>
-#include <boost/mpi.hpp>
 #include "graph.h"
 
 class Partition {

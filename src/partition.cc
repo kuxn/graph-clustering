@@ -43,7 +43,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 
     //VT_TRACER("PARTITION");
     boost::timer timer_partition;
-    int size = g.size();
     int num_of_eigenvec = log2(subgraphs);
 
     // Construct tridiagonal matrix using Lanczos algorithm
@@ -51,7 +50,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     boost::timer timer_lanczos;
     Lanczos<Vector, double> lanczos(g, num_of_eigenvec, GramSchmidt);
     double t_lan = timer_lanczos.elapsed();
-    cout << "Lanczos timer - Lanczos takes " << t_lan << "s" << endl;
     times.push_back(t_lan);
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
@@ -69,7 +67,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     boost::timer timer_tqli;
     tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
     double t_tqli = timer_tqli.elapsed();
-    cout << "TQLI timer - TQLI takes " << t_tqli << "s" << endl;
     times.push_back(t_tqli);
 
     // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha"
@@ -100,7 +97,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         laplacian_eigen_mat_.push_back(getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index));
     }
 
-    for (int vertex = 0; vertex < size; vertex++) {
+    for (int vertex = 0; vertex < g.size(); vertex++) {
         int colour = 0;
         for (int row = 0; row < num_of_eigenvec; row++) {
             colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][vertex]);
@@ -108,7 +105,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         g.setColour(vertex, colour);
     }
     double t_par = timer_partition.elapsed();
-    cout << "Partition timer - partition takes " << t_par << "s" << endl;
     times.push_back(t_par);
 }
 

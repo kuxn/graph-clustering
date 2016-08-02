@@ -59,7 +59,7 @@ using std::endl;
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
     //VT_TRACER("LANCZOS");
-    int local_size = g_local.localSize();
+    int local_size = g_local.size();
     int m = getIteration(num_of_eigenvec, global_size);
     Vector v1_halo(g_local.globalSize());
 
@@ -67,21 +67,21 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
     Vector v1_local = v0_local, w_local;
     T alpha_val_global = 0.0, beta_val_global = 0.0;
 
-    lanczos_vecs_local[0] = v1_local;
+    lanczos_vecs[0] = v1_local;
     haloInit(g_local);
 
     for (int iter = 1; iter < m; iter++) {
         haloUpdate(g_local, v1_local, v1_halo);
         w_local = multGraphVec(g_local, v1_halo);
         alpha_val_global = dot(v1_local, w_local);
-        alpha_global.push_back(alpha_val_global);
+        alpha.push_back(alpha_val_global);
 
         for (int i = 0; i < local_size; i++) {
             w_local[i] = w_local[i] - alpha_val_global * v1_local[i] - beta_val_global * v0_local[i];
         }
 
         beta_val_global = sqrt(dot(w_local, w_local));
-        beta_global.push_back(beta_val_global);
+        beta.push_back(beta_val_global);
 
         if (std::abs(beta_val_global) < 1e-5) {
             try {
@@ -98,8 +98,8 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
         if (GramSchmidt) {
             gramSchmidt(iter, v1_local);
         }
-        lanczos_vecs_local[iter] = v1_local;
-        v0_local = lanczos_vecs_local[iter-1];
+        lanczos_vecs[iter] = v1_local;
+        v0_local = lanczos_vecs[iter-1];
 
         //Verify the dot product of v0 and v1 which is supposed to be 0
 #ifdef Debug
@@ -119,7 +119,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
     haloUpdate(g_local, v1_local, v1_halo);
     w_local = multGraphVec(g_local, v1_halo);
     alpha_val_global = dot(v1_local, w_local);
-    alpha_global.push_back(alpha_val_global);
+    alpha.push_back(alpha_val_global);
 
     if (GramSchmidt && g_local.rank() == 0) {
         cout << "Lanczos algorithm WITH GramSchmidt is done." << endl;
@@ -136,7 +136,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bool SO) {
     //VT_TRACER("LANCZOS");
-    int local_size = g_local.localSize();
+    int local_size = g_local.size();
     int global_size = g_local.globalSize();
     int m, t = 0;
     double tol = 1e-7;
@@ -147,21 +147,21 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
     Vector v1_local = v0_local, w_local, v0_start = v0_local;
     T alpha_val_global = 0.0, beta_val_global = 0.0;
 
-    lanczos_vecs_local.resize(m);
-    lanczos_vecs_local[0] = v1_local;
+    lanczos_vecs.resize(m);
+    lanczos_vecs[0] = v1_local;
     haloInit(g_local);
 
     for (int iter = 1; iter < m; iter++) {
         haloUpdate(g_local, v1_local, v1_halo);
         w_local = multGraphVec(g_local, v1_halo);
         alpha_val_global = dot(v1_local, w_local);
-        alpha_global.push_back(alpha_val_global);
+        alpha.push_back(alpha_val_global);
 
         for (int i = 0; i < local_size; i++) {
             w_local[i] = w_local[i] - alpha_val_global * v1_local[i] - beta_val_global * v0_local[i];
         }
         beta_val_global = sqrt(dot(w_local, w_local));
-        beta_global.push_back(beta_val_global);
+        beta.push_back(beta_val_global);
 
         if (std::abs(beta_val_global) < 1e-5) {
             try {
@@ -179,13 +179,13 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
             gramSchmidt(iter, v1_local);
             t++;
         }
-        lanczos_vecs_local[iter] = v1_local;
-        v0_local = lanczos_vecs_local[iter-1];
+        lanczos_vecs[iter] = v1_local;
+        v0_local = lanczos_vecs[iter-1];
     }
     haloUpdate(g_local, v1_local, v1_halo);
     w_local = multGraphVec(g_local, v1_halo);
     alpha_val_global = dot(v1_local, w_local);
-    alpha_global.push_back(alpha_val_global);
+    alpha.push_back(alpha_val_global);
 
     if (g_local.rank() == 0) {
         cout << "m = " << m << ", t = " << t << endl;
@@ -339,7 +339,7 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
                 reqs.push_back(world.irecv(rank, 0, buf_recv[rank])); //(src, tag, store to value)
             }
         } else {
-            for (int j = 0; j < g.localSize(); j++) {
+            for (int j = 0; j < g.size(); j++) {
                 v_halo[g.globalIndex(j)] = v_local[j];
             }
         }
@@ -371,7 +371,7 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 
 template<typename Vector, typename T>
 Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
-    Vector prod(g.localSize());
+    Vector prod(g.size());
     for (auto it = g.cbegin(); it != g.cend(); ++it) {
         T temp = 0.0;
         if (!it->second.empty()) {
@@ -394,11 +394,11 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 template<typename Vector, typename T>
 inline void Lanczos<Vector, T>::gramSchmidt(const int& k, Vector& v) {
     //VT_TRACER("GramSchmidt");
-    int local_size = lanczos_vecs_local[0].size();
+    int local_size = lanczos_vecs[0].size();
     for (int i = 0; i < k; i++) {
-        T dot_global = dot(lanczos_vecs_local[i], v);
+        T dot_global = dot(lanczos_vecs[i], v);
         for (int j = 0; j < local_size; j++) {
-            v[j] -= dot_global * lanczos_vecs_local[i][j];
+            v[j] -= dot_global * lanczos_vecs[i][j];
         }
     }
     // Normalise
@@ -460,15 +460,15 @@ Vector Lanczos<Vector, T>::init(const Graph& g) {
 
 template<typename Vector, typename T>
 void Lanczos<Vector, T>::print_tri_mat() {
-    int size = alpha_global.size();
+    int size = alpha.size();
     for (int row = 0; row < size; row++) {
         for (int col = 0; col < size; col++) {
             if (row == col)
-                cout << alpha_global[row] << "\t";
+                cout << alpha[row] << "\t";
             else if (col - row == 1)
-                cout << beta_global[row] << "\t";
+                cout << beta[row] << "\t";
             else if (row - col == 1)
-                cout << beta_global[col] << "\t";
+                cout << beta[col] << "\t";
             else
                 cout << "0" << "\t";
         }

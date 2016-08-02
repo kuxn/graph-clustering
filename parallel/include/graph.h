@@ -54,7 +54,6 @@ class Graph {
 
         const int edgesNum() const;
         const int subgraphsNum() const;
-        const int size() const;
 
         void setColour(int vertex, int colour) const;
         const int getColour(int vertex) const;
@@ -66,7 +65,7 @@ class Graph {
         void printLaplacianMat() const;
 
         const int globalSize() const;
-        const int localSize() const;
+        const int size() const; // local_size
         const int rank() const;
         const int globalIndex(int local_index) const;
         const int localIndex(int global_index) const;

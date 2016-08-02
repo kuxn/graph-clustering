@@ -162,6 +162,9 @@ void Analysis::manuallyPartition(const Graph& g) {
  */
 
 void Analysis::outputTimes(const int& size, const vector<double>& vec) {
+    cout << "Lanczos takes " << vec[0] << "s" << endl;
+    cout << "TQLI takes " << vec[1] << "s" << endl;
+    cout << "Partition takes " << vec[2] << "s" << endl;
     string filename("./times/1.dat");
     ofstream Output(filename, ios::out | ios::binary | ios::app);
     //Output << "procs\tlanczos\ttqli\tpartition\t" << endl;
