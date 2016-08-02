@@ -42,7 +42,6 @@ class Graph {
         const int subgraphsNum() const;
         const int size() const;
 
-        void printDotFormat() const;
         void outputDotFormat(const std::string& filename) const;
         void printLaplacianMat() const;
         void setColour(int vertex, int colour) const;

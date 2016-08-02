@@ -1,5 +1,5 @@
 CXX 		= g++
-CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
+CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_
 INCPATH		= include
 VTINC		= /usr/local/include/vampirtrace
 

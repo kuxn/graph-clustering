@@ -50,32 +50,31 @@ double Analysis::cutEdgePercent(const Graph& g) {
  *-----------------------------------------------------------------------------*/
 
 void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_values) {
-    int size = g.size();
     int subgraphs = g.subgraphsNum();
-
     //cout << "subgraphs = " << subgraphs << endl;
 
     std::vector<std::vector<int>> cut_edge_table(subgraphs, std::vector<int>(subgraphs, 0));
     std::vector<int> cut_vertex_table(subgraphs, 0);
     std::vector<int> isolated_vertex;
 
-    for (int vertex = 0; vertex < size; vertex++) {
+    for (auto it = g.cbegin(); it != g.cend(); ++it) {
         int temp = 0;
-        int vertex_subgraph = g.getColour(vertex);
-        if (vertex_subgraph >= subgraphs)
+        int vertex_subgraph = g.getColour(it->first);
+        if (vertex_subgraph >= subgraphs) {
             vertex_subgraph = (vertex_subgraph/subgraphs)%subgraphs;
-        auto it = g.find(vertex);
+        }
         for (const int& neighbour:it->second) {
             int neighbour_subgraph = g.getColour(neighbour);
-            if (neighbour_subgraph >= subgraphs)
+            if (neighbour_subgraph >= subgraphs) {
                 neighbour_subgraph = (neighbour_subgraph/subgraphs)%subgraphs;
+            }
             cut_edge_table[vertex_subgraph][neighbour_subgraph]++;
             if (vertex_subgraph == neighbour_subgraph) {
                 temp++;
             }
         }
         if (temp == 0) {
-            isolated_vertex.push_back(vertex);
+            isolated_vertex.push_back(it->first);
         }
         cut_vertex_table[vertex_subgraph]++;
     }

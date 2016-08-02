@@ -58,15 +58,14 @@ Graph::Graph(int num_of_vertex) {
 
 /*
  * ===  FUNCTION  ======================================================================
- *         Name:  addEdge
- *  Description:  Add edges into graph
+ *         Name:  Partition operations
+ *  Description:  Functions for partition
  * =====================================================================================
  */
 
 void Graph::addEdge(int src, int dest) {
     // Avoid the self circle
     if (src == dest) return;
-
     // Add edge src->edge
     auto it = G.find(src);
     if (it != G.end())
@@ -78,24 +77,10 @@ void Graph::addEdge(int src, int dest) {
     }
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  setColour
- *  Description:  Map colour for each vertex
- * =====================================================================================
- */
-
 void Graph::setColour(int vertex, int colour) const {
     //Colour.insert({vertex, colour});
     Colour[vertex] = colour;
 }
-
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  getColour
- *  Description:  Return the colour of the vertex
- * =====================================================================================
- */
 
 const int Graph::getColour(int vertex) const {
     if (Colour.size() == 0) {
@@ -169,34 +154,10 @@ const int Graph::localIndex(int global_index) const {
 
 /*
  * ===  FUNCTION  ======================================================================
- *         Name:  printDotFormat
- *  Description:  Print graph in DOT format
+ *         Name:  outputDotFormat
+ *  Description:  Write graph in DOT format
  * =====================================================================================
  */
-
-void Graph::printDotFormat() const {
-    int num_of_vertex = G.size();
-    cout << "Undirected Graph {" << endl;
-    if (Colour.size() == 0) {
-        for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-            cout << globalIndex(vertex) << ";" << endl;
-        }
-    } else {
-        for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-            cout << globalIndex(vertex) << "[Colour=" << getColour(globalIndex(vertex)) << "];" << endl;
-        }
-    }
-    for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-        auto it = G.find(globalIndex(vertex));
-        for (const int& neighbour:it->second)
-            cout << globalIndex(vertex) << "--" << neighbour << " ;" << endl;
-    }
-    cout << "}" << endl;
-}
-
-/*-----------------------------------------------------------------------------
- *  Modified function to output the graph into dot file
- *-----------------------------------------------------------------------------*/
 
 void Graph::outputDotFormat(const string& filename) const {
     ofstream Output(filename, ios::out | ios::binary | ios::trunc);
@@ -267,9 +228,11 @@ void Graph::readDotFormat(const string& filename, const int& global_size) {
         std::cerr << "ERROR: Can't open the file" << endl;
         exit(-1);
     }
+    int from, to, local_index = 0;
+    In.ignore(INT_MAX, '{'); // Ignore the chars before the value of colour
+    In >> from; // the first vertex
     In.ignore(INT_MAX, '-');
     In.ignore(1); // Skip the second '-'
-    int from = 0, to = 0, local_index = 0;
     In >> to;
     In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 
@@ -281,7 +244,7 @@ void Graph::readDotFormat(const string& filename, const int& global_size) {
 
     while (In.good()) {
         if (from >= rank_ * local_size_ && from <= (rank_ + 1) * local_size_ - 1) {
-            //cout << "from = " << from << " to = " << to << endl;
+            //cout << "in rank_" << rank_ << ", from = " << from << " to = " << to << endl;
             addEdge(from, to);
             global_index_[local_index] = from;
             local_index_[from] = local_index;
@@ -298,7 +261,7 @@ void Graph::readDotFormat(const string& filename, const int& global_size) {
             In.ignore(2); // Ignore "--"
             In >> to;
             In.ignore(INT_MAX, '\n');
-            if (from > (rank_ + 1) * local_size_ - 1) break;
+            //if (from > (rank_ + 1) * local_size_ - 1) break;
         }
     }
     for (int i = 0; i < global_size; i++) {
@@ -320,14 +283,12 @@ void Graph::readDotFormatWithColour(const string& filename) {
         std::cerr << "ERROR: Can't open the file" << endl;
         exit(-1);
     }
+    int vertex, colour;
     In.ignore(INT_MAX, '{'); // Ignore the chars before the value of colour
-    int vertex = 0, colour = 0;
     In >> vertex;
     int first_vertex = vertex;
-    //cout << "vertex = " << vertex << endl;
     In.ignore(INT_MAX, '='); // Ignore the chars before the value of colour
     In >> colour;
-    //cout << "colour = " << colour << endl;
     In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 
     local_size_ = G.size();
@@ -340,9 +301,7 @@ void Graph::readDotFormatWithColour(const string& filename) {
         In >> colour;
         In.ignore(INT_MAX, '\n');
     }
-
-    int from = first_vertex, to = 0;
-    //cout << "first vertex = " << first_vertex << endl;
+    int from = first_vertex, to;
     In.ignore(2); // Ignore "--"
     In >> to;
     In.ignore(INT_MAX, '\n');
@@ -370,13 +329,11 @@ void Graph::readDotFormatByColour(const string& filename, const int& global_size
         exit(-1);
     }
     In.ignore(INT_MAX, '{'); // Ignore the chars before the value of colour
-    int vertex = 0, colour = 0;
+    int vertex, colour;
     In >> vertex;
     int first_vertex = vertex;
-    //cout << "vertex = " << vertex << endl;
     In.ignore(INT_MAX, '='); // Ignore the chars before the value of colour
     In >> colour;
-    //cout << "colour = " << colour << endl;
     In.ignore(INT_MAX, '\n'); // Ignore other chars before end of line, go to next line
 
     unordered_set<int> vertex_set; // vertices with same colour
@@ -399,8 +356,7 @@ void Graph::readDotFormatByColour(const string& filename, const int& global_size
         In >> colour;
         In.ignore(INT_MAX, '\n');
     }
-    int from = first_vertex, to = 0;
-    //cout << "first vertex = " << first_vertex << endl;
+    int from = first_vertex, to;
     In.ignore(2); // Ignore "--"
     In >> to;
     In.ignore(INT_MAX, '\n');

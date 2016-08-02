@@ -17,7 +17,6 @@
 class Tests {
     private:
         bool testReothogonalisation();
-        bool testCutEdgeVertexTable();
 
     public:
         static bool testTqli();
@@ -26,6 +25,7 @@ class Tests {
         static bool testReadGraph();
         static bool testReadGraphWithColour();
         static bool testManuallyPartition();
+        static bool testCutEdgeVertexTable();
 };
 
 #endif

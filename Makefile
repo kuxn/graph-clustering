@@ -25,7 +25,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.cc
 
 # Explicit dependencies required for headers
 $(OBJECTS):	$(INCPATH)/graph.h
-$(BUILDDIR)/test.o $(BUILDDIR)/partition.o:	$(INCPATH)/*.h $(SRCDIR)/lanczos.cc
+#$(BUILDDIR)/test.o $(BUILDDIR)/partition.o:	$(INCPATH)/*.h $(SRCDIR)/lanczos.cc
 
 define OBJECT_DEPENDS_ON_CORRESPONDING_HEADER
    $(1) : $(patsubst $(BUILDDIR)/%, $(INCPATH)/%, $(1:o=h)) 
