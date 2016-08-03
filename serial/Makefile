@@ -1,17 +1,17 @@
-CXX 		= mpic++
-#CXX 		= vtcxx -vt:c++ mpic++ -DVTRACE
+CXX 		= g++
+#CXX 		= vtcxx -vt:c++ g++ -DVTRACE
 CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_
+INCPATH		= include
 VTINC		= /usr/local/include/vampirtrace
 LIBDIR		= -L/usr/local/lib
-LDLIBS		= -lboost_mpi -lboost_serialization -lboost_program_options
+LDLIBS		= -lboost_program_options
 
-INCPATH		= ../include
-SRCDIR		= ../src
+SRCDIR		= src
 BUILDDIR	= build
 
 CXXFILES	= $(shell find $(SRCDIR) -name '*.cc')		
 OBJECTS 	= $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(CXXFILES:cc=o))
-TARGET 		= main
+TARGET 		= ../main_serial
 
 all: $(TARGET)
 
@@ -37,12 +37,16 @@ $(foreach object_file,$(OBJECTS),$(eval $(call OBJECT_DEPENDS_ON_CORRESPONDING_H
 .PHONY: clean
 clean:
 	rm -rf *.z *.dSYM *.otf *.thumb $(BUILDDIR) $(TARGET)
-	rm -rf data times output sbatch* slurm*
 
-plot:
-	chmod +x ./plot.sh
-	./plot.sh
+tester: $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBDIR) $(LDLIBS)
+	time ./tester
 
-bench: $(TARGET)
-	chmod +x ./submit.sh
-	./submit.sh
+output: main
+	time ./main > graph.dot
+
+eigenvalues_figure:
+	gnuplot < eigenvalues.gnu
+
+unit_tests: $(BUILDDIR)/$(TARGET).o
+	make -C unit_tests test

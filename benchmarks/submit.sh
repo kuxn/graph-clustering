@@ -29,7 +29,7 @@ module load gcc/4.8.2-gnu
 
 for v in 1024 2048 5120 10240 102400 1024000
 do
-    time mpirun -np $i ./main -f ../test/par_test_\$v.dot -v \$v -g -o >> ./data/$filename
+    time mpirun -np $i ./main_parallel -f ../test/par_test_\$v.dot -v \$v -g -o >> ./data/$filename
 done
 
 EOL

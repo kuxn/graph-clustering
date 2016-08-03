@@ -1,17 +1,17 @@
 CXX 		= mpic++
 #CXX 		= vtcxx -vt:c++ mpic++ -DVTRACE
 CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_
-INCPATH		= include
 VTINC		= /usr/local/include/vampirtrace
 LIBDIR		= -L/usr/local/lib
 LDLIBS		= -lboost_mpi -lboost_serialization -lboost_program_options
 
-SRCDIR		= src
-BUILDDIR	= build
+INCPATH		= ../parallel/include
+SRCDIR		= ../parallel/src
+BUILDDIR	= ../parallel/build
 
 CXXFILES	= $(shell find $(SRCDIR) -name '*.cc')		
 OBJECTS 	= $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(CXXFILES:cc=o))
-TARGET 		= ../main_parallel
+TARGET 		= main_parallel
 
 all: $(TARGET)
 
@@ -37,27 +37,12 @@ $(foreach object_file,$(OBJECTS),$(eval $(call OBJECT_DEPENDS_ON_CORRESPONDING_H
 .PHONY: clean
 clean:
 	rm -rf *.z *.dSYM *.otf *.thumb $(BUILDDIR) $(TARGET)
-
-
-tester: $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBDIR) $(LDLIBS)
-	mpirun -np 2 ./tester
-
-bench:
-	make -C benchmarks bench
-
-bench_clean:
-	make -C benchmarks clean
+	rm -rf data times output sbatch* slurm*
 
 plot:
-	make -C benchmarks plot
-	
-output: main
-	time ./main > graph.dot
+	chmod +x ./plot.sh
+	./plot.sh
 
-eigenvalues_figure:
-	gnuplot < eigenvalues.gnu
-
-unit_tests: $(BUILDDIR)/$(TARGET).o
-	make -C unit_tests test
-
+bench: $(TARGET)
+	chmod +x ./submit.sh
+	./submit.sh

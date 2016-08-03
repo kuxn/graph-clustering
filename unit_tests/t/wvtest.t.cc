@@ -2,11 +2,11 @@
 #include "wvtest.h"
 
 // Include any "../*.h" header files which are required for your code
-#include "../../include/lanczos.h"
-#include "../../include/tqli.h"
-#include "../../include/partition.h"
-#include "../../include/test.h"
-#include "../../include/analysis.h"
+#include "../../serial/include/lanczos.h"
+#include "../../serial/include/tqli.h"
+#include "../../serial/include/partition.h"
+#include "../../serial/include/test.h"
+#include "../../serial/include/analysis.h"
 
 WVTEST_MAIN("Graph properties - read dot format") {
     WVPASS(Tests::testReadGraph());

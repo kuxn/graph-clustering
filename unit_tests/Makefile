@@ -1,10 +1,10 @@
 CXX 		= g++
 CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_
-INCPATH		= include
+INCPATH		= /serial/include
 VTINC		= /usr/local/include/vampirtrace
 
 all: t/wvtest
-SRCDIR      = ../src
+SRCDIR      = ../serial/src
 CXXFILES  	= $(shell find $(SRCDIR) -name '*.cc')
 
 # EDIT HERE: add any "../*.c" files that you need to test
