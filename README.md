@@ -13,4 +13,4 @@ make parallel
 
 ## License
 
-See the LICENSE file for details.
+See the [LICENSE](LICENSE) file for details.
