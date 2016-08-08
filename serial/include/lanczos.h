@@ -23,6 +23,7 @@ class Lanczos {
     private:
         Vector init(const int& size);
         Vector multGraphVec(const Graph& g, const Vector& vec);
+        const int getIteration(const int& num_of_eigenvec, const int & size);
         inline T dot(const Vector& v1, const Vector& v2);
         inline T norm(const Vector& vec);
         inline Vector& normalise(Vector& vec);

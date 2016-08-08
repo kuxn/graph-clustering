@@ -144,6 +144,8 @@ int main(int argc, char* argv[]) {
         Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
     //partition.printLapEigenMat();
+        partition.printLapEigenvalues();
+        //partition.printLapEigenMat();
 
     env.~environment();
 

@@ -61,6 +61,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool Gra
     T beta_val = 0.0;
     alpha.resize(m);
     beta.resize(m - 1);
+    lanczos_vecs.resize(m);
     lanczos_vecs[0] = v0;
 
     for (int iter = 1; iter < m; iter++) {
@@ -81,11 +82,9 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool Gra
                 cout << "beta[" << iter - 1 << "]: " << beta[iter - 1] << endl;
             }
         }
-
         for (int index = 0; index < size; index++) {
             v1[index] = w[index]/beta[iter - 1];
         }
-
         if (GramSchmidt) {
             gramSchmidt(iter, v1);
         }
@@ -123,30 +122,8 @@ template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO) {
     //VT_TRACER("LANCZOS_SO");
     const int size = g.size();
-    //const int size = 1e9;
-    int m, scale;
-    if (num_of_eigenvec == 1) {
-        //SO = false;
-        scale = 4 * num_of_eigenvec;
-    } else if (num_of_eigenvec == 2) {
-        scale = 4 * (num_of_eigenvec - 1);
-    } else {
-        scale = num_of_eigenvec + 2;
-    }
-
-    cout << "num_of_eigenvec = " << num_of_eigenvec << endl;
-    cout << "scale = " << scale << endl;
-    cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
-
-    if (round(log10(size)) > 3) {
-        scale -= round(log10(std::sqrt(size)));
-        scale = scale <= 0 ? 1:scale;
-    }
-
-    cout << "scale = " << scale << endl;
-    m = scale * std::sqrt(size) < size ? scale *  std::sqrt(size):size;
-    //m = size;
-    cout << "m = " << m << endl;
+    int t = 0;
+    int m = getIteration(num_of_eigenvec, size);
 
     Vector v0 = init(size);
     Vector v1 = v0, w, vstart = v0;
@@ -157,7 +134,6 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
     lanczos_vecs.resize(m);
     lanczos_vecs[0] = v0;
 
-    int t = 0;
     for (int iter = 1; iter < m; iter++) {
         w = multGraphVec(g, v1);
         alpha[iter - 1] = dot(v1, w);
@@ -167,20 +143,18 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
 
         beta_val = norm(w);
         beta[iter - 1] = beta_val;
-        //if (std::abs(beta[iter - 1]) < 1e-5) {
-        //    try {
-        //        throw std::runtime_error("Value of beta is close to 0: ");
-        //    }
-        //    catch (std::runtime_error& e) {
-        //        std::cerr << "ERROR: " << e.what();
-        //        cout << "beta[" << iter - 1 << "]: " << beta[iter - 1] << endl;
-        //    }
-        //}
-
+        if (std::abs(beta[iter - 1]) < 1e-5) {
+            try {
+                throw std::runtime_error("Value of beta is close to 0: ");
+            }
+            catch (std::runtime_error& e) {
+                std::cerr << "ERROR: " << e.what();
+                cout << "beta[" << iter - 1 << "]: " << beta[iter - 1] << endl;
+            }
+        }
         for (int index = 0; index < size; index++) {
             v1[index] = w[index]/beta[iter - 1];
         }
-
         if (SO) {
             //std::vector<int, Vector> q;
             //Vector d = alpha;
@@ -211,8 +185,6 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
     }
     w = multGraphVec(g, v1);
     alpha[m - 1] = dot(v1, w);
-
-    cout << "t = " << t << endl;
     if (SO) {
         cout << "Lanczos algorithm WITH Selective Orthogonalisation is done." << endl;
     } else {
@@ -335,6 +307,36 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool RS)
     }
 }
 #endif // endif - RS
+
+/*
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getIteration
+ *  Description:  Calculate iterations for Lanczos algorithm
+ * =====================================================================================
+ */
+
+template<typename Vector, typename T>
+const int Lanczos<Vector, T>::getIteration(const int& num_of_eigenvec, const int & size) {
+    int scale, m;
+    if (num_of_eigenvec == 1) {
+        scale = 4 * num_of_eigenvec;
+    } else if (num_of_eigenvec == 2) {
+        scale = 4 * (num_of_eigenvec - 1);
+    } else {
+        scale = num_of_eigenvec + 2;
+    }
+    //cout << "scale = " << scale << endl;
+    if (round(log10(size)) > 3) {
+        scale -= round(log10(std::sqrt(size)));
+        scale = scale <= 0 ? 1:scale;
+    }
+    m = scale * std::sqrt(size) < size ? scale * std::sqrt(size):size;
+    //int size = size;
+    //cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
+    //cout << "scale = " << scale << endl;
+    m = size;
+    return m;
+}
 
 /*
  * ===  FUNCTION  ======================================================================

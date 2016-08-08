@@ -136,7 +136,7 @@ void Partition::printLapEigenvalues() {
 
 void Partition::outputLapEigenvalues() {
 
-    string filename("eigenvalues_");
+    string filename("./output/eigenvalues_");
     filename += to_string(laplacian_eigenvalues_.size());
     filename += ".dat";
 

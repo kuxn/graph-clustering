@@ -139,11 +139,12 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
     int local_size = g_local.size();
     int global_size = g_local.globalSize();
     int m, t = 0;
-    double tol = 1e-7;
+    double tol = 1e-6;
     m = getIteration(num_of_eigenvec, global_size);
 
     Vector v1_halo(global_size);
     Vector v0_local = init(g_local);
+
     Vector v1_local = v0_local, w_local, v0_start = v0_local;
     T alpha_val_global = 0.0, beta_val_global = 0.0;
 
@@ -175,10 +176,11 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
         for (int i = 0; i < local_size; i++) {
             v1_local[i] = w_local[i]/beta_val_global;
         }
-        if (std::abs(dot(v0_start, v1_local)) >= tol) {
+        if (SO && std::abs(dot(v0_start, v1_local)) >= tol) {
             gramSchmidt(iter, v1_local);
             t++;
         }
+
         lanczos_vecs[iter] = v1_local;
         v0_local = lanczos_vecs[iter-1];
     }
@@ -224,7 +226,7 @@ const int Lanczos<Vector, T>::getIteration(const int& num_of_eigenvec, const int
     //int size = global_size;
     //cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
     //cout << "scale = " << scale << endl;
-    //m = global_size;
+    m = global_size;
     return m;
 }
 
@@ -240,8 +242,6 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
     // Find out which rank and the corresponding data need to receive
     std::unordered_map<int, std::set<int>> halo_recv_temp; // <rank, halo_neighbours to receive>
     std::unordered_map<int, std::set<int>> halo_send_temp; // <rank, halo_neighbours to send>
-    //for (int vertex = 0; vertex < size; vertex++) {
-    //    auto iter = g.find(g.globalIndex(vertex));
     for (auto iter = g.cbegin(); iter != g.cend(); ++iter) {
         if (!iter->second.empty()) {
             for (const int& neighbour:iter->second) {
@@ -288,19 +288,19 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
         }
         halo_recv.insert({rank, vector_recv});
     }
-    //if (g.rank() == 0) {
+    //if (g.rank() == 2) {
     //	cout << "in rank " << g.rank() << " ";
     //	for (auto& it:halo_send) {
     //		cout << "send to rank " << it.first << ": " << endl;
     //		for (unsigned int i = 0; i < it.second.size(); ++i) {
-    //			cout << "vector_send["<< i << "]" << it.second[i] << endl;
+    //			cout << "vector_send["<< i << "] " << it.second[i] << endl;
     //		}
     //	}
     //	cout << "in rank " << g.rank() << " ";
     //	for (auto& it:halo_recv) {
     //		cout << "recv from rank " << it.first << ": " << endl;
     //		for (unsigned int i = 0; i < it.second.size(); ++i) {
-    //			cout << "vector_recv["<< i << "]" << it.second[i] << endl;
+    //			cout << "vector_recv["<< i << "] " << it.second[i] << endl;
     //		}
     //	}
     //}
@@ -402,10 +402,10 @@ inline void Lanczos<Vector, T>::gramSchmidt(const int& k, Vector& v) {
         }
     }
     // Normalise
-    //T norm_global = std::sqrt(dot(v, v));
-    //for (auto x:v) {
-    //    x /= norm_global;
-    //}
+    T norm_global = std::sqrt(dot(v, v));
+    for (auto& x:v) {
+        x /= norm_global;
+    }
 }
 
 /*
