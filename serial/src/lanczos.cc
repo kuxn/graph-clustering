@@ -334,7 +334,7 @@ const int Lanczos<Vector, T>::getIteration(const int& num_of_eigenvec, const int
     //int size = size;
     //cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
     //cout << "scale = " << scale << endl;
-    m = size;
+    //m = size;
     return m;
 }
 

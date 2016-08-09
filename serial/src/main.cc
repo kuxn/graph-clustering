@@ -98,12 +98,12 @@ int main(int argc, char* argv[]) {
             filename += "s.dot";
             g->outputDotFormat(filename);
         } else {
-            g->outputDotFormat("plot_6.dot");
-            g->printLaplacianMat();
-            partition.printLapEigenvalues();
+            //g->outputDotFormat("plot_6.dot");
+            //g->printLaplacianMat();
+            //partition.printLapEigenvalues();
             //partition.outputLapEigenvalues();
-            partition.printLapEigenMat();
-        	Analysis::outputTimes(vertices, partition.times);
+            //partition.printLapEigenMat();
+            Analysis::outputTimes(g->size(), partition.times);
             Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
             //cout << "cut edge precent = " << Analysis::cutEdgePercent(*g) << endl;
         }
