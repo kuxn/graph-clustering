@@ -139,18 +139,11 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
  * =====================================================================================
  */
 
-void Analysis::manuallyPartition(const Graph& g) {
-    int size = g.size();
-    int subgraph_size = size/g.subgraphsNum();
-
-    int num = 0, colour = 0;
+void Analysis::manuallyPartition(const Graph& g, const int& colours) {
+    int colour;
     for (auto it = g.cbegin(); it != g.cend(); ++it) {
+        colour = rand() % colours;
         g.setColour(it->first, colour);
-        num++;
-        if (num == subgraph_size) {
-            colour++;
-            num = 0;
-        }
     }
 }
 

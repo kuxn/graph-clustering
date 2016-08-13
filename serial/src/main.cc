@@ -19,14 +19,19 @@
 #include "graph.h"
 #include "partition.h"
 #include "analysis.h"
-//#include "vt_user.h"
+
+#ifdef VT_
+#include "vt_user.h"
+#endif
 
 using namespace std;
 namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
 
-    //VT_TRACER("MAIN");
+#ifdef VT_
+    VT_TRACER("MAIN");
+#endif
     int vertices, colours;
     string filename;
 
@@ -89,7 +94,7 @@ int main(int argc, char* argv[]) {
     if (benchmarks) {
         Analysis::benchmarks(gram_schmidt);
     } else {
-        Partition partition(*g, colours, gram_schmidt);
+        //Partition partition(*g, colours, gram_schmidt);
         if (output) {
             string filename("./output/serial_");
             filename += to_string(g->size());
@@ -103,8 +108,8 @@ int main(int argc, char* argv[]) {
             //partition.printLapEigenvalues();
             //partition.outputLapEigenvalues();
             //partition.printLapEigenMat();
-            Analysis::outputTimes(g->size(), partition.times);
-            Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
+            //Analysis::outputTimes(g->size(), partition.times);
+            //Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
             //cout << "cut edge precent = " << Analysis::cutEdgePercent(*g) << endl;
         }
     }

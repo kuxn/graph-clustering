@@ -23,14 +23,18 @@
 #include "tqli.h"
 #include "partition.h"
 #include "analysis.h"
-//#include "vt_user.h"
+#ifdef VT_
+#include "vt_user.h"
+#endif
 
 namespace mpi = boost::mpi;
 namespace po = boost::program_options;
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    //VT_TRACER("MAIN");
+#ifdef VT_
+    VT_TRACER("MAIN");
+#endif
     mpi::environment env;
     mpi::communicator world;
 
@@ -136,7 +140,7 @@ int main(int argc, char* argv[]) {
             filename += "v_";
             filename += to_string(subgraphs);
             filename += "s.dot";
-            g->outputDotFormat(filename);
+            //g->outputDotFormat(filename);
         }
         //partition.printLapEigenvalues();
         //partition.printLapEigenMat();

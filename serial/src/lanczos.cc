@@ -21,7 +21,10 @@
 
 #include "lanczos.h"
 #include "tqli.h"
-//#include "vt_user.h"
+
+#ifdef VT_
+#include "vt_user.h"
+#endif
 
 using std::cout;
 using std::endl;
@@ -120,7 +123,10 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool Gra
 #include <cmath>
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO) {
-    //VT_TRACER("LANCZOS_SO");
+
+#ifdef VT_
+    VT_TRACER("LANCZOS_SO");
+#endif
     const int size = g.size();
     int t = 0;
     int m = getIteration(num_of_eigenvec, size);
@@ -369,7 +375,10 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 
 template<typename Vector, typename T>
 inline void Lanczos<Vector, T>::gramSchmidt(const int& k,  Vector& v) {
-    //VT_TRACER("GramSchmidt");
+
+#ifdef VT_
+    VT_TRACER("GramSchmidt");
+#endif
     int size = v.size();
     for (int i = 0; i < k; i++) {
         T reorthog_dot_product = dot(lanczos_vecs[i], v);

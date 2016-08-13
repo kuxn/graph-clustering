@@ -26,7 +26,10 @@
 #include <boost/mpi/timer.hpp>
 
 #include "lanczos.h"
-//#include "vt_user.h"
+
+#ifdef VT_
+#include "vt_user.h"
+#endif
 
 namespace mpi = boost::mpi;
 using std::cout;
@@ -135,7 +138,9 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
 #ifdef SO_
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bool SO) {
-    //VT_TRACER("LANCZOS");
+#ifdef VT_
+    VT_TRACER("Lanczos::Lanczos");
+#endif
     int local_size = g_local.size();
     int global_size = g_local.globalSize();
     int m, t = 0;
@@ -226,7 +231,7 @@ const int Lanczos<Vector, T>::getIteration(const int& num_of_eigenvec, const int
     //int size = global_size;
     //cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
     //cout << "scale = " << scale << endl;
-    m = global_size;
+    //m = global_size;
     return m;
 }
 
@@ -315,6 +320,7 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
 
 template<typename Vector, typename T>
 void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_halo) {
+    //VT_TRACER("Lanczos::haloUpdate");
     std::vector<mpi::request> reqs;
     std::unordered_map<int, std::vector<T>> buf_send(world.size()); // <global_index, value>;
     std::unordered_map<int, std::vector<T>> buf_recv(world.size());
@@ -371,6 +377,9 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
 
 template<typename Vector, typename T>
 Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
+#ifdef VT_
+    VT_TRACER("Lanczos::multGraphVec");
+#endif
     Vector prod(g.size());
     for (auto it = g.cbegin(); it != g.cend(); ++it) {
         T temp = 0.0;
@@ -393,7 +402,9 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
 
 template<typename Vector, typename T>
 inline void Lanczos<Vector, T>::gramSchmidt(const int& k, Vector& v) {
-    //VT_TRACER("GramSchmidt");
+#ifdef VT_
+    VT_TRACER("Lanczos::GramSchmidt");
+#endif
     int local_size = lanczos_vecs[0].size();
     for (int i = 0; i < k; i++) {
         T dot_global = dot(lanczos_vecs[i], v);

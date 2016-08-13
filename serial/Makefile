@@ -1,5 +1,5 @@
 CXX 		= g++
-#CXX 		= vtcxx -vt:c++ g++ -DVTRACE
+#CXX 		= vtcxx -vt:c++ g++ -DVTRACE -DVT_
 CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_
 INCPATH		= include
 VTINC		= /usr/local/include/vampirtrace
@@ -17,7 +17,7 @@ all: $(TARGET)
 
 $(TARGET): $(filter-out $(BUILDDIR)/test.o, $(OBJECTS))
 	@echo "Linking..."
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBDIR) $(LDLIBS)
+	$(CXX) -o $@ $^ $(LIBDIR) $(LDLIBS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cc
 	@mkdir -p $(BUILDDIR)
@@ -40,7 +40,7 @@ clean:
 
 tester: $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBDIR) $(LDLIBS)
-	time ./tester
+	mv tester ../
 
 output: main
 	time ./main > graph.dot

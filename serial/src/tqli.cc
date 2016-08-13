@@ -17,7 +17,10 @@
 #include <utility>
 #include <limits>
 #include "tqli.h"
-//#include "vt_user.h"
+
+#ifdef VT_
+#include "vt_user.h"
+#endif
 
 #define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a)) // Magnitude of a times sign of b
 
@@ -68,7 +71,9 @@ double pythag(double a, double b) {
 
 void tqli (vector<double>& d, vector<double>& e, vector<vector<double>>& z) {
 
-    //VT_TRACER("TQLI");
+#ifdef VT_
+    VT_TRACER("TQLI");
+#endif
     int m,l,iter,i,k;
     double s,r,p,g,f,dd,c,b;
     const double EPS = numeric_limits<double>::epsilon();
