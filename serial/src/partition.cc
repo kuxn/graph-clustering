@@ -51,19 +51,12 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     int num_of_eigenvec = log2(subgraphs);
 
     // Construct tridiagonal matrix using Lanczos algorithm
-
     boost::timer timer_lanczos;
     Lanczos<Vector, double> lanczos(g, num_of_eigenvec, GramSchmidt);
     double t_lan = timer_lanczos.elapsed();
     times.push_back(t_lan);
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
-
-#ifdef Debug
-    cout << endl;
-    cout << "triangular matrix: " << endl;
-    lanczos.print_tri_mat();
-#endif
 
     // Define an identity matrix as the input for TQLI algorithm
     DenseMatrix tri_eigen_vecs;
@@ -205,12 +198,6 @@ void Partition::getLapEigenMat(const Graph& g, bool GramSchmidt) {
     Lanczos<Vector, double> lanczos(g, size, GramSchmidt);
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
-
-#ifdef Debug
-    cout << endl;
-    cout << "triangular matrix: " << endl;
-    lanczos.print_tri_mat();
-#endif
 
     // Define an identity matrix as the input for TQLI algorithm
     DenseMatrix tri_eigen_vecs;

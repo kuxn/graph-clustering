@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  lanczos.cpp
+ *       Filename:  lanczos.cc
  *
  *    Description:  Lanczos algorithm
  *        Created:  06/11/2016 15:33:49
@@ -11,8 +11,8 @@
  * =====================================================================================
  */
 
-#ifndef LANCZOS_CPP_
-#define LANCZOS_CPP_
+#ifndef LANCZOS_CC_
+#define LANCZOS_CC_
 
 #include <iostream>
 #include <exception>
@@ -32,12 +32,11 @@ using std::endl;
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  Constructor
- *  Description:  The triangular matrix calculated by Lanczos
+ *  Description:  Lanczos algorithm with selective orthogonalisation
  * =====================================================================================
  */
 
 /*-----------------------------------------------------------------------------
- *  Signiture of the funtion:
  * 	input:
  *		G contains all the elements of the original graph
  *
@@ -47,78 +46,6 @@ using std::endl;
  *		lanczos_vecs[0..n-1][0..n-1] the kth row returns the kth Lanczos vector
  *-----------------------------------------------------------------------------*/
 
-/*-----------------------------------------------------------------------------
- *  Modified Lanczos algorithm with GramSchmidt by Gram–Schmidt
- *-----------------------------------------------------------------------------*/
-#ifdef GS_
-template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool GramSchmidt) {
-    //VT_TRACER("LANCZOS");
-    const int size = g.size();
-    //const int m = 6 * std::sqrt(size);
-    const int m = size;
-
-    Vector v0 = init(size);
-    Vector v1 = v0, w;
-
-    T beta_val = 0.0;
-    alpha.resize(m);
-    beta.resize(m - 1);
-    lanczos_vecs.resize(m);
-    lanczos_vecs[0] = v0;
-
-    for (int iter = 1; iter < m; iter++) {
-        w = multGraphVec(g, v1);
-        alpha[iter - 1] = dot(v1, w);
-        for (int i = 0; i < size; i++) {
-            w[i] = w[i] - alpha[iter - 1] * v1[i] - beta_val * v0[i];
-        }
-
-        beta_val = norm(w);
-        beta[iter - 1] = beta_val;
-        if (std::abs(beta[iter - 1]) < 1e-5) {
-            try {
-                throw std::runtime_error("Value of beta is close to 0: ");
-            }
-            catch (std::runtime_error& e) {
-                std::cerr << "ERROR: " << e.what();
-                cout << "beta[" << iter - 1 << "]: " << beta[iter - 1] << endl;
-            }
-        }
-        for (int index = 0; index < size; index++) {
-            v1[index] = w[index]/beta[iter - 1];
-        }
-        if (GramSchmidt) {
-            gramSchmidt(iter, v1);
-        }
-        lanczos_vecs[iter] = v1;
-        v0 = lanczos_vecs[iter - 1];
-
-        //Verify the dot product of v0 and v1 which is supposed to be 0
-        T dot_product = dot(v0, v1);
-        if (std::abs(dot_product) > 1e-5) {
-            try {
-                throw std::runtime_error("Need reorthogonalise: ");
-            }
-            catch (std::runtime_error& e) {
-                std::cerr << "ERROR: " << e.what();
-                cout << "v"<< iter - 1 <<"*v" << iter << " = " << dot_product << endl;
-            }
-        }
-    }
-    w = multGraphVec(g, v1);
-    alpha[m - 1] = dot(v1, w);
-
-    if (GramSchmidt) {
-        cout << "Lanczos algorithm WITH GramSchmidt is done." << endl;
-    } else {
-        cout << "Lanczos algorithm WITHOUT GramSchmidt is done." << endl;
-    }
-}
-#endif // endif - GS_
-/*-----------------------------------------------------------------------------
- *  Modified Lanczos algorithm with selective orthogonalisation
- *-----------------------------------------------------------------------------*/
 #ifdef SO_
 #include <cmath>
 template<typename Vector, typename T>
@@ -162,32 +89,13 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
             v1[index] = w[index]/beta[iter - 1];
         }
         if (SO) {
-            //std::vector<int, Vector> q;
-            //Vector d = alpha;
-            //Vector e = beta;
-            //tqli(d, e, q);
-            //cout << "beta_val * std::abs(q[iter][iter - 1] = " << beta_val * std::abs(q[iter][iter - 1]) << endl;
             if (std::abs(dot(vstart, v1)) >= tol) {
-                //if (beta_val * std::abs(q[iter][iter - 1]) <= tol) {
                 gramSchmidt(iter, v1);
                 t++;
             }
         }
         lanczos_vecs[iter] = v1;
         v0 = lanczos_vecs[iter - 1];
-
-        //Verify the dot product of v0 and v1 which is supposed to be 0
-        //T dot_product = dot(vstart, v1);
-        ////cout << "v0 * v1 = " << dot(v0, v1) << endl;
-        //if (std::abs(dot_product) > 1e-5) {
-        //    try {
-        //        throw std::runtime_error("Need reorthogonalise: ");
-        //    }
-        //    catch (std::runtime_error& e) {
-        //        std::cerr << "ERROR: " << e.what();
-        //        cout << "v"<< iter - 1 <<"*v" << iter << " = " << dot_product << endl;
-        //    }
-        //}
     }
     w = multGraphVec(g, v1);
     alpha[m - 1] = dot(v1, w);

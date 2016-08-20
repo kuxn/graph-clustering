@@ -77,19 +77,9 @@ void tqli (vector<double>& d, vector<double>& e, vector<vector<double>>& z) {
     const double EPS = numeric_limits<double>::epsilon();
 
     int n = d.size();
-
     z.resize(n, vector<double>(n, 0));
     for(int i = 0; i < n; i++)	z[i][i] = 1;
     e.push_back(0.0);
-
-    // Convenient to renumber the elements of e.
-    //for (i = 2; i <= n; i++)
-    //	e[i-1] = e[i];
-    //e[n] = 0.0;
-    //
-    //for (i = 0; i <= n; i++)
-    //	cout << e[i] << " ";
-    //cout << endl;
 
     for (l = 0; l < n; l++) {
         //cout << "tqli" << l << endl;
@@ -131,12 +121,6 @@ void tqli (vector<double>& d, vector<double>& e, vector<vector<double>>& z) {
                     g = c * r - b;
                     // Next loop can be omitted if eigenvectors not wanted
                     // Form eigenvectors.
-
-                    //for (k = 1; k <= n; k++) {
-                    //	f = z[k][i+1];
-                    //	z[k][i+1] = s * z[k][i] + c * f;
-                    //	z[k][i] = c * z[k][i] - s * f;
-                    //}
                     for (k = 0; k < n; k++) {
                         f = z[k][i+1];
                         z[k][i+1] = s * z[k][i] + c * f;

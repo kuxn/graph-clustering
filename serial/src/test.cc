@@ -143,8 +143,8 @@ bool Tests::testPartition() {
 bool Tests::testManuallyPartition() {
     Graph g;
 
-    g.readDotFormat("./test/par_test_1024000.dot");
-    int colours = 2;
+    g.readDotFormat("./test/test_manually_partition_1000.dot");
+    int colours = 4;
     Analysis::manuallyPartition(g, colours);
     double cut_edge_percent = Analysis::cutEdgePercent(g);
     cout << "cut_edge_percent = " << cut_edge_percent * 100 << "%"<< endl;
@@ -213,11 +213,11 @@ bool Tests::testReothogonalisation() {
     return true;
 }
 
-int main() {
-    //Tests::testLanczos();
-    //Tests::testCutEdgeVertexTable();
-    Tests::testManuallyPartition();
-    //Tests::testReothogonalisation();
-
-    return 0;
-}
+//int main() {
+//    //Tests::testLanczos();
+//    //Tests::testCutEdgeVertexTable();
+//    Tests::testManuallyPartition();
+//    //Tests::testReothogonalisation();
+//
+//    return 0;
+//}

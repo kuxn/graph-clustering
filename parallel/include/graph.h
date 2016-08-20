@@ -62,6 +62,7 @@ class Graph {
         void readDotFormatWithColour(const std::string& filename);
         void readDotFormatByColour(const std::string& filename, const int& global_size);
         void outputDotFormat(const std::string& filename) const;
+        void printDotFormat() const;
         void printLaplacianMat() const;
 
         const int globalSize() const;

@@ -11,8 +11,8 @@
  * =====================================================================================
  */
 
-#ifndef LANCZOS_CPP_
-#define LANCZOS_CPP_
+#ifndef LANCZOS_CC_
+#define LANCZOS_CC_
 
 #include <iostream>
 #include <random>
@@ -38,7 +38,7 @@ using std::endl;
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  Constructor
- *  Description:  The triangular matrix calculated by Lanczos
+ *  Description:  Lanczos algorithm with selective orthogonalisation
  * =====================================================================================
  */
 
@@ -54,87 +54,6 @@ using std::endl;
  *		lanczos_vecs_global[0..n-1][0..n-1] the kth row returns the kth Lanczos vector
  *-----------------------------------------------------------------------------*/
 
-/*-----------------------------------------------------------------------------
- *  Modified Lanczos algorithm with GramSchmidt by Gram–Schmidt
- *-----------------------------------------------------------------------------*/
-
-#ifdef GS_
-template<typename Vector, typename T>
-Lanczos<Vector, T>::Lanczos(const Graph& g_local, bool GramSchmidt) {
-    //VT_TRACER("LANCZOS");
-    int local_size = g_local.size();
-    int m = getIteration(num_of_eigenvec, global_size);
-    Vector v1_halo(g_local.globalSize());
-
-    Vector v0_local = init(g_local);
-    Vector v1_local = v0_local, w_local;
-    T alpha_val_global = 0.0, beta_val_global = 0.0;
-
-    lanczos_vecs[0] = v1_local;
-    haloInit(g_local);
-
-    for (int iter = 1; iter < m; iter++) {
-        haloUpdate(g_local, v1_local, v1_halo);
-        w_local = multGraphVec(g_local, v1_halo);
-        alpha_val_global = dot(v1_local, w_local);
-        alpha.push_back(alpha_val_global);
-
-        for (int i = 0; i < local_size; i++) {
-            w_local[i] = w_local[i] - alpha_val_global * v1_local[i] - beta_val_global * v0_local[i];
-        }
-
-        beta_val_global = sqrt(dot(w_local, w_local));
-        beta.push_back(beta_val_global);
-
-        if (std::abs(beta_val_global) < 1e-5) {
-            try {
-                throw std::runtime_error("Value of beta is close to 0: ");
-            }
-            catch (std::runtime_error& e) {
-                std::cerr << "ERROR: " << e.what();
-                cout << "beta[" << iter-1 << "]: " << beta_val_global << endl;
-            }
-        }
-        for (int i = 0; i < local_size; i++) {
-            v1_local[i] = w_local[i]/beta_val_global;
-        }
-        if (GramSchmidt) {
-            gramSchmidt(iter, v1_local);
-        }
-        lanczos_vecs[iter] = v1_local;
-        v0_local = lanczos_vecs[iter-1];
-
-        //Verify the dot product of v0 and v1 which is supposed to be 0
-#ifdef Debug
-        T dot_global = dot(v0_local, v1_local);
-        cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_global << endl;
-        cout << endl;
-        if (std::abs(dot_global) > 1e-5)
-            try {
-                throw std::runtime_error("Need reorthogonalise: ");
-            }
-            catch (std::runtime_error& e) {
-                std::cerr << "ERROR: " << e.what();
-                cout << "v"<< iter-1 <<"*v" << iter << " = " << dot_global << endl;
-            }
-#endif
-    }
-    haloUpdate(g_local, v1_local, v1_halo);
-    w_local = multGraphVec(g_local, v1_halo);
-    alpha_val_global = dot(v1_local, w_local);
-    alpha.push_back(alpha_val_global);
-
-    if (GramSchmidt && g_local.rank() == 0) {
-        cout << "Lanczos algorithm WITH GramSchmidt is done." << endl;
-    } else if (g_local.rank() == 0) {
-        cout << "Lanczos algorithm WITHOUT GramSchmidt is done." << endl;
-    }
-}
-#endif /* end-if Gram-Schmidt */
-
-/*-----------------------------------------------------------------------------
- *  Selective Orthogonalisation
- *-----------------------------------------------------------------------------*/
 #ifdef SO_
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bool SO) {
@@ -293,22 +212,6 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
         }
         halo_recv.insert({rank, vector_recv});
     }
-    //if (g.rank() == 2) {
-    //	cout << "in rank " << g.rank() << " ";
-    //	for (auto& it:halo_send) {
-    //		cout << "send to rank " << it.first << ": " << endl;
-    //		for (unsigned int i = 0; i < it.second.size(); ++i) {
-    //			cout << "vector_send["<< i << "] " << it.second[i] << endl;
-    //		}
-    //	}
-    //	cout << "in rank " << g.rank() << " ";
-    //	for (auto& it:halo_recv) {
-    //		cout << "recv from rank " << it.first << ": " << endl;
-    //		for (unsigned int i = 0; i < it.second.size(); ++i) {
-    //			cout << "vector_recv["<< i << "] " << it.second[i] << endl;
-    //		}
-    //	}
-    //}
 }
 
 /*

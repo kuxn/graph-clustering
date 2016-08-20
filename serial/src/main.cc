@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
     ("help,h", ":produce help message")
     ("output,o", ":output the partitioned graph into a dot file")
     ("gram-schmidt,g", ":enable Gram Schmidt in Lanczos, default: false")
-    ("benchmarks,b", "run benchmarks:, default: false")
+    ("benchmarks,b", ":run benchmarks, default: false")
     ("vertices,v", po::value<int>(), ":set number of vertices, default: 20")
     ("colours,c", po::value<int>(), ":set number of colours, has to be the power of 2, default: 2")
     ("input-file,f", po::value<string>(), ":input file name")
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
     if (benchmarks) {
         Analysis::benchmarks(gram_schmidt);
     } else {
-        //Partition partition(*g, colours, gram_schmidt);
+        Partition partition(*g, colours, gram_schmidt);
         if (output) {
             string filename("./output/serial_");
             filename += to_string(g->size());
@@ -109,9 +109,8 @@ int main(int argc, char* argv[]) {
             //partition.outputLapEigenvalues();
             //partition.printLapEigenMat();
             //Analysis::outputTimes(g->size(), partition.times);
-            //Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
-            //cout << "cut edge precent = " << Analysis::cutEdgePercent(*g) << endl;
         }
+        Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
 
     delete g;

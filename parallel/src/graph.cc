@@ -177,6 +177,33 @@ void Graph::outputDotFormat(const string& filename) const {
 
 /*
  * ===  FUNCTION  ======================================================================
+ *         Name:  printDotFormat
+ *  Description:  Print graph in DOT format on the screen
+ * =====================================================================================
+ */
+
+void Graph::printDotFormat() const {
+    int num_of_vertex = G.size();
+    cout << "Undirected Graph {" << endl;
+    if (Colour.size() == 0) {
+        for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+            cout << globalIndex(vertex) << ";" << endl;
+        }
+    } else {
+        for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+            cout << globalIndex(vertex) << "[Colour=" << getColour(globalIndex(vertex)) << "];" << endl;
+        }
+    }
+    for (int vertex = 0; vertex < num_of_vertex; vertex++) {
+        auto it = G.find(globalIndex(vertex));
+        for (const int& neighbour:it->second)
+            cout << globalIndex(vertex) << "--" << neighbour << " ;" << endl;
+    }
+    cout << "}" << endl;
+}
+
+/*
+ * ===  FUNCTION  ======================================================================
  *         Name:  printLaplacianMat
  *  Description:  Print the graph in Laplacian Matrix
  * =====================================================================================

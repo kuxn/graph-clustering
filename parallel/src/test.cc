@@ -66,8 +66,7 @@ bool Tests::testReadGraph() {
     mpi::communicator world;
     Graph g;
     int num = 500, rank = 0;
-    g.init(world.rank(), num, num/world.size());
-    g.readDotFormat("par_test_500.dot");
+    g.readDotFormat("par_test_500.dot", num);
     if (world.rank() == rank) {
         g.printDotFormat();
         cout << "rank = " << world.rank() << endl;
@@ -91,13 +90,12 @@ bool Tests::testReadByColour() {
     mpi::communicator world;
     Graph g;
     int num = 20, rank = 3;
-    g.init(world.rank(), num, num/world.size());
-    g.readDotFormatByColour("./test/par_test_8.dot");
+    g.readDotFormatByColour("./pfs_test_4s/pfs_test_20.dot", num);
     if (world.rank() == rank) {
-        g.printDotFormat();
         cout << "rank = " << world.rank() << endl;
         cout << "size of graph = " << g.size() << endl;
         cout << "num of edges = " << g.edgesNum() << endl;
+        g.printDotFormat();
         //g.printLaplacianMat();
     }
     env.~environment();
@@ -115,11 +113,10 @@ bool Tests::testPartitionWithSubgraphs() {
     mpi::environment env;
     mpi::communicator world;
     Graph g;
-    int num = 102400, rank = 3, subgraphs = 2;
+    int num = 1024, subgraphs = 4;
     bool gram_schmidt = true;
-    g.init(world.rank(), num, num/world.size());
-    g.readDotFormatByColour("./pfs_test_4s/par_test_102400.dot");
-    if (world.rank() == rank) {
+    g.readDotFormatByColour("./pfs_test_4s/pfs_test_1024.dot", num);
+    if (world.rank() == 0) {
         g.printDotFormat();
         cout << "rank = " << world.rank() << ", size of graph = " << g.size() << ", num of edges = " << g.edgesNum() << endl;
         //g.printLaplacianMat();
@@ -130,8 +127,8 @@ bool Tests::testPartitionWithSubgraphs() {
 }
 
 int main() {
-    Tests::testPartitionWithSubgraphs();
-    //Tests::testReadByColour();
+    //Tests::testPartitionWithSubgraphs();
+    Tests::testReadByColour();
     //Tests::testPartition();
 
     return 0;

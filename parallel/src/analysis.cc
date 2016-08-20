@@ -51,7 +51,6 @@ double Analysis::cutEdgePercent(const Graph& g) {
 
 void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_values) {
     int subgraphs = g.subgraphsNum();
-    //cout << "subgraphs = " << subgraphs << endl;
 
     std::vector<std::vector<int>> cut_edge_table(subgraphs, std::vector<int>(subgraphs, 0));
     std::vector<int> cut_vertex_table(subgraphs, 0);
@@ -123,12 +122,12 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
     cout << " * Vertices that have no neighbours in the same subgraph" << endl;
     cout << "/*-----------------------------------------------------------------------------" << endl;
     cout << "There are " << isolated_vertex.size() << " such vertices." << endl;
-    if (isolated_vertex.size() != 0) {
-        cout << "VertexIndex(Colour)" << "\t" << "NeighboursSize" << endl;
-        for (const int& vertex:isolated_vertex) {
-            cout << vertex << "(" << g.getColour(vertex) << ")" << "\t\t\t" << g.find(vertex)->second.size() << endl;
-        }
-    }
+    //if (isolated_vertex.size() != 0) {
+    //    cout << "VertexIndex(Colour)" << "\t" << "NeighboursSize" << endl;
+    //    for (const int& vertex:isolated_vertex) {
+    //        cout << vertex << "(" << g.getColour(vertex) << ")" << "\t\t\t" << g.find(vertex)->second.size() << endl;
+    //    }
+    //}
 }
 
 /*

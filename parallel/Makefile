@@ -1,10 +1,10 @@
 CXX 		= mpic++
 #CXX 		= vtcxx -vt:c++ mpic++ -DVTRACE -DVT_
-CXXFLAGS	= -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_
+#VTINC		= /usr/local/include/vampirtrace
 INCPATH		= include
-VTINC		= /usr/local/include/vampirtrace
 LIBDIR		= -L/usr/local/lib
 LDLIBS		= -lboost_mpi -lboost_serialization -lboost_program_options
+CXXFLAGS	= -I $(INCPATH) -I $(VTINC) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_
 
 SRCDIR		= src
 BUILDDIR	= build
@@ -21,7 +21,7 @@ $(TARGET): $(filter-out $(BUILDDIR)/test.o, $(OBJECTS))
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cc
 	@mkdir -p $(BUILDDIR)
-	$(CXX) $(CXXFLAGS) -I $(INCPATH) -I $(VTINC) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 # Explicit dependencies required for headers
 $(OBJECTS):	$(INCPATH)/graph.h
@@ -36,28 +36,8 @@ $(foreach object_file,$(OBJECTS),$(eval $(call OBJECT_DEPENDS_ON_CORRESPONDING_H
 # Phony target to get around problem of having a file called 'clean'
 .PHONY: clean
 clean:
-	rm -rf *.z *.dSYM *.otf *.thumb $(BUILDDIR) $(TARGET)
+	rm -rf $(BUILDDIR) $(TARGET)
 
-
-tester: $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
+parallel_tester: $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBDIR) $(LDLIBS)
-	mpirun -np 2 ./tester
-
-bench:
-	make -C benchmarks bench
-
-bench_clean:
-	make -C benchmarks clean
-
-plot:
-	make -C benchmarks plot
-	
-output: main
-	time ./main > graph.dot
-
-eigenvalues_figure:
-	gnuplot < eigenvalues.gnu
-
-unit_tests: $(BUILDDIR)/$(TARGET).o
-	make -C unit_tests test
-
+	mv parallel_tester ../
