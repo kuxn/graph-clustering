@@ -24,7 +24,8 @@ class Tests {
         static bool testPartition();
         static bool testReadGraph();
         static bool testReadGraphWithColour();
-        static bool testManuallyPartition();
+        static bool testRandomPartition();
+        static bool testEvenPartition();
         static bool testCutEdgeVertexTable();
 };
 

@@ -41,7 +41,7 @@ typedef std::vector<Vector> DenseMatrix;
  *  Description:  Partition the graph into multiple subgraphs by only calculating the corresponding laplacian eigenvectors
  * =====================================================================================
  */
-
+#ifdef Fiedler_
 Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 
 #ifdef VT_
@@ -104,6 +104,98 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     }
     double t_par = timer_partition.elapsed();
     times.push_back(t_par);
+}
+#endif
+
+#ifdef Median_
+Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
+
+#ifdef VT_
+    VT_TRACER("Partition::Partition");
+#endif
+    boost::timer timer_partition;
+    int num_of_eigenvec = log2(subgraphs);
+
+    // Construct tridiagonal matrix using Lanczos algorithm
+    boost::timer timer_lanczos;
+    Lanczos<Vector, double> lanczos(g, num_of_eigenvec, GramSchmidt);
+    double t_lan = timer_lanczos.elapsed();
+    times.push_back(t_lan);
+    laplacian_eigenvalues_ = lanczos.alpha;
+    Vector beta = lanczos.beta;
+
+    // Define an identity matrix as the input for TQLI algorithm
+    DenseMatrix tri_eigen_vecs;
+
+    // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
+    boost::timer timer_tqli;
+    tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
+    double t_tqli = timer_tqli.elapsed();
+    times.push_back(t_tqli);
+
+    // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha"
+    int vector_index = 0;
+
+    int m = laplacian_eigenvalues_.size();
+    unordered_multimap<double, int> hashmap;
+    for (int i = 0; i < m; i++) {
+        hashmap.insert({laplacian_eigenvalues_[i], i});
+    }
+    Vector auxiliary_vec = laplacian_eigenvalues_;
+    sort(auxiliary_vec.begin(), auxiliary_vec.end());
+
+    Vector median_vec;
+    double median = 0.0;
+    int fiedler_index = 1;
+    //int fiedler_index = laplacian_eigenvalues_.size() - 1;
+    for (int i = 0; i < num_of_eigenvec; i++) {
+        auto it = hashmap.find(auxiliary_vec[fiedler_index]);
+        while (abs(it->first) < 1e-2) {
+            fiedler_index++;
+            it = hashmap.find(auxiliary_vec[fiedler_index]);
+        }
+        fiedler_index++;
+        //fiedler_index--;
+        vector_index = it->second;
+        ritz_values.push_back(it->first);
+        //cout << "eigenvalue used: " << it->first << ", Vector_Index: " << vector_index <<endl;
+        hashmap.erase(it); // Deal with identical eigenvalues
+        laplacian_eigen_mat_.push_back(getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index));
+
+		// Calculate the median for each eigenvector
+        Vector auxiliary_vec2 = laplacian_eigen_mat_[i];
+        sort(auxiliary_vec2.begin(), auxiliary_vec2.end());
+        int vec_size = auxiliary_vec2.size();
+        if (vec_size % 2 == 0) {
+            median = (auxiliary_vec2[vec_size/2] + auxiliary_vec2[vec_size/2 - 1])/2;
+        } else {
+            median = auxiliary_vec2[vec_size/2];
+        }
+		//cout << "sorted eigenvector:" << endl;
+		//for (const auto& x:auxiliary_vec2) {
+		//	cout << x << " ";
+		//}
+		//cout << endl;
+		//cout << "median for eigenvector " << i << " = " << median << endl;;
+        median_vec.push_back(median);
+    }
+
+	//cout << "colour: ";
+    for (int vertex = 0; vertex < g.size(); vertex++) {
+        int colour = 0;
+        for (int row = 0; row < num_of_eigenvec; row++) {
+            colour += pow(2, row) * signMedian(laplacian_eigen_mat_[row][vertex], median_vec[row]);
+        }
+        g.setColour(vertex, colour);
+		//cout << colour << " ";
+    }
+    double t_par = timer_partition.elapsed();
+    times.push_back(t_par);
+}
+#endif
+
+inline int Partition::signMedian(double entry, double median) {
+    return entry >= median ? 1:0;
 }
 
 /*

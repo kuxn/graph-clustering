@@ -140,12 +140,12 @@ bool Tests::testPartition() {
  * =====================================================================================
  */
 
-bool Tests::testManuallyPartition() {
+bool Tests::testRandomPartition() {
     Graph g;
 
     g.readDotFormat("./test/test_manually_partition_1000.dot");
     int colours = 4;
-    Analysis::manuallyPartition(g, colours);
+    Analysis::randomPartition(g, colours);
     double cut_edge_percent = Analysis::cutEdgePercent(g);
     cout << "cut_edge_percent = " << cut_edge_percent * 100 << "%"<< endl;
 
@@ -154,6 +154,25 @@ bool Tests::testManuallyPartition() {
     }
     return true;
 }
+
+bool Tests::testEvenPartition() {
+    Graph g;
+
+    //g.readDotFormat("./test/test_manually_partition_1000.dot");
+    g.readDotFormat("./median_file/median_102400v_2.dot");
+    int colours = 64;
+    Analysis::evenPartition(g, colours);
+    double cut_edge_percent = Analysis::cutEdgePercent(g);
+    std::vector<double> ritz_values(1, 0.0);
+    Analysis::cutEdgeVertexTable(g, ritz_values);
+    cout << "cut_edge_percent = " << cut_edge_percent * 100 << "%"<< endl;
+
+    if (g.subgraphsNum() != 4 || std::abs(cut_edge_percent - 0.501239) < 1e-5) {
+        return false;
+    }
+    return true;
+}
+
 
 /*
  * ===  FUNCTION  ======================================================================
@@ -213,11 +232,12 @@ bool Tests::testReothogonalisation() {
     return true;
 }
 
-//int main() {
-//    //Tests::testLanczos();
-//    //Tests::testCutEdgeVertexTable();
-//    Tests::testManuallyPartition();
-//    //Tests::testReothogonalisation();
-//
-//    return 0;
-//}
+int main() {
+    //Tests::testLanczos();
+    //Tests::testCutEdgeVertexTable();
+    //Tests::testRandomPartition();
+    Tests::testEvenPartition();
+    //Tests::testReothogonalisation();
+
+    return 0;
+}

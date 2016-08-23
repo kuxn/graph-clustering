@@ -4,7 +4,8 @@ CXX 		= mpic++
 INCPATH		= include
 LIBDIR		= -L/usr/local/lib
 LDLIBS		= -lboost_mpi -lboost_serialization -lboost_program_options
-CXXFLAGS	= -I $(INCPATH) -I $(VTINC) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_
+#CXXFLAGS	= -I $(INCPATH) -I $(VTINC) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_ -DMedian_
+CXXFLAGS	= -I $(INCPATH) -I $(VTINC) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_ -DFiedler_
 
 SRCDIR		= src
 BUILDDIR	= build

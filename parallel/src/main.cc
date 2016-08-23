@@ -78,12 +78,12 @@ int main(int argc, char* argv[]) {
         if (read_by_colour) {
             g->readDotFormatByColour(filename, vertices);
             if (world.rank() == 0) {
-                cout << "read file by colour" << endl;
+                cout << "cluster assignment" << endl;
             }
         } else {
             g->readDotFormat(filename, vertices);
             if (world.rank() == 0) {
-                cout << "read file without colour" << endl;
+                cout << "even assignment" << endl;
             }
         }
     } else {
@@ -124,32 +124,30 @@ int main(int argc, char* argv[]) {
     world.barrier();
     // Read all the vertices to rank 0
     if (world.rank() == 0) {
+        for (int rank = 1; rank < world.size(); ++rank) {
+            filename = "./output/temp_";
+            filename += to_string(vertices);
+            filename += "v_";
+            filename += to_string(world.size());
+            filename += "wr_";
+            filename += to_string(rank);
+            filename += "r.dot";
+            g->readDotFormatWithColour(filename);
+        }
         if (output) {
-            for (int rank = 1; rank < world.size(); rank++) {
-                filename = "./output/temp_";
-                filename += to_string(vertices);
-                filename += "v_";
-                filename += to_string(world.size());
-                filename += "wr_";
-                filename += to_string(rank);
-                filename += "r.dot";
-                g->readDotFormatWithColour(filename);
-            }
             filename = "./output/result_";
             filename += to_string(g->globalSize());
             filename += "v_";
             filename += to_string(subgraphs);
             filename += "s.dot";
-            //g->outputDotFormat(filename);
+            g->outputDotFormat(filename);
         }
-        //partition.printLapEigenvalues();
-        //partition.printLapEigenMat();
-        Analysis::outputTimes(world.size(), vertices, partition.times);
-        Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
+		Analysis::outputTimes(world.size(), vertices, partition.times);
+		Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
-
+    //partition.printLapEigenvalues();
+    //partition.printLapEigenMat();
     env.~environment();
-
     delete g;
     return 0;
 }
