@@ -16,7 +16,7 @@
 
 #include <boost/mpi.hpp>
 #include <boost/program_options.hpp>
-#include <boost/mpi/timer.hpp>
+#include <boost/timer.hpp>
 
 #include "graph.h"
 #include "lanczos.h"
@@ -68,6 +68,7 @@ int main(int argc, char* argv[]) {
 
     Graph* g;
 
+    boost::timer timer_io_input;
     if (read_graph) {
         g = new Graph;
         vertices = vm["vertices"].as<int>();
@@ -106,11 +107,16 @@ int main(int argc, char* argv[]) {
             cout << "number of processes = " << world.size() << "." << endl;
         }
     }
+    if (world.rank() == 0) {
+        double t_input = timer_io_input.elapsed();
+        cout << "input takes " << t_input << "s" << endl;
+    }
 
     world.barrier();
     Partition partition(*g, subgraphs, gram_schmidt);
     world.barrier();
 
+    boost::timer timer_io_output;
     if (output && world.rank() != 0) {
         filename = "./output/temp_";
         filename += to_string(vertices);
@@ -142,12 +148,13 @@ int main(int argc, char* argv[]) {
             filename += "s.dot";
             g->outputDotFormat(filename);
         }
-		Analysis::outputTimes(world.size(), vertices, partition.times);
-		Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
+        Analysis::outputTimes(world.size(), vertices, partition.times);
+        double t_output = timer_io_output.elapsed();
+        cout << "output takes " << t_output << "s" << endl;
+        Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
-    //partition.printLapEigenvalues();
-    //partition.printLapEigenMat();
-    env.~environment();
+
+    //#env.~environment();
     delete g;
     return 0;
 }

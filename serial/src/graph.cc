@@ -33,7 +33,7 @@ typedef std::unordered_map<int, std::unordered_set<int>>::const_iterator const_i
 Graph::Graph(int num_of_vertex) {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine rng(seed);
-    uniform_int_distribution<int> num_of_neigh(1, 3);
+    uniform_int_distribution<int> num_of_neigh(2, 3);
 
     for (int vertex = 0; vertex < num_of_vertex; ++vertex) {
         int num_of_neighbour = num_of_neigh(rng);

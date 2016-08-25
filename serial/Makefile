@@ -3,8 +3,8 @@ INCPATH		= include
 LIBDIR		= -L/usr/local/lib
 LDLIBS		= -lboost_program_options
 #GFLAGS		= -lprofiler
-#CXXFLAGS	= -I $(INCPATH) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_ -DMedian_
-CXXFLAGS	= -I $(INCPATH) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_ -DFiedler_
+#CXXFLAGS	= -I $(INCPATH) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DMedian_
+CXXFLAGS	= -I $(INCPATH) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 
 SRCDIR		= src
 BUILDDIR	= build

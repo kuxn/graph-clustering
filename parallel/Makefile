@@ -1,11 +1,11 @@
 CXX 		= mpic++
 #CXX 		= vtcxx -vt:c++ mpic++ -DVTRACE -DVT_
-#VTINC		= /usr/local/include/vampirtrace
+#VTINC		= -I /usr/local/include/vampirtrace
 INCPATH		= include
 LIBDIR		= -L/usr/local/lib
 LDLIBS		= -lboost_mpi -lboost_serialization -lboost_program_options
-#CXXFLAGS	= -I $(INCPATH) -I $(VTINC) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_ -DMedian_
-CXXFLAGS	= -I $(INCPATH) -I $(VTINC) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DSO_ -DFiedler_
+#CXXFLAGS	= -I $(INCPATH) $(VTINC) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -DMedian_
+CXXFLAGS	= -I $(INCPATH) $(VTINC) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops 
 
 SRCDIR		= src
 BUILDDIR	= build

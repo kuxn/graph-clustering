@@ -40,7 +40,6 @@ typedef std::vector<Vector> DenseMatrix;
  * =====================================================================================
  */
 
-#ifdef Fiedler_
 Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 #ifdef VT_
     VT_TRACER("Partition::Partition");
@@ -56,22 +55,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     laplacian_eigenvalues_ = lanczos.alpha;
     Vector beta = lanczos.beta;
 
-#ifdef Debug
-    cout << endl;
-    if (g.rank() == 0) {
-        cout << "lanczos matrix: " << endl;
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                cout << lanczos.lanczos_vecs[i][j] << "\t";
-            }
-            cout << endl;
-        }
-    }
-    cout << endl;
-    cout << "triangular matrix: " << endl;
-    lanczos.print_tri_mat();
-#endif
-
     // Define an identity matrix as the input for TQLI algorithm
     DenseMatrix tri_eigen_vecs;
 
@@ -81,21 +64,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     double t_tqli = timer_tqli.elapsed();
     times.push_back(t_tqli);
 
-#ifdef Debug
-    cout << "Eigenvalues after TQLI: ";
-    for (auto x:laplacian_eigenvalues_) {
-        cout << x << " ";
-    }
-    if (g.rank() == 0) {
-        cout << "tridiagonal matrix: " << endl;
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                cout << tri_eigen_vecs[i][j] << "\t";
-            }
-            cout << endl;
-        }
-    }
-#endif
     // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha"
     int vector_index = 0;
 
@@ -103,9 +71,10 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     unordered_multimap<double, int> hashmap;
     for (int i = 0; i < m; i++)
         hashmap.insert({laplacian_eigenvalues_[i], i});
-
     Vector auxiliary_vec = laplacian_eigenvalues_;
     sort(auxiliary_vec.begin(), auxiliary_vec.end());
+
+#ifndef Median_
     int fiedler_index = 1;
     //int fiedler_index = laplacian_eigenvalues_.size() - 1;
     for (int i = 0; i < num_of_eigenvec; i++) {
@@ -132,46 +101,9 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         }
         g.setColour(g.globalIndex(vertex), colour);
     }
-    double t_par = timer_partition.elapsed();
-    times.push_back(t_par);
-}
 #endif
 
 #ifdef Median_
-Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
-#ifdef VT_
-    VT_TRACER("Partition::Partition");
-#endif
-    boost::timer timer_partition;
-    int num_of_eigenvec = log2(subgraphs);
-
-    // Construct tridiagonal matrix using Lanczos algorithm
-    boost::timer timer_lanczos;
-    Lanczos<Vector, double> lanczos(g, num_of_eigenvec, GramSchmidt);
-    double t_lan = timer_lanczos.elapsed();
-    times.push_back(t_lan);
-    laplacian_eigenvalues_ = lanczos.alpha;
-    Vector beta = lanczos.beta;
-
-    // Define an identity matrix as the input for TQLI algorithm
-    DenseMatrix tri_eigen_vecs;
-
-    // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
-    boost::timer timer_tqli;
-    tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
-    double t_tqli = timer_tqli.elapsed();
-    times.push_back(t_tqli);
-
-    // Find the index of the nth smallest eigenvalue (fiedler vector) of the eigenvalues vector "alpha"
-    int vector_index = 0;
-
-    int m = laplacian_eigenvalues_.size();
-    unordered_multimap<double, int> hashmap;
-    for (int i = 0; i < m; i++)
-        hashmap.insert({laplacian_eigenvalues_[i], i});
-    Vector auxiliary_vec = laplacian_eigenvalues_;
-    sort(auxiliary_vec.begin(), auxiliary_vec.end());
-
     Vector median_vec;
     double median = 0.0;
     int fiedler_index = 1;
@@ -217,10 +149,11 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         }
         g.setColour(g.globalIndex(vertex), colour);
     }
+#endif
+
     double t_par = timer_partition.elapsed();
     times.push_back(t_par);
 }
-#endif
 
 inline int Partition::signMedian(double entry, double median) {
     return entry >= median ? 1:0;

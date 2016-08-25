@@ -23,7 +23,6 @@
 #include <set>
 
 #include <boost/serialization/serialization.hpp>
-#include <boost/mpi/timer.hpp>
 
 #include "lanczos.h"
 
@@ -54,7 +53,6 @@ using std::endl;
  *		lanczos_vecs_global[0..n-1][0..n-1] the kth row returns the kth Lanczos vector
  *-----------------------------------------------------------------------------*/
 
-#ifdef SO_
 template<typename Vector, typename T>
 Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bool SO) {
 #ifdef VT_
@@ -122,7 +120,6 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
         cout << "Lanczos algorithm WITHOUT Selective Orthogonalisation is done." << endl;
     }
 }
-#endif /* end-if SO */
 
 /*
  * ===  FUNCTION  ======================================================================
