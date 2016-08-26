@@ -164,7 +164,7 @@ void Graph::outputDotFormat(const string& filename) const {
         }
     } else {
         for (auto it = G.cbegin(); it != G.cend(); ++it) {
-            Output << it->first << "[Colour=" << getColour(it->first) << "];" << endl;
+            Output << it->first << "[C=" << getColour(it->first) << "];" << endl;
         }
     }
     for (auto it = G.cbegin(); it != G.cend(); ++it) {
@@ -191,7 +191,7 @@ void Graph::printDotFormat() const {
         }
     } else {
         for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-            cout << globalIndex(vertex) << "[Colour=" << getColour(globalIndex(vertex)) << "];" << endl;
+            cout << globalIndex(vertex) << "[C=" << getColour(globalIndex(vertex)) << "];" << endl;
         }
     }
     for (int vertex = 0; vertex < num_of_vertex; vertex++) {

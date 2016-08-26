@@ -158,7 +158,7 @@ void Graph::outputDotFormat(const string& filename) const {
         }
     } else {
         for (int vertex = 0; vertex < num_of_vertex; vertex++) {
-            Output << vertex << "[Colour=" << getColour(vertex) << "];" << endl;
+            Output << vertex << "[C=" << getColour(vertex) << "];" << endl;
         }
     }
     for (int vertex = 0; vertex < num_of_vertex; vertex++) {
