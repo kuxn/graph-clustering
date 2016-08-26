@@ -156,7 +156,7 @@ const int Graph::localIndex(int global_index) const {
  */
 
 void Graph::outputDotFormat(const string& filename) const {
-    ofstream Output(filename, ios::out | ios::binary | ios::trunc);
+    ofstream Output(filename, ios::out | ios::trunc);
     Output << "Undirected Graph {" << endl;
     if (Colour.size() == 0) {
         for (auto it = G.cbegin(); it != G.cend(); ++it) {

@@ -167,7 +167,7 @@ void Analysis::outputTimes(const int& procs, const int& size, const vector<doubl
     string filename("./times/");
     filename += to_string(procs);
     filename += ".dat";
-    ofstream Output(filename, ios::out | ios::binary | ios::app);
+    ofstream Output(filename, ios::out | ios::app);
     //Output << "procs\tlanczos\ttqli\tpartition\t" << endl;
     Output << procs << "\t" << size << "\t";
     std::ostream_iterator<double> outIter(Output, "\t");

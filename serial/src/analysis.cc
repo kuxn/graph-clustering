@@ -173,7 +173,7 @@ void Analysis::outputTimes(const int& size, const vector<double>& vec) {
     cout << "TQLI takes " << vec[1] << "s" << endl;
     cout << "Partition takes " << vec[2] << "s" << endl;
     string filename("./times/1.dat");
-    ofstream Output(filename, ios::out | ios::binary | ios::app);
+    ofstream Output(filename, ios::out | ios::app);
     //Output << "procs\tlanczos\ttqli\tpartition\t" << endl;
     Output << 1 << "\t" << size << "\t";
     std::ostream_iterator<double> outIter(Output, "\t");
