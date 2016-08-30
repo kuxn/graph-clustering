@@ -15,9 +15,6 @@
 #define TEST_H_
 
 class Tests {
-    private:
-        bool testReothogonalisation();
-
     public:
         static bool testTqli();
         static bool testLanczos();
@@ -27,6 +24,7 @@ class Tests {
         static bool testRandomPartition();
         static bool testEvenPartition();
         static bool testCutEdgeVertexTable();
+        static bool testReothogonalisation();
 };
 
 #endif

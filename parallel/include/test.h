@@ -16,16 +16,10 @@
 
 class Tests {
     public:
-        static bool testTqli();
-        static bool testLanczos();
         static bool testPartition();
-        static bool testReothogonalisation();
         static bool testReadGraph();
-        static bool testReadGraphWithColour();
         static bool testReadByColour();
-        static bool testCutEdgePercent();
-        static bool testCutEdgeNodeTable();
-        static bool testPartitionWithSubgraphs();
+        static bool testPartitionWithClusters();
 };
 
 #endif

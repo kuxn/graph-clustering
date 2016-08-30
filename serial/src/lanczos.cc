@@ -14,13 +14,11 @@
 #ifndef LANCZOS_CC_
 #define LANCZOS_CC_
 
+#include "lanczos.h"
 #include <iostream>
 #include <exception>
 #include <utility>
 #include <cmath>
-
-#include "lanczos.h"
-#include "tqli.h"
 
 #ifdef VT_
 #include "vt_user.h"
@@ -41,9 +39,9 @@ using std::endl;
  *		G contains all the elements of the original graph
  *
  *	output:
- *		alpha[0..n-1] returns all the diagonal elements of the tridiagonal matrix (diagonalised)
+ *		alpha[0..n-1] returns all the diagonal elements of the tridiagonal matrix
  *		beta[0..n-2] returns all the subdiagonal elements of the tridiagonal matrix
- *		lanczos_vecs[0..n-1][0..n-1] the kth row returns the kth Lanczos vector
+ *		lanczos_vecs[0..n-1][0..n-1] returns n vectors, each row represents a lanczos vector
  *-----------------------------------------------------------------------------*/
 
 #include <cmath>
@@ -75,6 +73,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
 
         beta_val = norm(w);
         beta[iter - 1] = beta_val;
+        /*
         if (std::abs(beta[iter - 1]) < 1e-5) {
             try {
                 throw std::runtime_error("Value of beta is close to 0: ");
@@ -84,6 +83,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
                 cout << "beta[" << iter - 1 << "]: " << beta[iter - 1] << endl;
             }
         }
+        */
         for (int index = 0; index < size; index++) {
             v1[index] = w[index]/beta[iter - 1];
         }
@@ -103,7 +103,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g, const int& num_of_eigenvec, bool SO)
     } else {
         cout << "Lanczos algorithm WITHOUT Selective Orthogonalisation is done." << endl;
     }
-	cout << "m = " << m << ", t = " << t << endl;
+    cout << "number of iterations = " << m << ", number of Orthogonalisation = " << t << endl;
 }
 
 /*
@@ -123,16 +123,11 @@ const int Lanczos<Vector, T>::getIteration(const int& num_of_eigenvec, const int
     } else {
         scale = num_of_eigenvec + 2;
     }
-    //cout << "scale = " << scale << endl;
     if (round(log10(size)) > 3) {
         scale -= round(log10(std::sqrt(size)));
         scale = scale <= 0 ? 1:scale;
     }
     m = scale * std::sqrt(size) < size ? scale * std::sqrt(size):size;
-    //int size = size;
-    //cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
-    //cout << "scale = " << scale << endl;
-    //m = size;
     return m;
 }
 
@@ -251,8 +246,6 @@ Vector Lanczos<Vector, T>::init(const int& size) {
     for (auto& x:vec) {
         x /= normalise;
     }
-
-    //vec = {0, 0.5, 0, 0.5, 0, 0.5, 0, 0.5};
     return vec;
 }
 

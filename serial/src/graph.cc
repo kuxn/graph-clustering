@@ -26,7 +26,7 @@ typedef std::unordered_map<int, std::unordered_set<int>>::const_iterator const_i
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  Constructor
- *  Description:  Generate random graph using addEdge function
+ *  Description:  Generate random graphs with the addEdge function
  * =====================================================================================
  */
 
@@ -56,13 +56,6 @@ Graph::Graph(int num_of_vertex) {
     cout << "Graph generation is done." << endl;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  Partition operations
- *  Description:  Functions for partition
- * =====================================================================================
- */
-
 void Graph::addEdge(int src, int dest) {
     // Avoid the self circle
     if (src == dest) return;
@@ -85,6 +78,13 @@ void Graph::addEdge(int src, int dest) {
         G.insert({dest, edges});
     }
 }
+
+/*
+ * ===  FUNCTION  ======================================================================
+ *         Name:  Partition operations
+ *  Description:  Functions for partition
+ * =====================================================================================
+ */
 
 void Graph::setColour(int vertex, int colour) const {
     Colour[vertex] = colour;
@@ -173,7 +173,7 @@ void Graph::outputDotFormat(const string& filename) const {
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  printLaplacianMat
- *  Description:  Print the graph in Laplacian Matrix
+ *  Description:  Print the Laplacian Matrix
  * =====================================================================================
  */
 
@@ -234,7 +234,7 @@ void Graph::readDotFormat(const string& filename) {
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  readDotFormatWithColour
- *  Description:  Read the graph from Dot file where has colour for each vertex
+ *  Description:  Read the graph from Dot file with the colour of each vertex
  * =====================================================================================
  */
 

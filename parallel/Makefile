@@ -39,6 +39,6 @@ $(foreach object_file,$(OBJECTS),$(eval $(call OBJECT_DEPENDS_ON_CORRESPONDING_H
 clean:
 	rm -rf $(BUILDDIR) $(TARGET)
 
-parallel_tester: $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
+tester_parallel: $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBDIR) $(LDLIBS)
-	mv parallel_tester ../
+	mv tester_parallel ../

@@ -9,14 +9,16 @@ parallel:
 	@echo "Compiling the parallel code..."
 	make -C parallel
 
-tester:
+tester_serial:
 	@echo "Compiling serial tester..."
-	make -C serial serial_tester
+	make -C serial tester_serial
+
+tester_parallel:
 	@echo "Compiling parallel tester..."
-	make -C parallel parallel_tester
+	make -C parallel tester_parallel
 
 clean:
-	rm -rf *.z *.dSYM *.otf *.thumb *tester
+	rm -rf *.z *.dSYM *.otf *.thumb tester*
 	make -C serial clean
 	make -C parallel clean
 

@@ -14,6 +14,7 @@
 #ifndef LANCZOS_CC_
 #define LANCZOS_CC_
 
+#include "lanczos.h"
 #include <iostream>
 #include <random>
 #include <chrono>
@@ -23,9 +24,6 @@
 #include <set>
 
 #include <boost/serialization/serialization.hpp>
-
-#include "lanczos.h"
-
 #ifdef VT_
 #include "vt_user.h"
 #endif
@@ -44,13 +42,12 @@ using std::endl;
 /*-----------------------------------------------------------------------------
  *  Signiture of the funtion:
  * 	input:
- *		G contains all the elements of the original graph
+ *		G contains all the elements of the local graph
  *
  *	output:
- *		alpha[0..n-1] returns all the diagonal elements of the tridiagonal matrix (diagonalised)
- *		beta[0..n-1] returns all the subdiagonal elements of the tridiagonal matrix
- *		tri_mat[0..n-1][0..n-1] returns the tridiagonal matrix
- *		lanczos_vecs_global[0..n-1][0..n-1] the kth row returns the kth Lanczos vector
+ *		alpha[0..m-1] returns all the diagonal elements of the tridiagonal matrix
+ *		beta[0..m-2] returns all the subdiagonal elements of the tridiagonal matrix
+ *		lanczos_vecs[0..m-1][0..n-1] returns m vectors, each row represents a local lanczos vector
  *-----------------------------------------------------------------------------*/
 
 template<typename Vector, typename T>
@@ -86,15 +83,6 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
         beta_val_global = sqrt(dot(w_local, w_local));
         beta.push_back(beta_val_global);
 
-        if (std::abs(beta_val_global) < 1e-5) {
-            try {
-                throw std::runtime_error("Value of beta is close to 0: ");
-            }
-            catch (std::runtime_error& e) {
-                std::cerr << "ERROR: " << e.what();
-                cout << "beta[" << iter-1 << "]: " << beta_val_global << endl;
-            }
-        }
         for (int i = 0; i < local_size; i++) {
             v1_local[i] = w_local[i]/beta_val_global;
         }
@@ -112,7 +100,7 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
     alpha.push_back(alpha_val_global);
 
     if (g_local.rank() == 0) {
-        cout << "m = " << m << ", t = " << t << endl;
+        cout << "number of iterations = " << m << ", number of Orthogonalisation = " << t << endl;
     }
     if (SO && g_local.rank() == 0) {
         cout << "Lanczos algorithm WITH Selective Orthogonalisation is done." << endl;
@@ -138,16 +126,11 @@ const int Lanczos<Vector, T>::getIteration(const int& num_of_eigenvec, const int
     } else {
         scale = num_of_eigenvec + 2;
     }
-    //cout << "scale = " << scale << endl;
     if (round(log10(global_size)) > 3) {
         scale -= round(log10(std::sqrt(global_size)));
         scale = scale <= 0 ? 1:scale;
     }
     m = scale * std::sqrt(global_size) < global_size ? scale * std::sqrt(global_size):global_size;
-    //int size = global_size;
-    //cout << "sqrt(" << size << ") = " << std::sqrt(size) << "(" << round(std::sqrt(size)) << "), log10(std::sqrt(" << size << ")) = " << log10(std::sqrt(size)) << "(" << round(log10(std::sqrt(size))) << ")" << endl;
-    //cout << "scale = " << scale << endl;
-    //m = global_size;
     return m;
 }
 
@@ -181,18 +164,16 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
                     auto it = halo_send_temp.find(rank);
                     if (it != halo_send_temp.end()) {
                         it->second.insert(iter->first);
-                        //it->second.insert(g.globalIndex(vertex));
                     } else {
                         std::set<int> halo_neighbours;
                         halo_neighbours.insert(iter->first);
-                        //halo_neighbours.insert(g.globalIndex(vertex));
                         halo_send_temp.insert({rank, halo_neighbours});
                     }
                 }
             }
         }
     }
-    // Convert <int, set> to <int, vector> for looking up in halo_update, cheaper than iterating a set.
+    // Convert <int, set> to <int, vector> for efficient looking up in halo_update, cheaper than iterating a set.
     for (auto& it:halo_send_temp) {
         int rank = it.first;
         std::vector<int> vector_send;

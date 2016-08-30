@@ -71,7 +71,6 @@ bool Tests::testTqli() {
         if (std::abs(diagonal[i] - result[i]) > 1e-5)
             return false;
     }
-
     return true;
 }
 
@@ -100,10 +99,6 @@ bool Tests::testLanczos() {
     vector<double> eigenvalues = {0, 1.20972, 1.505, 2, 2.86246, 4.32623, 5, 7.09659};
 
     sort(alpha.begin(), alpha.end());
-    //cout << "alpha:";
-    //for (auto x:alpha) {
-    //    cout << x << " ";
-    //}
     for (int i = 0; i < size; i++) {
         if (abs(alpha[i] - eigenvalues[i]) > 1e-5)
             return false;
@@ -119,7 +114,6 @@ bool Tests::testLanczos() {
  */
 
 bool Tests::testPartition() {
-
     Graph g;
     g.readDotFormat("./test/test_partition_10.dot");
 
@@ -142,7 +136,6 @@ bool Tests::testPartition() {
 
 bool Tests::testRandomPartition() {
     Graph g;
-
     g.readDotFormat("./test/test_manually_partition_1000.dot");
     int colours = 4;
     Analysis::randomPartition(g, colours);
@@ -157,9 +150,7 @@ bool Tests::testRandomPartition() {
 
 bool Tests::testEvenPartition() {
     Graph g;
-
-    //g.readDotFormat("./test/test_manually_partition_1000.dot");
-    g.readDotFormat("./median_file/median_102400v_2.dot");
+    g.readDotFormat("./test/test_manually_partition_1000.dot");
     int colours = 64;
     Analysis::evenPartition(g, colours);
     double cut_edge_percent = Analysis::cutEdgePercent(g);
@@ -194,6 +185,8 @@ bool Tests::testCutEdgeVertexTable() {
     Vertices:   20
     Edges:      36
     Subgraphs:  4
+    Used Ritz values: 0.868758, 1.1268
+	Cut Edge Percent: 47.2222%
      *-----------------------------------------------------------------------------
      * Number of nodes in each subgraph
      *-----------------------------------------------------------------------------
@@ -213,7 +206,6 @@ bool Tests::testCutEdgeVertexTable() {
 }
 
 bool Tests::testReothogonalisation() {
-
     Graph g(1000);
     Partition partition1(g, 4, false);
     cout << "WITHOUT reorthogonalisation: " << endl;
@@ -237,7 +229,7 @@ int main() {
     //Tests::testCutEdgeVertexTable();
     //Tests::testRandomPartition();
     Tests::testEvenPartition();
-    //Tests::testReothogonalisation();
+    Tests::testReothogonalisation();
 
     return 0;
 }

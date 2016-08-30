@@ -25,7 +25,7 @@ typedef std::unordered_map<int, std::unordered_set<int>>::const_iterator const_i
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  Constructor
- *  Description:  Generate random graph using addEdge function
+ *  Description:  Generate random graphs with the addEdge function
  * =====================================================================================
  */
 
@@ -37,7 +37,6 @@ Graph::Graph(int num_of_vertex) {
 
     for (int vertex = 0; vertex < num_of_vertex; vertex++) {
         int num_of_neighbour = num_of_neigh(rng);
-        //cout << "num_of_neighbour = " << num_of_neighbour << endl;
         uniform_int_distribution<int> randneigh(0, num_of_vertex - 1);
         unordered_set<int> neighbours;
         for (int neighbour = 0; neighbour < num_of_neighbour; neighbour++) {
@@ -56,13 +55,6 @@ Graph::Graph(int num_of_vertex) {
     cout << "Graph generation is done." << endl;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  Partition operations
- *  Description:  Functions for partition
- * =====================================================================================
- */
-
 void Graph::addEdge(int src, int dest) {
     // Avoid the self circle
     if (src == dest) return;
@@ -77,8 +69,14 @@ void Graph::addEdge(int src, int dest) {
     }
 }
 
+/*
+ * ===  FUNCTION  ======================================================================
+ *         Name:  Partition operations
+ *  Description:  Functions for partitioning
+ * =====================================================================================
+ */
+
 void Graph::setColour(int vertex, int colour) const {
-    //Colour.insert({vertex, colour});
     Colour[vertex] = colour;
 }
 
@@ -205,7 +203,7 @@ void Graph::printDotFormat() const {
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  printLaplacianMat
- *  Description:  Print the graph in Laplacian Matrix
+ *  Description:  Print the Laplacian Matrix
  * =====================================================================================
  */
 
@@ -241,7 +239,7 @@ void Graph::printLaplacianMat() const {
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  readDotFormat
- *  Description:  Read the graph from Dot file
+ *  Description:  Even assignment: Load the equal number of vertices to each process from Dot file
  * =====================================================================================
  */
 
@@ -267,7 +265,6 @@ void Graph::readDotFormat(const string& filename, const int& global_size) {
 
     while (In.good()) {
         if (from >= rank_ * local_size_ && from <= (rank_ + 1) * local_size_ - 1) {
-            //cout << "in rank_" << rank_ << ", from = " << from << " to = " << to << endl;
             addEdge(from, to);
             global_index_[local_index] = from;
             local_index_[from] = local_index;
@@ -296,7 +293,7 @@ void Graph::readDotFormat(const string& filename, const int& global_size) {
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  readDotFormatWithColour
- *  Description:  Read the graph from Dot file where has colour for each vertex
+ *  Description:  Read the graph from Dot file with the colour of each vertex
  * =====================================================================================
  */
 
@@ -341,7 +338,7 @@ void Graph::readDotFormatWithColour(const string& filename) {
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  readDotFormatByColour
- *  Description:  Each process read the vertices having same colour and the corresponding edges;
+ *  Description:  Cluster assignment: Each process read the vertices with the same colour and their edges;
  * =====================================================================================
  */
 
@@ -372,7 +369,7 @@ void Graph::readDotFormatByColour(const string& filename, const int& global_size
             local_index_[vertex] = local_size_;
             local_size_++;
         }
-        global_rank_map.push_back(colour); // Look the rank/colour of any global vertex
+        global_rank_map.push_back(colour);
         In >> vertex;
         if (vertex == first_vertex) break; // Break the loop at the beginning of edge line
         In.ignore(INT_MAX, '=');

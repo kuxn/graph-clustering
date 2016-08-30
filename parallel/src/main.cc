@@ -154,7 +154,6 @@ int main(int argc, char* argv[]) {
         Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
 
-    //#env.~environment();
     delete g;
     return 0;
 }

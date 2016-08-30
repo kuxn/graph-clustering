@@ -11,18 +11,17 @@
  * =====================================================================================
  */
 
+#include "partition.h"
+#include "lanczos.h"
+#include "tqli.h"
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <vector>
 #include <unordered_map>
-
 #include <boost/timer.hpp>
-
-#include "partition.h"
-#include "lanczos.h"
-#include "tqli.h"
 
 #ifdef VT_
 #include "vt_user.h"
@@ -80,7 +79,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 
 #ifndef Median_
     int fiedler_index = 1;
-    //int fiedler_index = laplacian_eigenvalues_.size() - 1;
     for (int i = 0; i < num_of_eigenvec; i++) {
         auto it = hashmap.find(auxiliary_vec[fiedler_index]);
         while (abs(it->first) < 1e-2) {
@@ -88,10 +86,8 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
             it = hashmap.find(auxiliary_vec[fiedler_index]);
         }
         fiedler_index++;
-        //fiedler_index--;
         vector_index = it->second;
         ritz_values.push_back(it->first);
-        //cout << "eigenvalue used: " << it->first << ", Vector_Index: " << vector_index <<endl;
         hashmap.erase(it); // Deal with identical eigenvalues
         laplacian_eigen_mat_.push_back(getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index));
     }
@@ -109,7 +105,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
     Vector median_vec;
     double median = 0.0;
     int fiedler_index = 1;
-    //int fiedler_index = laplacian_eigenvalues_.size() - 1;
     for (int i = 0; i < num_of_eigenvec; i++) {
         auto it = hashmap.find(auxiliary_vec[fiedler_index]);
         while (abs(it->first) < 1e-2) {
@@ -117,14 +112,12 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
             it = hashmap.find(auxiliary_vec[fiedler_index]);
         }
         fiedler_index++;
-        //fiedler_index--;
         vector_index = it->second;
         ritz_values.push_back(it->first);
-        //cout << "eigenvalue used: " << it->first << ", Vector_Index: " << vector_index <<endl;
         hashmap.erase(it); // Deal with identical eigenvalues
         laplacian_eigen_mat_.push_back(getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index));
 
-		// Calculate the median for each eigenvector
+        // Calculate the median for each eigenvector
         Vector auxiliary_vec2 = laplacian_eigen_mat_[i];
         sort(auxiliary_vec2.begin(), auxiliary_vec2.end());
         int vec_size = auxiliary_vec2.size();
@@ -133,22 +126,14 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         } else {
             median = auxiliary_vec2[vec_size/2];
         }
-		//cout << "sorted eigenvector:" << endl;
-		//for (const auto& x:auxiliary_vec2) {
-		//	cout << x << " ";
-		//}
-		//cout << endl;
-		//cout << "median for eigenvector " << i << " = " << median << endl;;
         median_vec.push_back(median);
     }
-	//cout << "colour: ";
     for (int vertex = 0; vertex < g.size(); vertex++) {
         int colour = 0;
         for (int row = 0; row < num_of_eigenvec; row++) {
             colour += pow(2, row) * signMedian(laplacian_eigen_mat_[row][vertex], median_vec[row]);
         }
         g.setColour(vertex, colour);
-		//cout << colour << " ";
     }
 #endif
 
@@ -163,7 +148,7 @@ inline int Partition::signMedian(double entry, double median) {
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  utilities
- *  Description:  Print vector, matrix for debug
+ *  Description:  Print eigenvalues, eigenvectors
  * =====================================================================================
  */
 
@@ -173,7 +158,6 @@ void Partition::printLapEigenMat() {
         int col_size = laplacian_eigen_mat_[row].size();
         for (int col = 0; col < col_size; col++) {
             cout << laplacian_eigen_mat_[row][col] << " ";
-            //cout << col << " " << laplacian_eigen_mat_[row][col] << " " << endl;
         }
         cout << endl;
     }
@@ -205,7 +189,7 @@ void Partition::outputLapEigenvalues() {
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  getOneLapEigenVec
- *  Description:  Return the fiedler vector using lanczos and tqli functions
+ *  Description:  Calculate one eigenvector.
  * =====================================================================================
  */
 

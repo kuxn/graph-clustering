@@ -29,5 +29,5 @@ WVTEST_MAIN("Partition - partition & cut edge percentage") {
 }
 
 WVTEST_MAIN("Analysis - manually partition & cut edge percentage") {
-    WVPASS(Tests::testManuallyPartition());
+    WVPASS(Tests::testRandomPartition());
 }

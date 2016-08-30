@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
             //g->printLaplacianMat();
             //partition.printLapEigenvalues();
             //partition.outputLapEigenvalues();
-            partition.printLapEigenMat();
+            //partition.printLapEigenMat();
             Analysis::outputTimes(g->size(), partition.times);
         }
         Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
