@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
     world.barrier();
 
     boost::timer timer_io_output;
-    if (output && world.rank() != 0) {
+    if (world.rank() != 0) {
         filename = "./output/temp_";
         filename += to_string(vertices);
         filename += "v_";
