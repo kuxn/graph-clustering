@@ -1,0 +1,39 @@
+*.DS_Store
+
+# Ignore test files
+*.dot
+!/unit_tests/*.dot 
+*.out
+*.dat
+/test_on_lonsdale
+
+# Ignore gnuplot files
+*.png
+*.gnu
+*.gp
+*.eps
+*.sh
+!/parallel/benchmarks/submit.sh
+*.gp
+!/parallel/benchmarks/*.gp
+benchmarks_*
+
+# Ignore object files
+*.o
+
+# Ignore executables
+main_serial
+main_parallel
+serial_tester
+parallel_tester
+
+# VampirTrace files
+*.z
+*.dSYM
+*.otf
+*.thumb
+*.vsettings
+parallel_profiling
+
+# Ignore text file
+*.txt
