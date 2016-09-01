@@ -18,7 +18,7 @@ tester_parallel:
 	make -C parallel tester_parallel
 
 clean:
-	rm -rf *.z *.dSYM *.otf *.thumb tester*
+	rm -rf *.z *.dSYM *.otf *.thumb tester* output/temp*
 	make -C serial clean
 	make -C parallel clean
 

@@ -102,17 +102,16 @@ int main(int argc, char* argv[]) {
             filename += to_string(g->subgraphsNum());
             filename += "s.dot";
             g->outputDotFormat(filename);
-        } else {
-            //g->outputDotFormat("plot_6.dot");
-            //g->printLaplacianMat();
-            //partition.printLapEigenvalues();
-            //partition.outputLapEigenvalues();
-            //partition.printLapEigenMat();
-            Analysis::outputTimes(g->size(), partition.times);
         }
+        //g->outputDotFormat("plot_6.dot");
+        //g->printLaplacianMat();
+        //partition.printLapEigenvalues();
+        //partition.outputLapEigenvalues();
+        //partition.printLapEigenMat();
+        Analysis::outputTimes(g->size(), partition.times);
         Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
 
-    delete g;
-    return 0;
+	delete g;
+	return 0;
 }
