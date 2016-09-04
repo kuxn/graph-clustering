@@ -6,7 +6,6 @@
 
 ## Compiling
 ```
-mkdir output times
 make serial
 make parallel
 ```

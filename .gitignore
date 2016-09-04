@@ -1,11 +1,8 @@
 *.DS_Store
 
 # Ignore test files
-*.dot
-!/unit_tests/*.dot 
 *.out
 *.dat
-/test_on_lonsdale
 
 # Ignore gnuplot files
 *.png
@@ -24,8 +21,8 @@ benchmarks_*
 # Ignore executables
 main_serial
 main_parallel
-serial_tester
-parallel_tester
+tester_serial
+tester_serial
 
 # VampirTrace files
 *.z

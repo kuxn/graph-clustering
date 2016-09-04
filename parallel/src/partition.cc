@@ -215,35 +215,3 @@ Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_
     return laplacian_vector;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  getLapEigenMat
- *  Description:  Get all the eigenvectors of the original matrix.
- * =====================================================================================
- */
-
-void Partition::getLapEigenMat(const Graph& g, bool GramSchmidt) {
-
-    int size = g.globalSize();
-
-    // Construct tridiagonal matrix using Lanczos algorithm
-    Lanczos<Vector, double> lanczos(g, size, GramSchmidt);
-    laplacian_eigenvalues_ = lanczos.alpha;
-    Vector beta = lanczos.beta;
-
-    // Define an identity matrix as the input for TQLI algorithm
-    DenseMatrix tri_eigen_vecs;
-
-    // Calculate the eigenvalues and eigenvectors of the tridiagonal matrix
-    tqli(laplacian_eigenvalues_, beta, tri_eigen_vecs);
-
-    // Calculate all the eigenvectors of original Laplacian matrix using
-    // the eigenvectors of the tridiagonal matrix computed by TQLI
-    for (int k = 0; k < size; k++) {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                laplacian_eigen_mat_[k][i] += lanczos.lanczos_vecs[j][i] * tri_eigen_vecs[j][k];
-            }
-        }
-    }
-}

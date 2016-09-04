@@ -1,8 +1,8 @@
 CXX 		= g++
 INCPATH		= include
 LIBDIR		= -L/usr/local/lib
-LDLIBS		= -lboost_program_options
 #GFLAGS		= -lprofiler
+LDLIBS		= -lboost_program_options $(GFLAGS)
 #MEDIANFLAG	= -DMedian_
 CXXFLAGS	= -I $(INCPATH) -Wall -std=c++11 -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops $(MEDIANFLAG)
 
@@ -21,7 +21,7 @@ $(TARGET): $(filter-out $(BUILDDIR)/test.o, $(OBJECTS))
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cc
 	@mkdir -p $(BUILDDIR)
-	$(CXX) $(CXXFLAGS) $(GFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 # Explicit dependencies required for headers
 $(OBJECTS):	$(INCPATH)/graph.h

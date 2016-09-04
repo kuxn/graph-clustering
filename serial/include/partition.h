@@ -28,7 +28,6 @@ class Partition {
         DenseMatrix laplacian_eigen_mat_;
 
         Vector getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index);
-        void getLapEigenMat(const Graph& g, bool GramSchmidt);
         inline int signMedian(double entry, double median);
 
     public:

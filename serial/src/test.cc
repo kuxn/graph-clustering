@@ -123,7 +123,6 @@ bool Tests::testPartition() {
     if (g.subgraphsNum() != 2 || std::abs(cut_edge_percent - 0.142857) > 1e-5) {
         return false;
     }
-
     return true;
 }
 
@@ -136,7 +135,7 @@ bool Tests::testPartition() {
 
 bool Tests::testRandomPartition() {
     Graph g;
-    g.readDotFormat("./test/test_manually_partition_1000.dot");
+    g.readDotFormat("./test/test_1000.dot");
     int colours = 4;
     Analysis::randomPartition(g, colours);
     double cut_edge_percent = Analysis::cutEdgePercent(g);
@@ -150,8 +149,8 @@ bool Tests::testRandomPartition() {
 
 bool Tests::testEvenPartition() {
     Graph g;
-    g.readDotFormat("./test/test_manually_partition_1000.dot");
-    int colours = 64;
+    g.readDotFormat("./test/test_1000.dot");
+    int colours = 4;
     Analysis::evenPartition(g, colours);
     double cut_edge_percent = Analysis::cutEdgePercent(g);
     std::vector<double> ritz_values(1, 0.0);
@@ -186,7 +185,7 @@ bool Tests::testCutEdgeVertexTable() {
     Edges:      36
     Subgraphs:  4
     Used Ritz values: 0.868758, 1.1268
-	Cut Edge Percent: 47.2222%
+    Cut Edge Percent: 47.2222%
      *-----------------------------------------------------------------------------
      * Number of nodes in each subgraph
      *-----------------------------------------------------------------------------
@@ -206,17 +205,17 @@ bool Tests::testCutEdgeVertexTable() {
 }
 
 bool Tests::testReothogonalisation() {
-    Graph g(1000);
+    Graph g(100);
     Partition partition1(g, 4, false);
     cout << "WITHOUT reorthogonalisation: " << endl;
     Analysis::cutEdgeVertexTable(g, partition1.ritz_values);
     cout << "eigenvalues:";
-    partition1.printLapEigenvalues();
+    //partition1.printLapEigenvalues();
     //partition1.printLapEigenMat();
 
-    //Partition partition2(g, 4, true);
-    //cout << "WITH reorthogonalisation: " << endl;
-    //Analysis::cutEdgeVertexTable(g);
+    Partition partition2(g, 4, true);
+    cout << "WITH reorthogonalisation: " << endl;
+    Analysis::cutEdgeVertexTable(g, partition2.ritz_values);
     //cout << "eigenvalues:";
     //partition2.printLapEigenvalues();
     //partition2.printLapEigenMat();
@@ -224,12 +223,12 @@ bool Tests::testReothogonalisation() {
     return true;
 }
 
-int main() {
+//int main() {
     //Tests::testLanczos();
     //Tests::testCutEdgeVertexTable();
     //Tests::testRandomPartition();
-    Tests::testEvenPartition();
-    Tests::testReothogonalisation();
+    //Tests::testEvenPartition();
+    //Tests::testReothogonalisation();
 
-    return 0;
-}
+    //return 0;
+//}
