@@ -84,7 +84,7 @@ bool Tests::testReadByColour() {
     mpi::communicator world;
     Graph g;
     int num = 20, rank = 3;
-    g.readDotFormatByColour("./pfs_test_4s/pfs_test_20.dot", num);
+    g.readDotFormatByColour("./test/par_test_20_4s.dot", num);
     if (world.rank() == rank) {
         cout << "rank = " << world.rank() << endl;
         cout << "size of graph = " << g.size() << endl;
@@ -108,7 +108,7 @@ bool Tests::testPartitionWithClusters() {
     Graph g;
     int num = 1024, subgraphs = 4;
     bool gram_schmidt = true;
-    g.readDotFormatByColour("./pfs_test_4s/pfs_test_1024.dot", num);
+    g.readDotFormatByColour("./test/par_test_1024.dot", num);
     if (world.rank() == 0) {
         //g.printDotFormat();
         cout << "rank = " << world.rank() << ", size of graph = " << g.size() << ", num of edges = " << g.edgesNum() << endl;
@@ -119,9 +119,9 @@ bool Tests::testPartitionWithClusters() {
 }
 
 int main() {
-    //Tests::testReadByColour();
+    Tests::testReadByColour();
     //Tests::testPartition();
-    Tests::testReadGraph();
+    //Tests::testReadGraph();
     //Tests::testPartitionWithClusters();
 
     return 0;
