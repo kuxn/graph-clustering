@@ -118,11 +118,11 @@ bool Tests::testPartitionWithClusters() {
     return true;
 }
 
-int main() {
-    Tests::testReadByColour();
-    //Tests::testPartition();
-    //Tests::testReadGraph();
-    //Tests::testPartitionWithClusters();
-
-    return 0;
-}
+// int main() {
+//     Tests::testReadByColour();
+//     //Tests::testPartition();
+//     //Tests::testReadGraph();
+//     //Tests::testPartitionWithClusters();
+// 
+//     return 0;
+// }
