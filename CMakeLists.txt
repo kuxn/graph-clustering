@@ -11,6 +11,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# -- Set common parts
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common/include)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/common/src COMMON_SOURCE_FILES)
+
 # -- Subdirectory that has CMakeLists
 
 add_subdirectory(serial)
