@@ -46,6 +46,7 @@ class Graph {
         void printLaplacianMat() const;
         void setColour(int vertex, int colour) const;
         const int getColour(int vertex) const;
+        const int globalIndex(int &vertex) const;
         void readDotFormat(const std::string& filename);
         void readDotFormatWithColour(const std::string& filename);
 

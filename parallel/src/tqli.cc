@@ -17,6 +17,7 @@
 #include <utility>
 #include <limits>
 #include "tqli.h"
+
 #ifdef VT_
 #include "vt_user.h"
 #endif
@@ -69,6 +70,7 @@ double pythag(double a, double b) {
  *-----------------------------------------------------------------------------*/
 
 void tqli (vector<double>& d, vector<double>& e, vector<vector<double>>& z) {
+
 #ifdef VT_
     VT_TRACER("TQLI");
 #endif
@@ -82,11 +84,9 @@ void tqli (vector<double>& d, vector<double>& e, vector<vector<double>>& z) {
     e.push_back(0.0);
 
     for (l = 0; l < n; l++) {
-        //cout << "tqli" << l << endl;
         iter = 0;
         do {
             // Look for a single small subdiagonal element to split the matrix.
-            //for (m = l; m <= n-1; m++)
             for (m = l; m < n-1; m++)
             {
                 dd = std::abs(d[m])+std::abs(d[m+1]);
@@ -121,7 +121,9 @@ void tqli (vector<double>& d, vector<double>& e, vector<vector<double>>& z) {
                     g = c * r - b;
                     // Next loop can be omitted if eigenvectors not wanted
                     // Form eigenvectors.
-                    for (k = 0; k < n; k++) {
+
+                   for (k = 0; k < n; k++) {
+                        //VT_TRACER("TQLI - Form eigenvectors");
                         f = z[k][i+1];
                         z[k][i+1] = s * z[k][i] + c * f;
                         z[k][i] = c * z[k][i] - s * f;

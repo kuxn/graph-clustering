@@ -140,6 +140,10 @@ const const_iterator Graph::cend() const {
     return G.cend();
 }
 
+const int Graph::globalIndex(int &vertex) const {
+    return vertex;
+}
+
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  outputDotFormat

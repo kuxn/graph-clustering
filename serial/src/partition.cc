@@ -97,7 +97,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         for (int row = 0; row < num_of_eigenvec; row++) {
             colour += pow(2, row) * Sign(laplacian_eigen_mat_[row][vertex]);
         }
-        g.setColour(vertex, colour);
+        g.setColour(g.globalIndex(vertex), colour);
     }
 #endif
 
@@ -133,7 +133,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         for (int row = 0; row < num_of_eigenvec; row++) {
             colour += pow(2, row) * signMedian(laplacian_eigen_mat_[row][vertex], median_vec[row]);
         }
-        g.setColour(vertex, colour);
+        g.setColour(g.globalIndex(vertex), colour);
     }
 #endif
 

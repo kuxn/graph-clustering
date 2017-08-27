@@ -14,10 +14,12 @@
 #include "partition.h"
 #include "lanczos.h"
 #include "tqli.h"
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <vector>
 #include <unordered_map>
 #include <boost/timer.hpp>
 
@@ -40,6 +42,7 @@ typedef std::vector<Vector> DenseMatrix;
  */
 
 Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
+
 #ifdef VT_
     VT_TRACER("Partition::Partition");
 #endif
@@ -68,8 +71,9 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
 
     int m = laplacian_eigenvalues_.size();
     unordered_multimap<double, int> hashmap;
-    for (int i = 0; i < m; i++)
+    for (int i = 0; i < m; i++) {
         hashmap.insert({laplacian_eigenvalues_[i], i});
+    }
     Vector auxiliary_vec = laplacian_eigenvalues_;
     sort(auxiliary_vec.begin(), auxiliary_vec.end());
 
@@ -84,7 +88,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         fiedler_index++;
         vector_index = it->second;
         ritz_values.push_back(it->first);
-        hashmap.erase(it);
+        hashmap.erase(it); // Deal with identical eigenvalues
         laplacian_eigen_mat_.push_back(getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index));
     }
 
@@ -110,7 +114,7 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
         fiedler_index++;
         vector_index = it->second;
         ritz_values.push_back(it->first);
-        hashmap.erase(it);
+        hashmap.erase(it); // Deal with identical eigenvalues
         laplacian_eigen_mat_.push_back(getOneLapEigenVec(lanczos.lanczos_vecs, tri_eigen_vecs, vector_index));
 
         // Calculate the median for each eigenvector
@@ -123,7 +127,6 @@ Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
             median = auxiliary_vec2[vec_size/2];
         }
         median_vec.push_back(median);
-
     }
     for (int vertex = 0; vertex < g.size(); vertex++) {
         int colour = 0;
@@ -169,11 +172,13 @@ void Partition::printLapEigenvalues() {
 }
 
 void Partition::outputLapEigenvalues() {
-    string filename("eigenvalues_");
+
+    string filename("./output/eigenvalues_");
     filename += to_string(laplacian_eigenvalues_.size());
     filename += ".dat";
 
     ofstream Output(filename);
+
     for (unsigned int i = 0; i < laplacian_eigenvalues_.size(); i++)	{
         Output << i << " " << laplacian_eigenvalues_[i] << endl;
     }
