@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  graph.cc
- *
- *    Description:  Member functions for Class Graph.hpp
- *        Created:  06/09/2016 22:42:42
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file graph.cc
+ * @brief Member functions for Class Graph.hpp
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #include <iostream>
@@ -23,11 +16,10 @@
 using namespace std;
 typedef std::unordered_map<int, std::unordered_set<int>>::const_iterator const_iterator;
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  Constructor
- *  Description:  Generate random graphs with the addEdge function
- * =====================================================================================
+/**
+ * @brief Generate random graphs with the addEdge function
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 Graph::Graph(int num_of_vertex) {
@@ -79,11 +71,10 @@ void Graph::addEdge(int src, int dest) {
     }
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  Partition operations
- *  Description:  Functions for partition
- * =====================================================================================
+/**
+ * @brief Functions for partition
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 void Graph::setColour(int vertex, int colour) const {
@@ -97,11 +88,10 @@ const int Graph::getColour(int vertex) const {
     return Colour.at(vertex);
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  return graph properties
- *  Description:  Functions to return graph properties
- * =====================================================================================
+/**
+ * @brief Functions to return graph properties
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 const int Graph::size() const {
@@ -144,11 +134,10 @@ const int Graph::globalIndex(int &vertex) const {
     return vertex;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  outputDotFormat
- *  Description:  Write graph in DOT format
- * =====================================================================================
+/**
+ * @brief Write graph in DOT format
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 void Graph::outputDotFormat(const string& filename) const {
@@ -174,11 +163,10 @@ void Graph::outputDotFormat(const string& filename) const {
     Output << "}" << endl;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  printLaplacianMat
- *  Description:  Print the Laplacian Matrix
- * =====================================================================================
+/**
+ * @brief Print the Laplacian Matrix
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 void Graph::printLaplacianMat() const {
@@ -204,11 +192,10 @@ void Graph::printLaplacianMat() const {
     }
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  readDotFormat
- *  Description:  Read the graph from Dot file
- * =====================================================================================
+/**
+ * @brief Read the graph from Dot file
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 void Graph::readDotFormat(const string& filename) {
@@ -235,11 +222,10 @@ void Graph::readDotFormat(const string& filename) {
     In.close();
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  readDotFormatWithColour
- *  Description:  Read the graph from Dot file with the colour of each vertex
- * =====================================================================================
+/**
+ * @brief Read the graph from Dot file with the colour of each vertex
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 void Graph::readDotFormatWithColour(const string& filename) {

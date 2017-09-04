@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  tqli.cc
- *
- *    Description:  Tridiagonal QL Implicit (tqli) algorithm
- *        Created:  06/14/2016 21:19:24
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file tqli.cc
+ * @brief Tridiagonal QL Implicit (tqli) algorithm
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #include <stdexcept>

@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  analysis.cc
- *
- *    Description:  Partitioning analysis
- *        Created:  06/22/2016 11:25:43
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file analysis.cc
+ * @brief Partitioning analysis
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #include <iostream>
@@ -21,11 +14,10 @@
 
 using namespace std;
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  cutEdgePercent
- *  Description:  The percentage of edges have been cut by partitioning
- * =====================================================================================
+/**
+ * @brief The percentage of edges have been cut by partitioning
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 double Analysis::cutEdgePercent(const Graph& g) {
@@ -130,11 +122,10 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
     //}
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  manuallyPartition
- *  Description:  Manually set equal number of vertices a colour and then compare the cutEdgePercent with Partitioning algorithm
- * =====================================================================================
+/**
+ * @brief Manually set equal number of vertices a colour and then compare the cutEdgePercent with Partitioning algorithm
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 void Analysis::manuallyPartition(const Graph& g) {
@@ -152,11 +143,10 @@ void Analysis::manuallyPartition(const Graph& g) {
     }
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  outputTimes
- *  Description:  output the times into a file
- * =====================================================================================
+/**
+ * @brief output the times into a file
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 void Analysis::outputTimes(const int& procs, const int& size, const vector<double>& vec) {

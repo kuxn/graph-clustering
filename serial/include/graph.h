@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  graph.h
- *
- *    Description:  The interface of a graph
- *        Created:  06/09/2016 16:22:24
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file graph.h
+ * @brief The interface of a graph
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 

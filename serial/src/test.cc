@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  test.cc
- *
- *    Description:  Functions for unit tests
- *        Created:  06/09/2016 18:12:52
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file test.cc
+ * @brief Functions for unit tests
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #include <iostream>
@@ -25,11 +18,10 @@
 
 using namespace std;
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  testReadGraph
- *  Description:  Test the read function, can not verify the correctness in unit testing, but can test the performance
- * =====================================================================================
+/**
+ * @brief Test the read function, can not verify the correctness in unit testing, but can test the performance
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 bool Tests::testReadGraph() {
@@ -50,11 +42,10 @@ bool Tests::testReadGraphWithColour() {
     return true;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  testTqli
- *  Description:  Test tqli function for the correctness of calculating eigenvalues, correct eigenvalues come from Matlab.
- * =====================================================================================
+/**
+ * @brief Test tqli function for the correctness of calculating eigenvalues, correct eigenvalues come from Matlab.
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 bool Tests::testTqli() {
@@ -74,11 +65,10 @@ bool Tests::testTqli() {
     return true;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  testLanczos
- *  Description:  The output alpha/beta would vary based on different initial vector, the eigenvalues should always be same.
- * =====================================================================================
+/**
+ * @brief The output alpha/beta would vary based on different initial vector, the eigenvalues should always be same.
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 bool Tests::testLanczos() {
@@ -106,11 +96,10 @@ bool Tests::testLanczos() {
     return true;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  testPartition
- *  Description:  Partitioning is based on the correctness of the calculation of eigenvalues and corresponding eigenvectors of the Laplacian matrix
- * =====================================================================================
+/**
+ * @brief Partitioning is based on the correctness of the calculation of eigenvalues and corresponding eigenvectors of the Laplacian matrix
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 bool Tests::testPartition() {
@@ -126,11 +115,10 @@ bool Tests::testPartition() {
     return true;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  testManuallyPartition
- *  Description:  Test the function manuallyPartition in analysis.cc
- * =====================================================================================
+/**
+ * @brief Test the function manuallyPartition in analysis.cc
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 bool Tests::testRandomPartition() {
@@ -164,11 +152,10 @@ bool Tests::testEvenPartition() {
 }
 
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  testCutEdgeTable
- *  Description:  Test the connection of the graph after partitioning
- * =====================================================================================
+/**
+ * @brief Test the connection of the graph after partitioning
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 bool Tests::testCutEdgeVertexTable() {

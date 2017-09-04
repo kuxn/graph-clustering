@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  partition.h
- *
- *    Description:  The interface of partitioning of a graph
- *        Created:  06/17/2016 14:35:37
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file partition.h
+ * @brief The interface of partitioning of a graph
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #ifndef PARTITION_H_

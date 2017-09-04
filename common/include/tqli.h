@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  tqli.h
- *
- *    Description:  Header file for tqli.cc
- *        Created:  06/14/2016 22:25:00
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file tqli.h
+ * @brief Header file for tqli.cc
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #ifndef TQLI_H_

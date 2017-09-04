@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  test.cc
- *
- *    Description:  Functions for unit tests
- *        Created:  06/29/2016 18:12:52
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file test.cc
+ * @brief Functions for unit tests
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #include <iostream>
@@ -22,11 +15,10 @@
 namespace mpi = boost::mpi;
 using namespace std;
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  testPartition
- *  Description:  Partitioning is based on the correctness of the calculation of eigenvalues and corresponding eigenvectors of the Laplacian matrix
- * =====================================================================================
+/**
+ * @brief Partitioning is based on the correctness of the calculation of eigenvalues and corresponding eigenvectors of the Laplacian matrix
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 bool Tests::testPartition() {
@@ -48,11 +40,10 @@ bool Tests::testPartition() {
     return true;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  testReadGraph
- *  Description:  Test the read function, can not verify the correctness in unit testing, but can test the performance
- * =====================================================================================
+/**
+ * @brief Test the read function, can not verify the correctness in unit testing, but can test the performance
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 bool Tests::testReadGraph() {
@@ -72,11 +63,10 @@ bool Tests::testReadGraph() {
     return true;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  testReadByColour
- *  Description:  Test reading the vertices with same colours and corresponding edges
- * =====================================================================================
+/**
+ * @brief Test reading the vertices with same colours and corresponding edges
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 bool Tests::testReadByColour() {
@@ -95,11 +85,10 @@ bool Tests::testReadByColour() {
     return true;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  testPartitionWithSubgraphs
- *  Description:  Cluster assignment: test the partition with partitioned graph
- * =====================================================================================
+/**
+ * @brief Cluster assignment: test the partition with partitioned graph
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 bool Tests::testPartitionWithClusters() {

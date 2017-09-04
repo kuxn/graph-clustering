@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  partition.cc
- *
- *    Description:  Partition the graph according to the eigenvectors
- *        Created:  06/17/2016 14:15:15
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file partition.cc
+ * @brief Partition the graph according to the eigenvectors
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #include "partition.h"
@@ -34,11 +27,10 @@ using namespace std;
 typedef std::vector<double> Vector;
 typedef std::vector<Vector> DenseMatrix;
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  Constructor
- *  Description:  Partition the graph into multiple subgraphs by only calculating the corresponding laplacian eigenvectors
- * =====================================================================================
+/**
+ * @brief Partition the graph into multiple subgraphs by only calculating the corresponding laplacian eigenvectors
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 Partition::Partition(const Graph& g, const int& subgraphs, bool GramSchmidt) {
@@ -145,11 +137,10 @@ inline int Partition::signMedian(double entry, double median) {
     return entry >= median ? 1:0;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  utilities
- *  Description:  Print eigenvalues, eigenvectors
- * =====================================================================================
+/**
+ * @brief Print eigenvalues, eigenvectors
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 void Partition::printLapEigenMat() {
@@ -186,11 +177,10 @@ void Partition::outputLapEigenvalues() {
     Output.close();
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  getOneLapEigenVec
- *  Description:  Calculate one eigenvector.
- * =====================================================================================
+/**
+ * @brief Calculate one eigenvector.
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 Vector Partition::getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index) {

@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  lanczos.h
- *
- *    Description:  The interface of lanczos algorithm
- *        Created:  06/11/2016 21:22:58
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file lanczos.h
+ * @brief The interface of lanczos algorithm
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #ifndef LANCZOS_H_

@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  lanczos.cc
- *
- *    Description:  Lanczos algorithm
- *        Created:  06/29/2016 21:33:49
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file lanczos.cc
+ * @brief Lanczos algorithm
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #ifndef LANCZOS_CC_
@@ -32,11 +25,10 @@ namespace mpi = boost::mpi;
 using std::cout;
 using std::endl;
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  Constructor
- *  Description:  Lanczos algorithm with selective orthogonalisation
- * =====================================================================================
+/**
+ * @brief Lanczos algorithm with selective orthogonalisation
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 /*-----------------------------------------------------------------------------
@@ -109,11 +101,10 @@ Lanczos<Vector, T>::Lanczos(const Graph& g_local, const int& num_of_eigenvec, bo
     }
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  getIteration
- *  Description:  Calculate iterations for Lanczos algorithm
- * =====================================================================================
+/**
+ * @brief Calculate iterations for Lanczos algorithm
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 template<typename Vector, typename T>
@@ -134,11 +125,10 @@ const int Lanczos<Vector, T>::getIteration(const int& num_of_eigenvec, const int
     return m;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  haloInit
- *  Description:  Find out which rank and the corresponding data need to receive
- * =====================================================================================
+/**
+ * @brief Find out which rank and the corresponding data need to receive
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 template<typename Vector, typename T>
@@ -192,11 +182,10 @@ void Lanczos<Vector, T>::haloInit(const Graph& g) {
     }
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  haloUpdate
- *  Description:  Refresh the halo elements each iteration for Graph * Lanczos_Vec
- * =====================================================================================
+/**
+ * @brief Refresh the halo elements each iteration for Graph * Lanczos_Vec
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 template<typename Vector, typename T>
@@ -249,11 +238,10 @@ void Lanczos<Vector, T>::haloUpdate(const Graph& g, Vector& v_local, Vector& v_h
     }
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  multGraphVec
- *  Description:  The first component of Lanczos iteration fomular, Laplacian matrix * vector
- * =====================================================================================
+/**
+ * @brief The first component of Lanczos iteration fomular, Laplacian matrix * vector
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 template<typename Vector, typename T>
@@ -274,11 +262,10 @@ Vector Lanczos<Vector, T>::multGraphVec(const Graph& g, const Vector& vec) {
     return prod;
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  gramSchmidt
- *  Description:  GramSchmidt
- * =====================================================================================
+/**
+ * @brief GramSchmidt
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 template<typename Vector, typename T>
@@ -300,11 +287,10 @@ inline void Lanczos<Vector, T>::gramSchmidt(const int& k, Vector& v) {
     }
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  utilities
- *  Description:  Vector operations
- * =====================================================================================
+/**
+ * @brief Vector operations
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 template<typename Vector, typename T>

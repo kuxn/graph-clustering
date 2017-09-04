@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  test.h
- *
- *    Description:  Header file for test.cc
- *        Created:   06/21/2016 16:38:27
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file test.h
+ * @brief Header file for test.cc
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #ifndef TEST_H_

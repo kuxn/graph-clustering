@@ -1,14 +1,7 @@
-/*
- * =====================================================================================
- *
- *       Filename:  analysis.h
- *
- *    Description:  Header file for analysis.cc
- *        Created:  06/22/2016 11:49:29
- *
- *         Author:  Ken Hu, xnchnhu@gmail.com
- *
- * =====================================================================================
+/**
+ * @file analysis.h
+ * @brief Header file for analysis.cc
+ * @author Ken Hu, xnchnhu@gmail.com
  */
 
 #ifndef ANALYSIS_H_
