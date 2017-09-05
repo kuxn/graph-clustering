@@ -21,11 +21,10 @@ using namespace std;
 
 double SQR(double a);
 double pythag(double a, double b);
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  pythag (P70, Numerical Recipes)
- *  Description:  Computes sqrt(a^2 + b^2) without destructive underflow or overflow.
- * =====================================================================================
+/**
+ * @brief Computes sqrt(a^2 + b^2) without destructive underflow or overflow.
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 // Square a double value
@@ -42,11 +41,10 @@ double pythag(double a, double b) {
     else return (absb == 0.0 ? 0.0 : absb*sqrt(1.0+SQR(absa/absb)));
 }
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  tqli (P480, Numerical Recipes)
- *  Description:  Calculate the eigenvalues and eigenvectors of a sysmetric triangular matrix
- * =====================================================================================
+/**
+ * @brief Calculate the eigenvalues and eigenvectors of a sysmetric triangular matrix
+ * @param FILL-ME-IN
+ * @return FILL-ME-IN
  */
 
 /*-----------------------------------------------------------------------------
