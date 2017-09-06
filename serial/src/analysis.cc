@@ -4,12 +4,12 @@
  * @author Ken Hu, xnchnhu@gmail.com
  */
 
-#include <iostream>
-#include <vector>
-#include <iterator>
+#include "analysis.h"
 #include <algorithm>
 #include <fstream>
-#include "analysis.h"
+#include <iostream>
+#include <iterator>
+#include <vector>
 #include "partition.h"
 
 using namespace std;
@@ -20,31 +20,36 @@ using namespace std;
  * @return FILL-ME-IN
  */
 
-double Analysis::cutEdgePercent(const Graph& g) {
+double Analysis::cutEdgePercent(const Graph& g)
+{
     int cut_edge_num = 0;
     if (g.subgraphsNum() == 1) {
         return 0.0;
     }
     for (auto it = g.cbegin(); it != g.cend(); ++it) {
         int vertex_colour = g.getColour(it->first);
-        for (const int& neighbour:it->second) {
+        for (const int& neighbour : it->second) {
             int neighbour_colour = g.getColour(neighbour);
             if (neighbour_colour != vertex_colour) {
                 cut_edge_num++;
             }
         }
     }
-    return (double)cut_edge_num/(double)g.edgesNum()/2.0;
+    return (double)cut_edge_num / (double)g.edgesNum() / 2.0;
 }
 
 /*-----------------------------------------------------------------------------
- *  Modified cutEdgePercent function calculating percentage of cut edges between different subgraphs
+ *  Modified cutEdgePercent function calculating percentage of cut edges between
+ *different subgraphs
  *-----------------------------------------------------------------------------*/
 
-void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_values) {
+void Analysis::cutEdgeVertexTable(const Graph& g,
+                                  const vector<double>& ritz_values)
+{
     int subgraphs = g.subgraphsNum();
 
-    std::vector<std::vector<int>> cut_edge_table(subgraphs, std::vector<int>(subgraphs, 0));
+    std::vector<std::vector<int>> cut_edge_table(
+        subgraphs, std::vector<int>(subgraphs, 0));
     std::vector<int> cut_vertex_table(subgraphs, 0);
     std::vector<int> isolated_vertex;
 
@@ -52,12 +57,13 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
         int temp = 0;
         int vertex_subgraph = g.getColour(it->first);
         if (vertex_subgraph >= subgraphs) {
-            vertex_subgraph = (vertex_subgraph/subgraphs)%subgraphs;
+            vertex_subgraph = (vertex_subgraph / subgraphs) % subgraphs;
         }
-        for (const int& neighbour:it->second) {
+        for (const int& neighbour : it->second) {
             int neighbour_subgraph = g.getColour(neighbour);
             if (neighbour_subgraph >= subgraphs) {
-                neighbour_subgraph = (neighbour_subgraph/subgraphs)%subgraphs;
+                neighbour_subgraph =
+                    (neighbour_subgraph / subgraphs) % subgraphs;
             }
             cut_edge_table[vertex_subgraph][neighbour_subgraph]++;
             if (vertex_subgraph == neighbour_subgraph) {
@@ -72,31 +78,48 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
     std::ostream_iterator<double> it_double(std::cout, "\t");
     std::ostream_iterator<int> it_int(std::cout, "\t");
 
-    cout << "/*-----------------------------------------------------------------------------" << endl;
+    cout << "/*----------------------------------------------------------------"
+            "-------------"
+         << endl;
     cout << " * Basic info of the graph" << endl;
-    cout << "/*-----------------------------------------------------------------------------" << endl;
+    cout << "/*----------------------------------------------------------------"
+            "-------------"
+         << endl;
     cout << "Vertices:  " << g.size() << endl;
     cout << "Edges:     " << g.edgesNum() << endl;
     cout << "Colours:   " << subgraphs << endl;
     cout << "Used Ritz values: ";
     copy(ritz_values.cbegin(), ritz_values.cend(), it_double);
-    cout << endl << "Cut Edge Percent: " << cutEdgePercent(g) * 100 << "%" << endl;
+    cout << endl
+         << "Cut Edge Percent: " << cutEdgePercent(g) * 100 << "%" << endl;
 
-    cout << "/*-----------------------------------------------------------------------------" << endl;
+    cout << "/*----------------------------------------------------------------"
+            "-------------"
+         << endl;
     cout << " * Number of vertices in each subgraph" << endl;
-    cout << "/*-----------------------------------------------------------------------------" << endl;
-    cout << "Colour:    " << "\t";
+    cout << "/*----------------------------------------------------------------"
+            "-------------"
+         << endl;
+    cout << "Colour:    "
+         << "\t";
     for (int col = 0; col < subgraphs; col++) {
         cout << col << "\t";
     }
     cout << endl;
-    cout << "vertices:  " << "\t";
+    cout << "vertices:  "
+         << "\t";
     copy(cut_vertex_table.cbegin(), cut_vertex_table.cend(), it_int);
     cout << endl;
-    cout << "/*-----------------------------------------------------------------------------" << endl;
+    cout << "/*----------------------------------------------------------------"
+            "-------------"
+         << endl;
     cout << " * Edges table after partitioning" << endl;
-    cout << " * Each element represents number of edges (inside)/between subgraphs" << endl;
-    cout << "/*-----------------------------------------------------------------------------" << endl;
+    cout << " * Each element represents number of edges (inside)/between "
+            "subgraphs"
+         << endl;
+    cout << "/*----------------------------------------------------------------"
+            "-------------"
+         << endl;
     for (int col = 0; col < subgraphs; col++) {
         cout << "\t" << col;
     }
@@ -105,31 +128,39 @@ void Analysis::cutEdgeVertexTable(const Graph& g, const vector<double>& ritz_val
         cout << row << "\t";
         for (int col = 0; col < subgraphs; col++) {
             if (row == col)
-                cout << "(" << cut_edge_table[row][col]/2 << ")" << "\t";
+                cout << "(" << cut_edge_table[row][col] / 2 << ")"
+                     << "\t";
             else
                 cout << cut_edge_table[row][col] << "\t";
         }
         cout << endl;
     }
-    cout << "/*-----------------------------------------------------------------------------" << endl;
+    cout << "/*----------------------------------------------------------------"
+            "-------------"
+         << endl;
     cout << " * Vertices that have no neighbours in the same subgraph" << endl;
-    cout << "/*-----------------------------------------------------------------------------" << endl;
+    cout << "/*----------------------------------------------------------------"
+            "-------------"
+         << endl;
     cout << "There are " << isolated_vertex.size() << " such vertices." << endl;
-    //if (isolated_vertex.size() != 0) {
+    // if (isolated_vertex.size() != 0) {
     //    cout << "VertexIndex(Colour)" << "\t" << "NeighboursSize" << endl;
     //    for (const int& vertex:isolated_vertex) {
-    //        cout << vertex << "(" << g.getColour(vertex) << ")" << "\t\t\t" << g.find(vertex)->second.size() << endl;
+    //        cout << vertex << "(" << g.getColour(vertex) << ")" << "\t\t\t" <<
+    //        g.find(vertex)->second.size() << endl;
     //    }
     //}
 }
 
 /**
- * @brief Manually set equal number of vertices a colour and then compare the cutEdgePercent with Partitioning algorithm
+ * @brief Manually set equal number of vertices a colour and then compare the
+ * cutEdgePercent with Partitioning algorithm
  * @param FILL-ME-IN
  * @return FILL-ME-IN
  */
 
-void Analysis::randomPartition(const Graph& g, const int& colours) {
+void Analysis::randomPartition(const Graph& g, const int& colours)
+{
     int colour;
     for (auto it = g.cbegin(); it != g.cend(); ++it) {
         colour = rand() % colours;
@@ -137,12 +168,13 @@ void Analysis::randomPartition(const Graph& g, const int& colours) {
     }
 }
 
-void Analysis::evenPartition(const Graph& g, const int& colours) {
+void Analysis::evenPartition(const Graph& g, const int& colours)
+{
     int size = g.size();
-    int subgraph_size = size/colours;
+    int subgraph_size = size / colours;
 
     int num = 0, colour = 0;
-	for (int vertex = 0; vertex < size; vertex++) {
+    for (int vertex = 0; vertex < size; vertex++) {
         g.setColour(vertex, colour);
         num++;
         if (num == subgraph_size) {
@@ -158,13 +190,14 @@ void Analysis::evenPartition(const Graph& g, const int& colours) {
  * @return FILL-ME-IN
  */
 
-void Analysis::outputTimes(const int& size, const vector<double>& vec) {
+void Analysis::outputTimes(const int& size, const vector<double>& vec)
+{
     cout << "Lanczos takes " << vec[0] << "s" << endl;
     cout << "TQLI takes " << vec[1] << "s" << endl;
     cout << "Partition takes " << vec[2] << "s" << endl;
     string filename("./times/1.dat");
     ofstream Output(filename, ios::out | ios::app);
-    //Output << "procs\tlanczos\ttqli\tpartition\t" << endl;
+    // Output << "procs\tlanczos\ttqli\tpartition\t" << endl;
     Output << 1 << "\t" << size << "\t";
     std::ostream_iterator<double> outIter(Output, "\t");
     std::copy(vec.cbegin(), vec.cend(), outIter);
@@ -178,14 +211,14 @@ void Analysis::outputTimes(const int& size, const vector<double>& vec) {
  * @return FILL-ME-IN
  */
 
-void Analysis::benchmarks(bool GramSchmidt) {
-    vector<std::string> filenames = {"./test/par_test_1024.dot",
-                                     "./test/par_test_2048.dot",
-                                     "./test/par_test_5120.dot",
-                                     "./test/par_test_10240.dot",
-                                     "./test/par_test_102400.dot",
-                                    };
-    //vector<int> subgraphs = {2, 4, 8, 16, 32, 64};
+void Analysis::benchmarks(bool GramSchmidt)
+{
+    vector<std::string> filenames = {
+        "./test/par_test_1024.dot",   "./test/par_test_2048.dot",
+        "./test/par_test_5120.dot",   "./test/par_test_10240.dot",
+        "./test/par_test_102400.dot",
+    };
+    // vector<int> subgraphs = {2, 4, 8, 16, 32, 64};
     vector<int> subgraphs = {8};
     vector<std::vector<std::vector<double>>> output_times;
     cout << "filenames.size() = " << filenames.size() << endl;
@@ -224,4 +257,3 @@ void Analysis::benchmarks(bool GramSchmidt) {
         Output.close();
     }
 }
-

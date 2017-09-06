@@ -7,13 +7,13 @@
 #ifndef TEST_H_
 #define TEST_H_
 
-class Tests {
-    public:
-        static bool testPartition();
-        static bool testReadGraph();
-        static bool testReadByColour();
-        static bool testPartitionWithClusters();
+class Tests
+{
+public:
+    static bool testPartition();
+    static bool testReadGraph();
+    static bool testReadByColour();
+    static bool testPartitionWithClusters();
 };
 
 #endif
-

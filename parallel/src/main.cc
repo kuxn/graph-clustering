@@ -11,11 +11,11 @@
 #include <boost/program_options.hpp>
 #include <boost/timer.hpp>
 
+#include "analysis.h"
 #include "graph.h"
 #include "lanczos.h"
-#include "tqli.h"
 #include "partition.h"
-#include "analysis.h"
+#include "tqli.h"
 #ifdef VT_
 #include "vt_user.h"
 #endif
@@ -24,7 +24,8 @@ namespace mpi = boost::mpi;
 namespace po = boost::program_options;
 using namespace std;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
 #ifdef VT_
     VT_TRACER("MAIN");
 #endif
@@ -55,8 +56,7 @@ int main(int argc, char* argv[]) {
 
     bool read_graph = vm.count("input-file") && vm.count("vertices"),
          read_by_colour = vm.count("read-by-colour"),
-         sub_graphs = vm.count("subgraphs"),
-         output = vm.count("output"),
+         sub_graphs = vm.count("subgraphs"), output = vm.count("output"),
          gram_schmidt = vm.count("gram-schmidt");
 
     Graph* g;
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         vertices = vm["vertices"].as<int>();
         filename = vm["input-file"].as<string>();
         if (world.rank() == 0) {
-            cout << "Input file is \"" << filename  << "\""<< endl;
+            cout << "Input file is \"" << filename << "\"" << endl;
         }
         if (read_by_colour) {
             g->readDotFormatByColour(filename, vertices);
@@ -96,7 +96,8 @@ int main(int argc, char* argv[]) {
     } else {
         subgraphs = 4;
         if (world.rank() == 0 && read_graph) {
-            cout << "default argument: subgraphs = " << subgraphs << "." << endl;
+            cout << "default argument: subgraphs = " << subgraphs << "."
+                 << endl;
             cout << "number of processes = " << world.size() << "." << endl;
         }
     }

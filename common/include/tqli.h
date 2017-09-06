@@ -9,7 +9,7 @@
 
 #include <vector>
 
-void tqli (std::vector<double>& d, std::vector<double>& e, std::vector<std::vector<double>>& z);
+void tqli(std::vector<double>& d, std::vector<double>& e,
+          std::vector<std::vector<double>>& z);
 
 #endif
-

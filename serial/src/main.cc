@@ -4,14 +4,14 @@
  * @author Ken Hu, xnchnhu@gmail.com
  */
 
-#include <iostream>
-#include <string>
 #include <boost/program_options.hpp>
 #include <boost/timer.hpp>
+#include <iostream>
+#include <string>
 
+#include "analysis.h"
 #include "graph.h"
 #include "partition.h"
-#include "analysis.h"
 
 #ifdef VT_
 #include "vt_user.h"
@@ -20,8 +20,8 @@
 using namespace std;
 namespace po = boost::program_options;
 
-int main(int argc, char* argv[]) {
-
+int main(int argc, char* argv[])
+{
 #ifdef VT_
     VT_TRACER("MAIN");
 #endif
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
     } else if (read_graph) {
         g = new Graph;
         filename = vm["input-file"].as<string>();
-        cout << "Input file is \"" << filename  << "\""<< endl;
+        cout << "Input file is \"" << filename << "\"" << endl;
         g->readDotFormat(filename);
     } else {
         cout << desc << endl;
@@ -96,15 +96,15 @@ int main(int argc, char* argv[]) {
             filename += "s.dot";
             g->outputDotFormat(filename);
         }
-        //g->outputDotFormat("plot_6.dot");
-        //g->printLaplacianMat();
-        //partition.printLapEigenvalues();
-        //partition.outputLapEigenvalues();
-        //partition.printLapEigenMat();
+        // g->outputDotFormat("plot_6.dot");
+        // g->printLaplacianMat();
+        // partition.printLapEigenvalues();
+        // partition.outputLapEigenvalues();
+        // partition.printLapEigenMat();
         Analysis::outputTimes(g->size(), partition.times);
         Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
     }
 
-	delete g;
-	return 0;
+    delete g;
+    return 0;
 }

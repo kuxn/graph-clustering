@@ -4,24 +4,26 @@
  * @author Ken Hu, xnchnhu@gmail.com
  */
 
-#include <iostream>
-#include <fstream>
-#include <utility>
 #include "test.h"
+#include <boost/mpi.hpp>
+#include <fstream>
+#include <iostream>
+#include <utility>
 #include "graph.h"
 #include "partition.h"
-#include <boost/mpi.hpp>
 
 namespace mpi = boost::mpi;
 using namespace std;
 
 /**
- * @brief Partitioning is based on the correctness of the calculation of eigenvalues and corresponding eigenvectors of the Laplacian matrix
+ * @brief Partitioning is based on the correctness of the calculation of
+ * eigenvalues and corresponding eigenvectors of the Laplacian matrix
  * @param FILL-ME-IN
  * @return FILL-ME-IN
  */
 
-bool Tests::testPartition() {
+bool Tests::testPartition()
+{
     mpi::environment env;
     mpi::communicator world;
     Graph g;
@@ -41,12 +43,14 @@ bool Tests::testPartition() {
 }
 
 /**
- * @brief Test the read function, can not verify the correctness in unit testing, but can test the performance
+ * @brief Test the read function, can not verify the correctness in unit
+ * testing, but can test the performance
  * @param FILL-ME-IN
  * @return FILL-ME-IN
  */
 
-bool Tests::testReadGraph() {
+bool Tests::testReadGraph()
+{
     mpi::environment env;
     mpi::communicator world;
     Graph g;
@@ -57,7 +61,7 @@ bool Tests::testReadGraph() {
         cout << "rank = " << world.rank() << endl;
         cout << "size of graph = " << g.size() << endl;
         cout << "num of edges = " << g.edgesNum() << endl;
-        //g.printLaplacianMat();
+        // g.printLaplacianMat();
     }
     env.~environment();
     return true;
@@ -69,7 +73,8 @@ bool Tests::testReadGraph() {
  * @return FILL-ME-IN
  */
 
-bool Tests::testReadByColour() {
+bool Tests::testReadByColour()
+{
     mpi::environment env;
     mpi::communicator world;
     Graph g;
@@ -91,7 +96,8 @@ bool Tests::testReadByColour() {
  * @return FILL-ME-IN
  */
 
-bool Tests::testPartitionWithClusters() {
+bool Tests::testPartitionWithClusters()
+{
     mpi::environment env;
     mpi::communicator world;
     Graph g;
@@ -99,8 +105,9 @@ bool Tests::testPartitionWithClusters() {
     bool gram_schmidt = true;
     g.readDotFormatByColour("./test/par_test_1024.dot", num);
     if (world.rank() == 0) {
-        //g.printDotFormat();
-        cout << "rank = " << world.rank() << ", size of graph = " << g.size() << ", num of edges = " << g.edgesNum() << endl;
+        // g.printDotFormat();
+        cout << "rank = " << world.rank() << ", size of graph = " << g.size()
+             << ", num of edges = " << g.edgesNum() << endl;
     }
     Partition partition(g, subgraphs, gram_schmidt);
     env.~environment();
@@ -112,6 +119,6 @@ bool Tests::testPartitionWithClusters() {
 //     //Tests::testPartition();
 //     //Tests::testReadGraph();
 //     //Tests::testPartitionWithClusters();
-// 
+//
 //     return 0;
 // }

@@ -7,31 +7,33 @@
 #ifndef PARTITION_H_
 #define PARTITION_H_
 
-#include <vector>
 #include <map>
+#include <vector>
 #include "graph.h"
 
-class Partition {
+class Partition
+{
+private:
+    typedef std::vector<double> Vector;
+    typedef std::vector<Vector> DenseMatrix;
 
-    private:
-        typedef std::vector<double> Vector;
-        typedef std::vector<Vector> DenseMatrix;
+    Vector laplacian_eigenvalues_;
+    DenseMatrix laplacian_eigen_mat_;
 
-        Vector laplacian_eigenvalues_;
-        DenseMatrix laplacian_eigen_mat_;
+    Vector getOneLapEigenVec(DenseMatrix& lanczos_vecs,
+                             DenseMatrix& tri_eigen_vecs,
+                             const int& vector_index);
+    inline int signMedian(double entry, double median);
 
-        Vector getOneLapEigenVec(DenseMatrix& lanczos_vecs, DenseMatrix& tri_eigen_vecs, const int& vector_index);
-        inline int signMedian(double entry, double median);
+public:
+    Partition() {}
+    Partition(const Graph& g, const int& subgraphs, bool GramSchmidt);
 
-    public:
-        Partition() {}
-        Partition(const Graph& g, const int& subgraphs, bool GramSchmidt);
-
-        void printLapEigenMat();
-        void printLapEigenvalues();
-        void outputLapEigenvalues();
-        std::vector<double> ritz_values;
-        std::vector<double> times;
+    void printLapEigenMat();
+    void printLapEigenvalues();
+    void outputLapEigenvalues();
+    std::vector<double> ritz_values;
+    std::vector<double> times;
 };
 
 #endif
