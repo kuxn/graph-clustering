@@ -15,11 +15,15 @@ class Analysis
 public:
     static double cutEdgePercent(const Graph& g);
     static void cutEdgeVertexTable(const Graph& g,
-                                   const std::vector<double>& ritz_values);
+                                   const std::vector<double>& ritzValues);
+    static void manuallyPartition(const Graph& g);
+    static void outputTimes(const int& procs, const int& size,
+                            const std::vector<double>& vec);
+    // For serial
     static void randomPartition(const Graph& g, const int& colours);
     static void evenPartition(const Graph& g, const int& colours);
-    static void benchmarks(bool GramSchmidt);
-    static void outputTimes(const int& size, const std::vector<double>& vec);
+    static void outputTimes(const int& numOfVertices, const std::vector<double>& vec);
+    //static void benchmarks(bool enableGramSchmidt);
 };
 
 #endif

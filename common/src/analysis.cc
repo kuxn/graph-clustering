@@ -16,35 +16,34 @@ using namespace std;
 
 /**
  * @brief The percentage of edges have been cut by partitioning
- * @param FILL-ME-IN
- * @return FILL-ME-IN
+ * @param g The graph to be analysed
+ * @return The percentage of the cut edges
  */
-
 double Analysis::cutEdgePercent(const Graph& g)
 {
-    int cut_edge_num = 0;
+    int numOfCutEdges = 0;
     if (g.subgraphsNum() == 1) {
         return 0.0;
     }
     for (auto it = g.cbegin(); it != g.cend(); ++it) {
-        int vertex_colour = g.getColour(it->first);
+        int vertexColour = g.getColour(it->first);
         for (const int& neighbour : it->second) {
-            int neighbour_colour = g.getColour(neighbour);
-            if (neighbour_colour != vertex_colour) {
-                cut_edge_num++;
+            int neighbourColour = g.getColour(neighbour);
+            if (neighbourColour != vertexColour) {
+                numOfCutEdges++;
             }
         }
     }
-    return (double)cut_edge_num / (double)g.edgesNum() / 2.0;
+    return (double)numOfCutEdges / (double)g.edgesNum() / 2.0;
 }
 
-/*-----------------------------------------------------------------------------
- *  Modified cutEdgePercent function calculating percentage of cut edges between
- *different subgraphs
- *-----------------------------------------------------------------------------*/
-
+/**
+ * cutEdgeVertexTable
+ * @param g graph to be analysed
+ * @param ritzValues
+ */
 void Analysis::cutEdgeVertexTable(const Graph& g,
-                                  const vector<double>& ritz_values)
+                                  const vector<double>& ritzValues)
 {
     int subgraphs = g.subgraphsNum();
 
@@ -89,7 +88,7 @@ void Analysis::cutEdgeVertexTable(const Graph& g,
     cout << "Edges:     " << g.edgesNum() << endl;
     cout << "Colours:   " << subgraphs << endl;
     cout << "Used Ritz values: ";
-    copy(ritz_values.cbegin(), ritz_values.cend(), it_double);
+    copy(ritzValues.cbegin(), ritzValues.cend(), it_double);
     cout << endl
          << "Cut Edge Percent: " << cutEdgePercent(g) * 100 << "%" << endl;
     cout << "/*----------------------------------------------------------------"
@@ -153,21 +152,19 @@ void Analysis::cutEdgeVertexTable(const Graph& g,
 
 /**
  * @brief Manually set equal number of vertices a colour and then compare the
- * cutEdgePercent with Partitioning algorithm
- * @param FILL-ME-IN
- * @return FILL-ME-IN
+ *        cutEdgePercent with Partitioning algorithm for parallel
+ * @param g The graph to be analysed
  */
-
 void Analysis::manuallyPartition(const Graph& g)
 {
     int size = g.size();
-    int subgraph_size = size / g.subgraphsNum();
+    int subgraphSize = size / g.subgraphsNum();
 
     int num = 0, colour = 0;
     for (auto it = g.cbegin(); it != g.cend(); ++it) {
         g.setColour(it->first, colour);
         num++;
-        if (num == subgraph_size) {
+        if (num == subgraphSize) {
             colour++;
             num = 0;
         }
@@ -175,12 +172,13 @@ void Analysis::manuallyPartition(const Graph& g)
 }
 
 /**
- * @brief output the times into a file
- * @param FILL-ME-IN
- * @return FILL-ME-IN
+ * @brief output the times into a file for parallel
+ * @param procs Number of processes
+ * @param numOfVertices
+ * @param vec Vector contains the time elapsed in Lanczos, TQLI, Partition
  */
 
-void Analysis::outputTimes(const int& procs, const int& size,
+void Analysis::outputTimes(const int& procs, const int& numOfVertices,
                            const vector<double>& vec)
 {
     cout << "In P0, Lanczos takes " << vec[0] << "s" << endl;
@@ -192,9 +190,106 @@ void Analysis::outputTimes(const int& procs, const int& size,
     filename += ".dat";
     ofstream Output(filename, ios::out | ios::app);
     // Output << "procs\tlanczos\ttqli\tpartition\t" << endl;
-    Output << procs << "\t" << size << "\t";
+    Output << procs << "\t" << numOfVertices << "\t";
     std::ostream_iterator<double> outIter(Output, "\t");
     std::copy(vec.cbegin(), vec.cend(), outIter);
     Output << endl;
     Output.close();
 }
+
+/**
+ * @brief Analysis for serial
+ */
+void Analysis::randomPartition(const Graph& g, const int& colours)
+{
+    int colour;
+    for (auto it = g.cbegin(); it != g.cend(); ++it) {
+        colour = rand() % colours;
+        g.setColour(it->first, colour);
+    }
+}
+
+void Analysis::evenPartition(const Graph& g, const int& colours)
+{
+    int size = g.size();
+    int subgraph_size = size / colours;
+
+    int num = 0, colour = 0;
+    for (int vertex = 0; vertex < size; vertex++) {
+        g.setColour(vertex, colour);
+        num++;
+        if (num == subgraph_size) {
+            colour++;
+            num = 0;
+        }
+    }
+}
+
+/**
+ * @brief output the times into a file
+ * @param numOfVertices
+ * @param vec Vector contains the time elapsed in Lanczos, TQLI, Partition
+ */
+void Analysis::outputTimes(const int& numOfVertices, const vector<double>& vec)
+{
+    cout << "Lanczos takes " << vec[0] << "s" << endl;
+    cout << "TQLI takes " << vec[1] << "s" << endl;
+    cout << "Partition takes " << vec[2] << "s" << endl;
+    string filename("./times/1.dat");
+    ofstream Output(filename, ios::out | ios::app);
+    // Output << "procs\tlanczos\ttqli\tpartition\t" << endl;
+    Output << 1 << "\t" << numOfVertices << "\t";
+    std::ostream_iterator<double> outIter(Output, "\t");
+    std::copy(vec.cbegin(), vec.cend(), outIter);
+    Output << endl;
+    Output.close();
+}
+
+/**
+ * @brief output time data for different number of vertices/colours
+ * @param enableGramSchmidt
+ */
+/*
+void Analysis::benchmarks(bool enableGramSchmidt)
+{
+    vector<std::string> filenames = {
+        "./test/par_test_1024.dot",   "./test/par_test_2048.dot",
+        "./test/par_test_5120.dot",   "./test/par_test_10240.dot",
+        "./test/par_test_102400.dot",
+    };
+    // vector<int> subgraphs = {2, 4, 8, 16, 32, 64};
+    vector<int> subgraphs = {8};
+    vector<std::vector<std::vector<double>>> output_times;
+    cout << "filenames.size() = " << filenames.size() << endl;
+
+    // output_times[filename][subgraphs][times]
+    for (unsigned int i = 0; i < filenames.size(); i++) {
+        Graph g;
+        g.readDotFormat(filenames[i]);
+        vector<std::vector<double>> subgraph_times;
+        for (unsigned int j = 0; j < subgraphs.size(); j++) {
+            Partition partition(g, subgraphs[j], enableGramSchmidt);
+            outputTimes(g.size(), partition.times);
+            subgraph_times.push_back(partition.times);
+        }
+        output_times.push_back(subgraph_times);
+    }
+
+    // Output times: Lanczos - 0; TQLI - 1; Partition - 2;
+    for (int i = 0; i < 3; i++) {
+        string filename("./times/serial_");
+        filename += to_string(i);
+        filename += ".dat";
+        ofstream Output(filename, ios::out | ios::binary | ios::trunc);
+        Output << "subgraphs\t100\t200\t500\t1k\t5k\t10k" << endl;
+        for (unsigned int row = 0; row < subgraphs.size(); row++) {
+            Output << subgraphs[row] << "\t";
+            for (unsigned int col = 0; col < filenames.size(); col++) {
+                Output << output_times[col][row][i] << "\t";
+            }
+            Output << endl;
+        }
+        Output.close();
+    }
+}
+*/

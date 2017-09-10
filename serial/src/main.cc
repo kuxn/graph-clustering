@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     }
 
     if (benchmarks) {
-        Analysis::benchmarks(gram_schmidt);
+        // Analysis::benchmarks(gram_schmidt);
     } else {
         Partition partition(*g, colours, gram_schmidt);
         if (output) {
