@@ -22,16 +22,17 @@ using namespace std;
 
 double SQR(double a);
 double pythag(double a, double b);
-/**
- * @brief Computes sqrt(a^2 + b^2) without destructive underflow or overflow.
- * @param FILL-ME-IN
- * @return FILL-ME-IN
- */
 
 // Square a double value
 static double sqrarg;
 double SQR(double a) { return (sqrarg = (a)) == 0.0 ? 0.0 : sqrarg * sqrarg; }
 
+/**
+ * @brief Computes sqrt(a^2 + b^2) without destructive underflow or overflow.
+ * @param a Double
+ * @param b Double
+ * @return Double
+ */
 double pythag(double a, double b)
 {
     double absa, absb;
@@ -45,27 +46,14 @@ double pythag(double a, double b)
 
 /**
  * @brief Calculate the eigenvalues and eigenvectors of a sysmetric triangular
- * matrix
- * @param FILL-ME-IN
- * @return FILL-ME-IN
+ *        matrix
+ * @param d[0..n-1] contains the diagonal elements of the tridiagonal
+ *        matrix, the eigenvalues will be written.
+ * @param e[0..n-1] inputs the subdiagonal elements of the tridiagonal
+ *        matrix, with e[n-1] arbitrary.
+ * @param z[0..n-1][0..n-1] is input as the identity matrix, the kth
+ *        column of z returns the normalized eigenvector corresponding to d[k].
  */
-
-/*-----------------------------------------------------------------------------
- *  Signiture of the funtion:
- * 	input:
- *		d[0..n-1] contains the diagonal elements of the tridiagonal
- *matrix
- * 		e[0..n-1] inputs the subdiagonal elements of the tridiagonal
- *matrix, with e[n-1] arbitrary
- *		z[0..n-1][0..n-1] is input as the identity matrix.
- *
- *	output:
- *		d[0..n-1] returns the eigenvalues
- *		e[0..n-1] is destroyed
- *		z[0..n-1][0..n-1] the kth column of z returns the normalized
- *eigenvector corresponding to d[k].
- *-----------------------------------------------------------------------------*/
-
 void tqli(vector<double>& d, vector<double>& e, vector<vector<double>>& z)
 {
 #ifdef VT_

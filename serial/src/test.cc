@@ -186,8 +186,8 @@ bool Tests::testCutEdgeVertexTable()
      *-----------------------------------------------------------------------------
      * Number of nodes in each subgraph
      *-----------------------------------------------------------------------------
-    Colour: 	0	1	2	3
-    Vertices: 	6	5	3	6
+    Colour:     0	1	2	3
+    Vertices:   6	5	3	6
      *-----------------------------------------------------------------------------
      * Edges table after partitioning
      * Each element represents number of edges (inside)/between subgraphs
@@ -206,14 +206,14 @@ bool Tests::testReothogonalisation()
     Graph g(100);
     Partition partition1(g, 4, false);
     cout << "WITHOUT reorthogonalisation: " << endl;
-    Analysis::cutEdgeVertexTable(g, partition1.ritz_values);
+    Analysis::cutEdgeVertexTable(g, partition1.ritzValues);
     cout << "eigenvalues:";
     // partition1.printLapEigenvalues();
     // partition1.printLapEigenMat();
 
     Partition partition2(g, 4, true);
     cout << "WITH reorthogonalisation: " << endl;
-    Analysis::cutEdgeVertexTable(g, partition2.ritz_values);
+    Analysis::cutEdgeVertexTable(g, partition2.ritzValues);
     // cout << "eigenvalues:";
     // partition2.printLapEigenvalues();
     // partition2.printLapEigenMat();

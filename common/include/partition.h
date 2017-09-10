@@ -14,15 +14,14 @@
 class Partition
 {
 private:
-    typedef std::vector<double> Vector;
-    typedef std::vector<Vector> DenseMatrix;
+    using DenseMatrix = std::vector<std::vector<double>>;
 
-    Vector laplacian_eigenvalues_;
-    DenseMatrix laplacian_eigen_mat_;
+    std::vector<double> laplacianEigenvalues_;
+    DenseMatrix laplacianEigenMatrix_;
 
-    Vector getOneLapEigenVec(DenseMatrix& lanczos_vecs,
-                             DenseMatrix& tri_eigen_vecs,
-                             const int& vector_index);
+    std::vector<double> getOneLapEigenVec(DenseMatrix& lanczosVectors,
+                                          DenseMatrix& tridiagonalEigenVectors,
+                                          const int& vectorIndex);
     inline int signMedian(double entry, double median);
 
 public:
@@ -32,7 +31,7 @@ public:
     void printLapEigenMat();
     void printLapEigenvalues();
     void outputLapEigenvalues();
-    std::vector<double> ritz_values;
+    std::vector<double> ritzValues;
     std::vector<double> times;
 };
 

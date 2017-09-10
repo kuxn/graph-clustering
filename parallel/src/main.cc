@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
         Analysis::outputTimes(world.size(), vertices, partition.times);
         double t_output = timer_io_output.elapsed();
         cout << "output takes " << t_output << "s" << endl;
-        Analysis::cutEdgeVertexTable(*g, partition.ritz_values);
+        Analysis::cutEdgeVertexTable(*g, partition.ritzValues);
     }
 
     delete g;
