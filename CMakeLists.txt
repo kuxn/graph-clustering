@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7.1)
+cmake_minimum_required(VERSION 3.5.2)
 project(graph-clustering C CXX)
 
 set(CMAKE_DISABLE_SOURCE_CHANGES ON) # disable in source build
@@ -17,6 +17,16 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/common/src COMMON_SOURCE_FILES)
 
 # -- Subdirectory that has CMakeLists
 
+message("/. CMAKE_BINARY_DIR: " ${CMAKE_BINARY_DIR})
+message("/. CMAKE_SOURCE_DIR: " ${CMAKE_SOURCE_DIR})
+message("/. CMAKE_CURRENT_BINARY_DIR: " ${CMAKE_CURRENT_BINARY_DIR})
+message("/. CMAKE_CURRENT_SOURCE_DIR: " ${CMAKE_CURRENT_SOURCE_DIR})
+message("/. graph-clustering_BINARY_DIR: " ${graph-clustering_BINARY_DIR})
+message("/. graph-clustering_SOURCE_DIR: " ${graph-clustering_SOURCE_DIR})
+
+# -- For add_test in the subdirectory, $ make test
+enable_testing()
+
 add_subdirectory(serial)
 add_subdirectory(parallel)
-
+add_subdirectory(tests)
