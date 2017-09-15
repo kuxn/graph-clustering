@@ -27,7 +27,7 @@ using std::endl;
  */
 
 /*-----------------------------------------------------------------------------
- * 	input:
+ *      input:
  *		G contains all the elements of the original graph
  *
  *	output:

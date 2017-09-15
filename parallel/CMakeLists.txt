@@ -1,10 +1,10 @@
 # -- Include
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include) # add given directories to current list of directories
+include_directories(${PARALLEL_INCLUDE_DIR}) # add given directories to current list of directories
 
 # -- Source
 
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src SOURCE_FILES)
+# aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src SOURCE_FILES)
 
 # -- Packages
 find_package(MPI REQUIRED)
@@ -17,10 +17,18 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
+# -- Libs
+
+add_library(parallel_core ${COMMON_SOURCE_FILES} ${PARALLEL_SOURCE_FILES})
+
 # -- Binary
 
-add_executable(main_parallel ${COMMON_SOURCE_FILES} ${SOURCE_FILES})
-target_link_libraries(main_parallel ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES})
+add_executable(main_parallel ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc)
+target_link_libraries(main_parallel ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES} parallel_core)
+
+# -- Add gtests to ctest
+
+add_gtest(ParallelTest ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES} parallel_core)
 
 # -- Options
 
