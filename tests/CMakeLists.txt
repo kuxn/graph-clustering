@@ -42,3 +42,6 @@ message("<gtest>/. gtest_BINARY_DIR: " ${gtest_BINARY_DIR})
 if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
+
+set(ENV{TEST_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/dotfiles)
+message("set environment variable: "  $ENV{TEST_FILES})
