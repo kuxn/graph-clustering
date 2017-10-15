@@ -6,8 +6,7 @@
 
 ## Compiling
 ```
-make serial
-make parallel
+mkdir build && cd build && cmake ..
 ```
 
 ## License
