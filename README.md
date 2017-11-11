@@ -4,9 +4,11 @@
 - GCC: 4.8.2 or newer
 - OpenMPI: 1.8.6 or newer
 
-## Compiling
+## Run
 ```
 mkdir build && cd build && cmake ..
+make
+ctest
 ```
 
 ## License

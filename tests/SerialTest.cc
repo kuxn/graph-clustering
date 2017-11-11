@@ -28,8 +28,9 @@ protected:
         if (path != nullptr) {
             filePath = path;
         } else {
-            std::cout << "Please export TEST_FILES to the path of test files"
-                      << std::endl;
+            filePath = "../../tests/dotfiles";
+            // std::cout << "Please export TEST_FILES to the path of test files"
+            //<< std::endl;
         }
     }
     Graph g;

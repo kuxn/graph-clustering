@@ -24,13 +24,6 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/parallel/src PARALLEL_SOURCE_FI
 list(REMOVE_ITEM PARALLEL_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/parallel/src/main.cc)
 include_directories(${COMMON_INCLUDE_DIR})
 
-message("/. CMAKE_BINARY_DIR: " ${CMAKE_BINARY_DIR})
-message("/. CMAKE_SOURCE_DIR: " ${CMAKE_SOURCE_DIR})
-message("/. CMAKE_CURRENT_BINARY_DIR: " ${CMAKE_CURRENT_BINARY_DIR})
-message("/. CMAKE_CURRENT_SOURCE_DIR: " ${CMAKE_CURRENT_SOURCE_DIR})
-message("/. graph-clustering_BINARY_DIR: " ${graph-clustering_BINARY_DIR})
-message("/. graph-clustering_SOURCE_DIR: " ${graph-clustering_SOURCE_DIR})
-
 # -- For add_test in the subdirectory, $ make test
 
 enable_testing()
